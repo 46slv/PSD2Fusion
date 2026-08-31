@@ -15,8 +15,14 @@ the user-facing handoff; keep that directory beside the `.comp` file.
 - Real PSD artifact: `D:\Documents\PSD2Fusion-real-smoke-hair\PSD2Fusion.comp`.
   Source: the user's `Hair.psd`; conversion produced 17 assets, 26 semantic
   layers, 2 PSD groups, and 19 Merge nodes.
-- Synthetic Group artifact: `D:\Documents\PSD2Fusion\fixture_out4\PSD2Fusion.comp`.
-- Synthetic Clipping artifact: `D:\Documents\PSD2Fusion\clip_out4\PSD2Fusion.comp`.
+- Combined Group + Clipping PSD fixture:
+  `D:\Documents\PSD2Fusion-smoke-groupclip.psd`, with output
+  `D:\Documents\PSD2Fusion-real-smoke-groupclip\PSD2Fusion.comp`.
+  It is a small, ordinary PSD (4 semantic layers, 1 group, 1 clipping chain)
+  kept as a direct user trial for the two required semantics together.
+- Individual probes remain available as
+  `D:\Documents\PSD2Fusion\fixture_out4\PSD2Fusion.comp` (Group) and
+  `D:\Documents\PSD2Fusion\clip_out4\PSD2Fusion.comp` (Clipping).
 
 ## Observed host results
 
@@ -28,6 +34,7 @@ for all three artifacts:
 | real Hair | 42 | 2 | 17 | 19 | 1 | n/a |
 | Group fixture | 8 | 1 | 2 | 3 | 1 | n/a |
 | Clipping fixture | 7 | 0 | 2 | 3 | 1 | `ClipInR_d8f0034495`, `Operator=In` |
+| Combined Group + Clipping PSD | 12 | 1 | 3 | 5 | 1 | `ClipInRI_c5fba3ce84`, `Operator=In` |
 
 `MediaOut1` was found in each loaded composition. The clipping probe also
 found the generated `Merge` whose `Operator` input is `In`, confirming that
@@ -51,8 +58,9 @@ path above.
 2. Open/import `PSD2Fusion.comp` in the Fusion page while retaining its
    sibling `assets/` directory.
 3. Inspect the generated Loader/Merge chain, `GroupOperator` containers, and
-   `MediaOut1`. For a clipping check, use the clipping fixture above or a PSD
-   with a contiguous Photoshop clipping chain.
+   `MediaOut1`. For a combined Group + Clipping check, open
+   `D:\Documents\PSD2Fusion-real-smoke-groupclip\PSD2Fusion.comp` (its source
+   PSD is `D:\Documents\PSD2Fusion-smoke-groupclip.psd`).
 
 For scripted host loading, the minimal non-destructive call is:
 
