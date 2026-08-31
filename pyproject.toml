@@ -1,0 +1,16 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "psd2fusion"
+version = "0.1.0"
+description = "Deterministic PSD semantic extraction and Fusion composition generation"
+requires-python = ">=3.10"
+dependencies = ["psd-tools>=1.18,<1.19", "Pillow>=10"]
+
+[tool.setuptools]
+packages = ["psd2fusion"]
+
+[project.scripts]
+psd2fusion = "psd2fusion.cli:main"

@@ -1,0 +1,10 @@
+__pycache__/
+*.py[cod]
+*.egg-info/
+*_fusion/
+*_out/
+*_out*/
+fixture*.psd
+clipfixture*.psd
+smoke-output/
+smoke-*/
