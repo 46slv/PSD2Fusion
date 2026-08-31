@@ -2,128 +2,204 @@
 
 Use this policy when the supervising/root agent is a strong Sol-class model. Its purpose is to prevent strong reasoning from turning a bounded Goal into repeated audits, speculative architecture, or unnecessary framework work.
 
-## Core rule
+## Core operating bias
 
-Use Sol to make the few decisions that materially improve verified progress. Do not use stronger reasoning as permission to widen scope.
+**Think deeply about architecture once. Implement by the shortest practical route. Validate broadly only after a usable slice exists.**
 
-`Goal -> minimum decision needed -> delegate/act -> verify once against the declared acceptance -> stop or repair`
+Default sequence:
 
-The current Goal and its acceptance criteria are the boundary. Sol must not silently replace them with a stricter, broader, or more elegant Goal.
+`deep architecture pass -> freeze the needed boundaries -> fastest implementation -> continuation smoke only -> first usable build -> minimum host smoke -> user use -> fix what real use exposes`
 
-## Default behavior
+The objective is not to prove the system theoretically complete before it can be used. The objective is to get a real PSD into a real Fusion graph quickly enough that the user can judge the product in practice.
 
-- Prefer the smallest design that satisfies the current user-visible behavior and keeps the next known extension possible.
-- Prefer an existing boring mechanism over a new abstraction when both satisfy the current contract.
-- Treat future extensibility as a constraint only when a concrete next requirement demonstrates it.
-- Use Luna for routine repository reading, implementation, debugging, fixture generation, and focused validation when delegation is useful.
-- Keep Sol on architecture decisions, ambiguous boundaries, acceptance quality, difficult causal diagnosis, and final adjudication.
-- Once Sol resolves an ambiguity, return routine execution to Luna instead of remaining the implementation worker by default.
+## 1. Architecture deep, implementation small
 
-## Anti-overdesign rules
+Architecture quality and implementation size are different things.
 
-Do not introduce any of the following without evidence that the current Goal needs it:
+Before substantial implementation, Sol should reason deeply enough to settle only the boundaries that are expensive to reverse, such as:
+- what semantic information must survive PSD parsing;
+- where PSD semantics end and Fusion graph generation begins;
+- how group semantics differ from graph layout/visual grouping;
+- how clipping is represented independently of serialization;
+- where host-specific behavior is isolated;
+- where unsupported semantics fall back to rasterization/baking.
 
+Then stop architecting and implement.
+
+Do not turn the architecture pass into building generalized infrastructure. A deep design may still result in five small modules and direct functions.
+
+Re-open an architecture decision only when implementation/runtime evidence contradicts it or when a concrete required behavior cannot fit it without destructive change.
+
+## 2. First usable build outranks completeness
+
+Optimize for the shortest route to a tool the user can actually try.
+
+The early product target should be approximately:
+1. select/open a PSD;
+2. read enough layer semantics;
+3. generate a Fusion composition/graph;
+4. Resolve/Fusion recognizes and loads it;
+5. ordinary layers work;
+6. one real Group case is readable;
+7. one real Clipping case behaves plausibly enough for user testing.
+
+Do not delay this build for complete Photoshop parity, exhaustive blend-mode coverage, perfect layout, generalized fallback systems, performance optimization, packaging polish, or comprehensive regression infrastructure.
+
+A known limitation with a direct implementation is preferable to an elegant subsystem that postpones first use.
+
+## 3. Sol anti-overengineering rules
+
+Sol must not widen the Goal merely because it can see future complexity.
+
+Do not introduce without current evidence:
 - plugin/framework systems;
-- generalized intermediate representations beyond the semantic distinctions already required by tested PSD behavior;
-- compatibility layers for hypothetical future hosts or PSD features;
-- migration/versioning machinery before there is persisted data or a real compatibility boundary;
-- configurable strategy/factory/provider layers for a single current implementation;
-- generalized graph optimizers, schedulers, caches, registries, dependency injection, event buses, or orchestration frameworks;
-- broad fallback matrices when one explicit fallback handles the demonstrated unsupported case;
-- performance architecture before measurement shows a relevant bottleneck;
-- speculative support for Adjustment Layers, Smart Objects, Layer Styles, text editing, or unrelated Photoshop semantics while the active Goal concerns the current core.
+- generalized IR layers beyond semantics currently needed to generate the first working graph;
+- strategy/factory/provider abstractions for one implementation;
+- registries, dependency-injection systems, event buses, schedulers, graph optimizers, generalized caches, migration/versioning frameworks;
+- compatibility layers for hypothetical hosts or future PSD features;
+- broad fallback matrices when one explicit fallback is sufficient;
+- performance architecture before a measured bottleneck;
+- speculative Adjustment Layer, Smart Object, Layer Style, native text, or unrelated Photoshop support.
 
-A clean extension seam is acceptable. Building the extension before it is required is not.
+Prefer direct code first. Extract an abstraction after a second real use demonstrates duplication or conflicting behavior.
 
-## Architecture decision test
+A clean seam is useful. Pre-building every implementation behind the seam is not.
 
-Before adding an abstraction, Sol should be able to answer at least one of these with current evidence:
+## 4. Reuse prior art aggressively
 
-1. Which two or more currently required behaviors would otherwise duplicate or conflict?
-2. Which verified host/parser contract requires the boundary?
-3. Which current test becomes materially simpler or more correct because of it?
-4. Which already-authorized near-term requirement would otherwise force a destructive rewrite?
+Do not rebuild solved mechanics for originality.
 
-If none applies, prefer local code and defer the abstraction.
+The previously researched PSD/Fusion projects are implementation references, especially:
+- `NUROKU/DaVinciResolve_PSDFusionGenerator`;
+- `bixcl/PSDconverter`;
+- `34j/DaVinciResolve.PSDGeneratorBuilder`;
+- other source-backed prior art recorded under `docs/research/` once it is in the repository.
 
-## Research bounds
+Use prior art to shorten implementation:
+- copy/adapt proven `.comp` / `.setting` serialization patterns;
+- reuse known layer-position/merge construction logic;
+- reuse PSD extraction patterns;
+- reuse loader/template generation and path-handling approaches;
+- reuse small utilities instead of rewriting them when doing so is cleaner and faster.
 
-Research only until it can change a pending implementation/design decision.
+Code copying is allowed only when the source license permits it. Preserve required license notices/attribution and record the source repository + relevant revision/path when code is materially copied or adapted. Do not copy code with incompatible, unclear, or proprietary licensing. Ideas, observed behavior, interfaces, and independently reimplemented patterns may still be used where legally appropriate.
 
-- Start from the exact unresolved question.
-- Prefer one authoritative source or direct runtime/repo evidence per claim class; add more sources only when they disagree or authority is weak.
-- Do not continue collecting equivalent sources after the decision-relevant fact is established.
-- Do not turn a research task into implementation unless the Goal explicitly authorizes implementation.
-- Record unresolved host-only facts as probes/TODO decisions rather than inventing architecture around uncertainty.
+Prefer an existing maintained library such as `psd-tools` over writing a PSD parser unless a demonstrated semantic gap forces otherwise.
 
-For design-review tasks, produce decision evidence and options; do not pre-implement every option.
+When choosing between inventing and adapting a working implementation, **adapt first**.
 
-## Verification budget
+## 5. Implementation cadence: build first
 
-Verification should match risk and acceptance, not model capability.
+Once the architecture pass has produced a bounded route, implementation should move continuously toward a complete vertical slice.
 
-Default closure for an ordinary bounded change:
+During implementation:
+- do not stop after every small edit for broad validation;
+- do not repeatedly run full suites;
+- do not create tests for every internal helper before the flow exists;
+- do not ask reviewers to audit incomplete intermediate states unless a concrete blocker requires it;
+- do not repeatedly reconsider architecture because code is temporarily ugly;
+- TODOs and local hard-coded choices are acceptable when reversible and visible.
 
-1. focused tests/fixtures for the changed semantic boundary;
-2. the smallest relevant integration/static check;
-3. host or visual comparison only when the acceptance actually depends on host/visual behavior;
-4. one concise self-review of the final diff for unmet acceptance or obvious regression risk.
+Use only **continuation checks** needed to avoid developing blind:
+- syntax/import succeeds;
+- script starts;
+- expected file is emitted;
+- generated syntax is parseable enough to continue;
+- a dependency/API assumption is not obviously false.
 
-After all declared Done checks pass, stop. Do not add extra review loops merely to increase confidence.
+Continuation checks are not an acceptance campaign. Keep them cheap.
 
-Additional checks are justified only when:
-- a required check failed;
-- the change crosses an untested boundary;
-- the acceptance oracle is demonstrably weak/ambiguous;
-- the diff exposes a concrete high-risk regression surface;
-- an independent review identifies a specific defect hypothesis.
+## 6. Validation happens after the slice is assembled
 
-Do not recursively review the review. Do not spawn multiple reviewers without independent high-value scopes.
+The default is **implementation first, meaningful validation after a complete candidate exists**.
 
-## No-progress versus more checking
+For the first usable build, minimum validation is deliberately small:
+1. the program/script runs;
+2. it accepts a PSD;
+3. it produces the intended Fusion artifact;
+4. Resolve/Fusion recognizes or loads the artifact;
+5. a minimal ordinary-layer example appears;
+6. the current Group/Clipping target can be tried in the host without immediate failure.
 
-If evidence already supports PASS, more checking is not progress.
+If those pass, hand the build to the user quickly.
 
-If evidence supports FAIL or INCONCLUSIVE:
-- localize the smallest unresolved boundary;
-- change hypothesis/approach;
-- run the smallest check capable of falsifying it.
+Do not block first use on:
+- exhaustive fixture matrices;
+- full visual parity sweeps;
+- every blend mode;
+- every malformed PSD;
+- broad cross-version testing;
+- multiple independent reviews;
+- extensive CI;
+- theoretical proof that the graph model covers future Photoshop semantics.
 
-Do not respond to uncertainty by running the entire suite repeatedly, re-reading the entire repository, or redesigning adjacent systems.
+The user using the tool is an important validation surface. Real failures should become the next focused bugfix/fixture/regression case.
 
-## Scope control
+Exceptions: perform early safety checks when an action risks destructive data loss, credentials, irreversible mutation, or uncontrolled external side effects. This exception is about safety, not software perfection.
 
-During a task, classify discoveries as:
+## 7. User-driven hardening loop
 
-- **required now** — blocks current acceptance; fix it;
-- **small adjacent defect** — fix only if clearly safe, directly caused/exposed by the current work, and validation remains bounded;
-- **future candidate** — record briefly in the appropriate issue/doc and do not implement;
-- **interesting only** — leave it alone.
+After first usable build:
 
-Finding a possible improvement does not make it part of the Goal.
+`user tries real PSD -> observe concrete failure/friction -> localize -> fix -> add the smallest regression guard -> ship again`
 
-## PSD2Fusion current product bias
+Prefer evidence from actual user files and Resolve behavior over speculative edge-case design.
 
-Until repository authority says otherwise, optimize for a usable core rather than Photoshop completeness:
+Only promote behavior into a durable test/harness when it is required by the product, exposes a real failure, or protects a boundary likely to regress.
 
-- layer compositing correctness;
-- readable PSD group representation;
-- clipping semantics;
-- enough blend/alpha/pass-through handling to support demonstrated fixtures;
-- deterministic graph generation/layout;
-- explicit raster fallback for unsupported semantics where needed.
+Do not front-load a large verification framework before there is a product behavior worth protecting.
 
-Do not chase complete Photoshop feature parity as an implicit acceptance criterion.
+## 8. Research stop rule
 
-## Completion / stop rule
+Research is complete when it supports the pending architecture decision or implementation choice.
 
-Stop the task when:
-- the declared Goal is satisfied;
-- required acceptance evidence is present;
-- no known regression directly attributable to the change remains;
-- host-only claims are correctly marked unverified when host evidence was unavailable;
-- the final diff is coherent and bounded.
+- Do not collect equivalent sources after the decision-relevant fact is established.
+- For uncertain Resolve behavior, prefer a minimal host probe over further abstract reasoning.
+- Record unknowns explicitly and design a reversible seam around them if needed.
+- Do not wait for every host semantic to be known before starting the core implementation.
 
-At that point, report remaining ideas as out-of-scope notes. Do not convert them into another implementation cycle without a new Goal.
+When uncertainty can be answered by building the minimal candidate and trying it, build it.
 
-A smaller verified solution is preferable to a broader theoretically complete system that delays usable behavior.
+## 9. Luna / Sol split
+
+Use Sol for:
+- one deep architecture pass;
+- hard semantic boundary decisions;
+- resolving conflicting evidence;
+- bounded diagnosis when Luna is genuinely stuck;
+- deciding whether a discovered issue matters now.
+
+Use Luna for:
+- repository reading/localization;
+- adapting prior-art code;
+- routine implementation;
+- repetitive graph/serialization work;
+- debugging;
+- small smoke checks;
+- host trial execution when available.
+
+After Sol answers the hard question, return execution to Luna. Do not let Sol remain in a repeated inspect/review/rewrite loop.
+
+## 10. Scope control
+
+Classify discoveries:
+- **blocks first usable build** -> fix now;
+- **prevents basic user use** -> fix now;
+- **small reversible imperfection** -> ship it and observe;
+- **future feature** -> note briefly, do not implement;
+- **interesting architecture possibility** -> ignore until evidence requires it.
+
+Finding an improvement is not authority to implement it.
+
+## 11. Stop rule
+
+For early development, stop and hand off to user as soon as:
+- a coherent first-use flow exists;
+- the application/host recognizes it;
+- the basic target behavior can be exercised;
+- there is no immediate destructive failure;
+- known limitations are stated briefly.
+
+Do not continue polishing because more checking is possible.
+
+For PSD2Fusion, **a rough tool that successfully imports a real PSD into a readable Fusion graph is more valuable than a nearly perfect architecture that has not yet imported one.**
