@@ -35,9 +35,10 @@ clipping is represented as Fusion graph logic rather than omitted metadata.
 
 The Resolve process remained responsive after the load-only smoke. A separate
 exploratory call to the Fusion scripting `Composition:Render` method (not used
-by PSD2Fusion and not part of this handoff) disconnected Resolve; it was
-stopped and is not treated as product evidence. The accepted smoke is the
-load/graph-recognition path above.
+by PSD2Fusion and not part of this handoff) disconnected/terminated Resolve;
+Resolve was restarted before repeating the accepted smoke. That call is not
+treated as product evidence. The accepted smoke is the load/graph-recognition
+path above.
 
 ## User trial
 
