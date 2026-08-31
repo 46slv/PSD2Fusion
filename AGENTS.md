@@ -12,7 +12,7 @@ Use this precedence when facts conflict:
 4. repo documentation and historical notes;
 5. inference.
 
-Read `README.md` for project identity. For non-trivial implementation, debugging, validation, or multi-agent work, also read `docs/AGENT_OPERATIONS.md`. Do not load every document preemptively.
+Read `README.md` for project identity. For non-trivial implementation, debugging, validation, or multi-agent work, also read `docs/AGENT_OPERATIONS.md`. When the supervising/root model is Sol or another strong reasoning model, also read `docs/SOL_OPERATIONS.md` to bound checking, research, and architecture scope. Do not load every document preemptively.
 
 ## Product invariants
 - Preserve PSD layer order, visibility, opacity, positioning, and supported blend semantics when they affect output.
