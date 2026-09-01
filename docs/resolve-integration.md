@@ -29,9 +29,17 @@ and has been checked by the user.
 The launcher writes to <PSD folder>\<PSD stem>_fusion by default.  If that
 folder already contains a PSD2Fusion composition or manifest, a confirmation
 dialog is required before --force is passed for that run.  On success it
-calls Fusion's LoadComp and reports whether MediaOut1 was recognized.  If
-automatic loading is unavailable, the dialog shows the .comp path and its
-neighboring assets directory for manual opening.
+reads the generated `.comp` settings and pastes that tool set into the Fusion
+Composition that was current when the script started.  The generated `.comp`,
+assets, and manifest remain available as recovery/debug artifacts.
+
+This differs from `LoadComp` and `TimelineItem.ImportFusionComp(path)`, which
+load or add a separate composition instead of inserting tools into the graph
+currently shown in Resolve's integrated Fusion page.  The launcher verifies
+the current Composition identity before and after insertion, preserves every
+pre-existing tool object, and wraps the paste in one undo operation.  It does
+not replace the Composition, delete nodes, or save the project/timeline.  If
+insertion fails after changing the graph, it attempts and verifies an undo.
 
 The launcher writes a short-lived UTF-8 JSON request for the bridge.  Only the
 installed Python/bridge paths and the temporary request/log paths are passed
@@ -48,16 +56,18 @@ source of truth for conversion.
 
 ## Validation on this machine
 
-On 2026-09-01 with DaVinci Resolve Studio 21.0.3.0007, the menu entry was
-visible in the Fusion page.  Selecting `D:\Documents\PSD2Fusion\clipfixture.psd`
-from the picker generated `clipfixture_fusion\PSD2Fusion.comp` and its
-`assets` directory.  The launcher then loaded the composition through Fusion's
-`LoadComp`; the returned composition contained `MediaOut1`.  The smoke used a
-new empty Resolve project and did not edit or save an existing project.  The
-same menu path was subsequently exercised with `D:\Downloads\a.psd` and
-completed with the same artifact and `MediaOut1` checks.  The UTF-8 bridge
-request was also verified with `D:\Downloads\アニメーション 20260812.psd`,
-producing its `.comp`, `manifest.json`, and `assets` directory.
+On 2026-09-01 with DaVinci Resolve Studio 21.0.3.0007, an installed-docs and
+runtime probe established `fu:GetCurrentComp()`, `bmd.readfile`, and the
+Composition `Paste`/undo APIs as the shortest current-graph insertion path.
+The Workspace > Scripts > Comp > PSD2Fusion flow then passed with both an ASCII
+PSD path and a Japanese/space PSD path in a new unsaved validation project.
+Each run inserted 12 tools into the same selected Composition: one
+`GroupOperator`, three `Loader`, five `Merge` (including the clipping input),
+two `Background`, and one generated `MediaOut`.  The original `MediaOut` and
+all tools from the first run remained the same runtime objects after the
+second run; the generated final Merge-to-MediaOut connection was visible and
+Resolve remained responsive.  Existing Group/clipping behavior and the
+pre-existing no-current-Composition guard were unchanged.
 
 ## Known limitations
 
@@ -65,10 +75,8 @@ producing its `.comp`, `manifest.json`, and `assets` directory.
   after moving the repository or changing the Python installation.
 - The default output is deliberately fail-closed for an existing result unless
   the overwrite checkbox is explicitly enabled.
-- `LoadComp` is a non-destructive Fusion load.  Resolve may keep the current
-  timeline composition visible in its page UI; the completion dialog always
-  shows the exact `.comp` and `assets` paths for manual opening if the loaded
-  tab is not surfaced by that Resolve layout.
+- The inserted graph retains the generated `MediaOut` as a recovery-complete
+  tool set; it does not reconnect or remove a pre-existing `MediaOut`.
 - Unsupported Photoshop features retain the existing FIRST_USABLE core's
   warnings/fallbacks; this integration does not add masks, text, smart objects,
   adjustment layers, or render automation.

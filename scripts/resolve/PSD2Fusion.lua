@@ -275,6 +275,179 @@ local function resolve_comp_state()
     }
 end
 
+local function snapshot_tools(target_comp)
+    if target_comp == nil or target_comp.GetToolList == nil then
+        return nil, "Current Composition does not expose GetToolList."
+    end
+    local ok, tools = pcall(function()
+        return target_comp:GetToolList(false)
+    end)
+    if not ok then
+        return nil, safe_text(tools)
+    end
+    if tools == nil then
+        return nil, "GetToolList returned nil."
+    end
+    local references = {}
+    local count = 0
+    for _, tool in pairs(tools) do
+        references[tool] = true
+        count = count + 1
+    end
+    return {count = count, references = references}, nil
+end
+
+local function original_tools_preserved(before, after)
+    if before == nil or after == nil then
+        return false
+    end
+    for tool, _ in pairs(before.references) do
+        if not after.references[tool] then
+            return false
+        end
+    end
+    return true
+end
+
+local function settings_have_tools(settings)
+    if type(settings) ~= "table" or type(settings.Tools) ~= "table" then
+        return false
+    end
+    for _, _ in pairs(settings.Tools) do
+        return true
+    end
+    return false
+end
+
+local function insert_generated_graph(target_comp, composition_path)
+    if bmd == nil or bmd.readfile == nil then
+        return false, "Fusion bmd.readfile API is unavailable."
+    end
+    local required = {"Paste", "GetToolList", "Lock", "Unlock", "StartUndo", "EndUndo", "Undo"}
+    for _, method_name in ipairs(required) do
+        local method_ok, method = pcall(function()
+            return target_comp[method_name]
+        end)
+        if not method_ok or method == nil then
+            return false, "Current Composition does not expose " .. method_name .. "."
+        end
+    end
+
+    local read_ok, settings = pcall(function()
+        return bmd.readfile(composition_path)
+    end)
+    if not read_ok then
+        return false, "Could not read generated Fusion settings: " .. safe_text(settings)
+    end
+    if not settings_have_tools(settings) then
+        return false, "Generated Fusion settings did not contain a non-empty Tools table."
+    end
+
+    local identity_before = resolve_comp_state()
+    if identity_before.current == nil or identity_before.current ~= target_comp then
+        return false, "Current Fusion Composition changed before insertion; no graph was inserted."
+    end
+    local before, before_error = snapshot_tools(target_comp)
+    if before == nil then
+        return false, "Could not snapshot current Composition before insertion: " .. safe_text(before_error)
+    end
+
+    local locked = false
+    local undo_started = false
+    local paste_result = nil
+    local after = nil
+    local failure_detail = nil
+    local operation_ok, operation_error = xpcall(function()
+        target_comp:Lock()
+        locked = true
+
+        local locked_identity = resolve_comp_state()
+        if locked_identity.current == nil or locked_identity.current ~= target_comp then
+            error("Current Fusion Composition changed before the locked insertion.")
+        end
+
+        target_comp:StartUndo("PSD2Fusion insert generated graph")
+        undo_started = true
+        paste_result = target_comp:Paste(settings)
+        local after_error = nil
+        after, after_error = snapshot_tools(target_comp)
+        if after == nil then
+            error("Could not snapshot current Composition after insertion: " .. safe_text(after_error))
+        end
+
+        local identity_after = resolve_comp_state()
+        local grew = after.count > before.count
+        local preserved = original_tools_preserved(before, after)
+        local same_identity = identity_after.current ~= nil and identity_after.current == target_comp
+        local paste_succeeded = paste_result ~= false and paste_result ~= nil
+        local changed = after.count ~= before.count or not preserved
+
+        target_comp:EndUndo(changed)
+        undo_started = false
+
+        if not paste_succeeded then
+            error("Fusion Paste returned " .. safe_text(paste_result) .. ".")
+        end
+        if not same_identity then
+            error("Current Fusion Composition changed during insertion.")
+        end
+        if not grew then
+            error("Fusion Paste did not add any tools.")
+        end
+        if not preserved then
+            error("An existing tool was not preserved during insertion.")
+        end
+    end, function(err)
+        return safe_text(err)
+    end)
+
+    if not operation_ok then
+        failure_detail = safe_text(operation_error)
+        local rollback_before = after
+        if rollback_before == nil then
+            rollback_before = select(1, snapshot_tools(target_comp))
+        end
+        local changed = rollback_before ~= nil
+            and (rollback_before.count ~= before.count or not original_tools_preserved(before, rollback_before))
+        if undo_started then
+            pcall(function()
+                target_comp:EndUndo(changed)
+            end)
+            undo_started = false
+        end
+        if changed then
+            local undo_ok, undo_error = pcall(function()
+                target_comp:Undo()
+            end)
+            local rolled_back = select(1, snapshot_tools(target_comp))
+            local rollback_verified = undo_ok
+                and rolled_back ~= nil
+                and rolled_back.count == before.count
+                and original_tools_preserved(before, rolled_back)
+            if not rollback_verified then
+                failure_detail = failure_detail .. " Rollback verification failed: " .. safe_text(undo_error)
+            else
+                failure_detail = failure_detail .. " Partial insertion was rolled back."
+            end
+        end
+    end
+
+    if locked then
+        local unlock_ok, unlock_error = pcall(function()
+            target_comp:Unlock()
+        end)
+        if not unlock_ok then
+            return false, (failure_detail or "Insertion completed but unlock failed.")
+                .. " Unlock error: " .. safe_text(unlock_error)
+        end
+    end
+
+    if not operation_ok then
+        return false, failure_detail
+    end
+    return true, "inserted " .. tostring(after.count - before.count) .. " tools into the current Composition"
+end
+
 local function show_message(target_comp, title, body)
     if target_comp ~= nil and target_comp.AskUser ~= nil then
         local ok = pcall(function()
@@ -319,8 +492,8 @@ local function failure_body(state, detail)
     if state.comp_match ~= nil and state.current_comp_api_resolved then
         table.insert(lines, "selected/current object match: " .. bool_text(state.comp_match))
     end
-    if state.load_error ~= nil and state.load_error ~= "" then
-        table.insert(lines, "LoadComp error: " .. trim_detail(state.load_error, 700))
+    if state.insert_error ~= nil and state.insert_error ~= "" then
+        table.insert(lines, "Insertion error: " .. trim_detail(state.insert_error, 700))
     end
     return table.concat(lines, "\n")
 end
@@ -537,44 +710,19 @@ local function main(state)
         return
     end
 
-    state.phase = "composition_load"
-    local loaded = false
-    local recognized = false
-    local load_detail = "not attempted"
-    if fusion_app.LoadComp ~= nil then
-        local load_ok, loaded_comp = pcall(function()
-            return fusion_app:LoadComp(composition_path)
-        end)
-        if load_ok and loaded_comp ~= nil then
-            loaded = true
-            load_detail = "loaded"
-            if loaded_comp.FindTool ~= nil then
-                local find_ok, media_out = pcall(function()
-                    return loaded_comp:FindTool("MediaOut1")
-                end)
-                recognized = find_ok and media_out ~= nil
-                if recognized then
-                    load_detail = "loaded (MediaOut1 recognized)"
-                end
-            end
-        elseif load_ok then
-            state.load_error = "LoadComp returned nil."
-        else
-            state.load_error = safe_text(loaded_comp)
-        end
-    else
-        state.load_error = "Fusion LoadComp API is unavailable."
-    end
+    state.phase = "graph_insertion"
+    local inserted, insert_detail = insert_generated_graph(target_comp, composition_path)
     state.artifacts = artifact_state(output_path, separator)
-    if not loaded or not recognized then
-        show_failure(target_comp, state, state.load_error or "The generated composition did not expose MediaOut1 after LoadComp.")
+    if not inserted then
+        state.insert_error = insert_detail
+        show_failure(target_comp, state, insert_detail)
         return
     end
 
     state.phase = "success_dialog"
     local body = "PSD2Fusion completed.\n\nComposition: " .. composition_path
         .. "\nAssets: " .. path_join(output_path, "assets", separator)
-        .. "\nFusion: " .. load_detail
+        .. "\nFusion: " .. insert_detail
         .. "\nCurrent comp: " .. bool_text(state.current_comp_resolved)
         .. " (" .. safe_text(state.current_comp_origin) .. ")"
     show_message(target_comp, "PSD2Fusion", body)
