@@ -33,6 +33,14 @@ calls Fusion's LoadComp and reports whether MediaOut1 was recognized.  If
 automatic loading is unavailable, the dialog shows the .comp path and its
 neighboring assets directory for manual opening.
 
+The launcher writes a short-lived UTF-8 JSON request for the bridge.  Only the
+installed Python/bridge paths and the temporary request/log paths are passed
+through the Windows shell; the selected PSD and output paths stay in the JSON
+payload.  This keeps spaces and Japanese Windows paths out of command-line
+codepage parsing.  A failure dialog identifies the phase, input/output,
+bridge exit code, stderr/exception summary, artifact state, and the resolved
+current Fusion Composition (including the `fu:GetCurrentComp()` comparison).
+
 The launcher uses the Python executable found by the installer and a small
 repository bridge; it does not require a PowerShell command from the user.
 The repository's normal python -m pip install -e . dependencies remain the
@@ -45,7 +53,11 @@ visible in the Fusion page.  Selecting `D:\Documents\PSD2Fusion\clipfixture.psd`
 from the picker generated `clipfixture_fusion\PSD2Fusion.comp` and its
 `assets` directory.  The launcher then loaded the composition through Fusion's
 `LoadComp`; the returned composition contained `MediaOut1`.  The smoke used a
-new empty Resolve project and did not edit or save an existing project.
+new empty Resolve project and did not edit or save an existing project.  The
+same menu path was subsequently exercised with `D:\Downloads\a.psd` and
+completed with the same artifact and `MediaOut1` checks.  The UTF-8 bridge
+request was also verified with `D:\Downloads\アニメーション 20260812.psd`,
+producing its `.comp`, `manifest.json`, and `assets` directory.
 
 ## Known limitations
 
