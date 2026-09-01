@@ -77,7 +77,8 @@ assert(comp:FindTool("MediaOut1") ~= nil)
 - Pixel masks, native text, smart objects, adjustment layers, layer styles,
   and unsupported blend modes are warned or selectively baked where pixels are
   available; this is not Photoshop parity.
-- Advanced Photoshop pass-through/backdrop interactions and
-  `Blend Clipped Layers As Group` are explicit approximation/fallback areas.
+- Advanced Photoshop pass-through/backdrop interactions and explicit
+  `Blend Clipped Layers As Group=false` remain approximation/fallback areas;
+  the default/true clipping-chain boundary is reconstructed as a subtree.
 - The exploratory scripting `Composition:Render` call above is not a supported
   PSD2Fusion entrypoint; use the generated comp through Fusion/Resolve.

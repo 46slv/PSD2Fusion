@@ -12,6 +12,16 @@ BBox = Tuple[int, int, int, int]
 
 
 @dataclass
+class ClippingChain:
+    """One same-parent PSD clipping chain in canonical bottom-to-top order."""
+
+    base_id: str
+    member_ids: List[str] = field(default_factory=list)
+    blend_clipped_as_group: bool = True
+    blend_clipped_as_group_provenance: str = "photoshop_default_true"
+
+
+@dataclass
 class SemanticLayer:
     id: str
     name: str
@@ -60,7 +70,7 @@ class SemanticDocument:
     profile: Optional[str] = None
     # Children are normalized to PSD2Fusion's bottom-to-top order.
     children: List[SemanticLayer] = field(default_factory=list)
-    clipping_chains: List[Dict[str, Any]] = field(default_factory=list)
+    clipping_chains: List[ClippingChain] = field(default_factory=list)
     warnings: List[str] = field(default_factory=list)
     capabilities: Dict[str, str] = field(default_factory=dict)
 

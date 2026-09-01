@@ -5,7 +5,7 @@ import importlib.metadata
 import os
 from typing import Any, Iterable, List, Optional, Tuple
 
-from .semantic import SemanticDocument, SemanticGroup, SemanticLayer
+from .semantic import ClippingChain, SemanticDocument, SemanticGroup, SemanticLayer
 
 
 # PSD four-byte blend keys and their display names. Fusion IDs are selected in
@@ -159,6 +159,22 @@ def _mode_name(psd: Any) -> str:
     return str(getattr(value, "name", value)).upper()
 
 
+def _blend_clipped_as_group(layer: Any) -> Tuple[bool, str]:
+    """Return PSD ``clbl`` plus whether the value was explicit or defaulted."""
+
+    try:
+        from psd_tools.constants import Tag
+
+        tagged_blocks = getattr(layer, "tagged_blocks", None)
+        key = Tag.BLEND_CLIPPING_ELEMENTS
+        if tagged_blocks is not None and key in tagged_blocks:
+            value = tagged_blocks.get_data(key)
+            return bool(int(value)), "explicit_psd_clbl"
+    except (AttributeError, TypeError, ValueError):
+        pass
+    return True, "photoshop_default_true"
+
+
 def parse_psd(path: str) -> SemanticDocument:
     """Read a PSD and return a deterministic semantic document.
 
@@ -294,7 +310,26 @@ def parse_psd(path: str) -> SemanticDocument:
 
     def attach_clipping(raw_items: List[Any], nodes: List[SemanticLayer]) -> None:
         base: Optional[SemanticLayer] = None
+        base_raw: Optional[Any] = None
         member_ids: List[str] = []
+
+        def finish_chain() -> None:
+            if base is None or base_raw is None or not member_ids:
+                return
+            blend_as_group, provenance = _blend_clipped_as_group(base_raw)
+            document.clipping_chains.append(
+                ClippingChain(
+                    base_id=base.id,
+                    member_ids=list(member_ids),
+                    blend_clipped_as_group=blend_as_group,
+                    blend_clipped_as_group_provenance=provenance,
+                )
+            )
+            if not blend_as_group:
+                base.warnings.append(
+                    "Blend Clipped Layers As Group=false uses the explicit fallback path"
+                )
+
         for raw, node in zip(raw_items, nodes):
             try:
                 clipped = bool(getattr(raw, "clipping", False))
@@ -311,18 +346,13 @@ def parse_psd(path: str) -> SemanticDocument:
                     base.clipping_members.append(node.id)
                     member_ids.append(node.id)
             else:
-                if base is not None and member_ids:
-                    document.clipping_chains.append(
-                        {"base_id": base.id, "member_ids": list(member_ids)}
-                    )
+                finish_chain()
                 base = node
+                base_raw = raw
                 member_ids = []
             if node.children:
                 attach_clipping(_raw_children(raw), node.children)
-        if base is not None and member_ids:
-            document.clipping_chains.append(
-                {"base_id": base.id, "member_ids": list(member_ids)}
-            )
+        finish_chain()
 
     attach_clipping(raw_roots, document.children)
     return document

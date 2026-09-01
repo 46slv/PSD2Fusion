@@ -163,21 +163,24 @@ the two boundaries distinct.
 
 Clipping is an IR relationship, never a per-layer boolean mask shortcut. The
 parser normalizes each same-parent contiguous chain to one base ID plus ordered
-members. The compiler processes a sibling sequence bottom-to-top:
+members. The chain also retains `Blend Clipped Layers As Group` and whether it
+came from an explicit PSD `clbl` value or Photoshop's default-true behavior.
+For the supported true/default case, the compiler processes a sibling sequence
+bottom-to-top:
 
-1. compose the base normally into the current parent stream;
-2. retain the base output as the alpha matte source;
+1. materialize the base without consuming the current parent stream;
+2. retain that base output as both the initial subtree and fixed alpha matte;
 3. for each clipped member, create a `Merge` with `Operator = FuID { "In" }`,
    `Background = base matte`, and the member image as `Foreground`;
-4. merge that clipped result into the parent stream with the member's
-   canonical blend and opacity;
-5. reuse the same base matte for all successive members.
+4. merge that clipped result into the preceding subtree with the member's
+   canonical blend and opacity and `ProcessAlpha = 0`, preserving base alpha;
+5. after all ordered members are complete, merge the subtree into the parent
+   stream exactly once using the base layer's blend and opacity.
 
-This is the smallest graph that keeps the base visible, clips pixels outside
-the base alpha, and makes the clipping logic inspectable in Fusion. The
-Photoshop `Blend Clipped Layers As Group` scope, clipped-layer interactions
-with complex base modes, and advanced mask combinations are not claimed as
-parity; they remain explicit warnings/fallback decisions in the manifest.
+This keeps member pixels inside the base alpha and prevents non-Normal member
+blends from evaluating against the outer backdrop. Explicit `clbl=false`,
+advanced masks, adjustment layers, and Fill Opacity behavior are not claimed
+as parity; they remain explicit warnings/fallback decisions.
 
 ## Asset strategy and fallback policy
 

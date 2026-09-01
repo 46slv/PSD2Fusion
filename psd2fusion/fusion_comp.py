@@ -171,6 +171,7 @@ def _merge(
     x: float,
     y: float,
     operator: Optional[str] = None,
+    process_alpha: Optional[bool] = None,
 ) -> str:
     inputs: List[str] = []
     if background is not None:
@@ -184,6 +185,10 @@ def _merge(
     if operator:
         inputs.append(
             "Operator = Input { Value = FuID { %s }, }," % _quote(operator)
+        )
+    if process_alpha is not None:
+        inputs.append(
+            "ProcessAlpha = Input { Value = %d, }," % (1 if process_alpha else 0)
         )
     inputs.append("PerformDepthMerge = Input { Value = 0, },")
     return _simple_tool(name, "Merge", inputs, comment, x, y)
@@ -259,6 +264,9 @@ class _Compiler:
         self.doc = doc
         self.output_path = os.path.abspath(output_path)
         self.lookup = index_layers(doc.children)
+        self.clipping_chains = {
+            chain.base_id: chain for chain in doc.clipping_chains
+        }
         self.used_names: set[str] = set()
         self.node_count = 0
         self.merge_count = 0
@@ -472,6 +480,47 @@ class _Compiler:
         )
         return _Source(clip_name)
 
+    def clipping_subtree(
+        self,
+        base_result: _ItemResult,
+        base: SemanticLayer,
+        members: Sequence[SemanticLayer],
+        depth: int,
+        scope: str,
+    ) -> _ItemResult:
+        """Evaluate a true/default clipping chain without consuming outer backdrop."""
+
+        current = base_result.output
+        fixed_matte = base_result.matte
+        for member in members:
+            if not member.effective_visible:
+                continue
+            member_result = self.item(member, current, depth, scope)
+            clipped_source = self.clipping_merge(
+                fixed_matte, member_result, member, depth, scope
+            )
+            merge_name = self.name("ClipStack" + scope, member.id)
+            self.merge_count += 1
+            x, y = self.position(0, depth)
+            self._current_tools.append(
+                _merge(
+                    merge_name,
+                    current,
+                    clipped_source,
+                    self.mode_id(member),
+                    member.opacity,
+                    "PSD clipping subtree member (base=%s): %s"
+                    % (base.id, member.name),
+                    x,
+                    y,
+                    # Photoshop clipping keeps the base alpha as the chain
+                    # boundary while member RGB/blend/opacity are evaluated.
+                    process_alpha=False,
+                )
+            )
+            current = _Source(merge_name)
+        return _ItemResult(current, fixed_matte)
+
     def sequence(
         self,
         items: Sequence[SemanticLayer],
@@ -503,31 +552,57 @@ class _Compiler:
                 current = base_result.output
                 i += 1
                 continue
-            base_matte = base_result.matte
-            current = self.merge_item(current, base_result, layer, depth, scope)
             if layer.clipping_members:
-                member_ids = set(layer.clipping_members)
+                chain = self.clipping_chains.get(layer.id)
+                ordered_member_ids = (
+                    list(chain.member_ids) if chain is not None else list(layer.clipping_members)
+                )
+                member_ids = set(ordered_member_ids)
                 j = i + 1
+                members: List[SemanticLayer] = []
                 while j < len(items) and items[j].id in member_ids:
-                    member = items[j]
-                    if member.effective_visible:
-                        member_result = self.item(member, current, depth, scope)
-                        clipped_source = self.clipping_merge(
-                            base_matte, member_result, member, depth, scope
-                        )
-                        current = self.merge_item(
-                            current,
-                            _ItemResult(clipped_source, clipped_source),
-                            member,
-                            depth,
-                            scope,
-                            comment_prefix="PSD clipped layer merge",
-                            opacity=member.opacity,
-                            mode=member.blend,
-                        )
+                    members.append(items[j])
                     j += 1
+                if chain is not None and chain.blend_clipped_as_group:
+                    ordered = {member.id: member for member in members}
+                    members = [ordered[item_id] for item_id in ordered_member_ids if item_id in ordered]
+                    subtree = self.clipping_subtree(
+                        base_result, layer, members, depth, scope
+                    )
+                    current = self.merge_item(
+                        current,
+                        subtree,
+                        layer,
+                        depth,
+                        scope,
+                        comment_prefix="PSD clipping chain merge",
+                        opacity=layer.opacity,
+                        mode=layer.blend,
+                    )
+                else:
+                    # Explicit clbl=false is outside this Goal. Preserve the
+                    # named FIRST_USABLE fallback instead of silently claiming
+                    # group-scope semantics.
+                    current = self.merge_item(current, base_result, layer, depth, scope)
+                    for member in members:
+                        if member.effective_visible:
+                            member_result = self.item(member, current, depth, scope)
+                            clipped_source = self.clipping_merge(
+                                base_result.matte, member_result, member, depth, scope
+                            )
+                            current = self.merge_item(
+                                current,
+                                _ItemResult(clipped_source, clipped_source),
+                                member,
+                                depth,
+                                scope,
+                                comment_prefix="PSD clipped layer fallback (clbl=false)",
+                                opacity=member.opacity,
+                                mode=member.blend,
+                            )
                 i = j
             else:
+                current = self.merge_item(current, base_result, layer, depth, scope)
                 i += 1
         return _SequenceResult(current, self._current_tools)
 
