@@ -18,3 +18,13 @@ The exact manual host-smoke procedure and any environment blocker are recorded
 in `docs/host-smoke-handoff.md`.
 Unsupported layer kinds are retained in the manifest and selectively baked
 when `psd-tools` can provide pixels; no Photoshop parity is implied.
+
+## DaVinci Resolve launcher
+
+Install the per-user Resolve/Fusion menu launcher from the repository root:
+
+    pwsh -NoProfile -File .\scripts\install_resolve.ps1
+
+Then run Workspace > Scripts > Comp > PSD2Fusion from Resolve's Fusion page.
+The install, uninstall, output, and known-limitation details are in
+`docs/resolve-integration.md`.
