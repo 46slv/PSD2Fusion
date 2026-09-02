@@ -21,7 +21,7 @@
     "psd_sha256": "574d8a6511b2aabe744835d81ed76c8fc8ffd0c9c5678f3359e8eda10f9174db",
     "reference_png_sha256": "91ff8daef941b3d9052497190fdc8aa6f4d56ba524c8d912cf011b6818535f54"
   },
-  "active_task_id": "PARITY-003",
+  "active_task_id": "PARITY-004",
   "task_contract": ".control/CURRENT_GOAL.md",
   "tasks": [
     {
@@ -46,18 +46,18 @@
     },
     {
       "id": "PARITY-003",
-      "status": "awaiting_verification",
+      "status": "done",
       "requires": [
         "PARITY-002"
       ],
-      "verification": "pending",
+      "verification": "pass",
       "branch": "codex/parity-003",
       "commit": "2979e657959fe0b7bf7f271cf7d3d09d1a8e369a",
       "evidence": [".control/evidence/PARITY-003/20260902-161254/summary.json"]
     },
     {
       "id": "PARITY-004",
-      "status": "blocked",
+      "status": "ready",
       "requires": [
         "PARITY-003"
       ],
