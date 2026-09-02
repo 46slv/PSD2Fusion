@@ -57,14 +57,17 @@
     },
     {
       "id": "PARITY-004",
-      "status": "awaiting_verification",
+      "status": "blocked_host",
       "requires": [
         "PARITY-003"
       ],
-      "verification": "pending",
+      "verification": "blocked",
       "branch": "codex/parity-004",
       "commit": "311b3f3236895650ca15210daca00ba029750b98",
-      "evidence": [".control/evidence/PARITY-004/20260902-170000/summary.json"]
+      "evidence": [
+        ".control/evidence/PARITY-004/20260902-170000/summary.json",
+        ".control/evidence/PARITY-004/20260902-174500/verifier.json"
+      ]
     },
     {
       "id": "PARITY-005",
