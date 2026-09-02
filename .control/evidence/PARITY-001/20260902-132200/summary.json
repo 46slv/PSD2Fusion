@@ -4,17 +4,17 @@
   "status": "FAIL",
   "inspection_status": "PASS",
   "qualification_status": "exact_canvas",
-  "candidate_commit": "45a94e232de35032e1c5c9202b174c63171bf1ef",
-  "source_head": "45a94e232de35032e1c5c9202b174c63171bf1ef",
+  "candidate_commit": "20e4bd0df77bd2d1fe2c041f70bdf27471738f29",
+  "source_head": "20e4bd0df77bd2d1fe2c041f70bdf27471738f29",
   "branch": "codex/parity-001",
   "command_templates": [
     {"command": "pwsh -NoProfile -File .\\scripts\\check.ps1", "exit_code": 0},
     {"command": "pwsh -NoProfile -File .\\scripts\\parity\\run.ps1 -Mode baseline -Psd <private-input> -Reference <private-input> -Output parity-output\\20260902-131741-baseline", "exit_code": 3}
   ],
   "environment": {
-    "git_head": "45a94e232de35032e1c5c9202b174c63171bf1ef",
+    "git_head": "20e4bd0df77bd2d1fe2c041f70bdf27471738f29",
     "git_branch": "codex/parity-001",
-    "git_head_role": "Exact PARITY-001 source candidate used for reproduction; subsequent branch commits are metadata-only",
+    "git_head_role": "Completed PARITY-001 candidate code/test/evidence-cleanup commit used for reproduction; subsequent branch commits are metadata-only",
     "windows": "Windows-11-10.0.26200-SP0",
     "python": "3.12.10",
     "psd_tools": "1.18.0",
@@ -56,25 +56,29 @@
   "inputs_unchanged": true,
   "privacy": {"private_input_paths_committed": false, "safe_summary": true},
   "verifier_start": {
-    "reproduction_commit": "45a94e232de35032e1c5c9202b174c63171bf1ef",
-    "reproduction_tree": "ab3495ab29906f3c6fd88b53f62b7803930bd5f0",
-    "canonical_state_task_commit": "45a94e232de35032e1c5c9202b174c63171bf1ef",
-    "summary_candidate_commit": "45a94e232de35032e1c5c9202b174c63171bf1ef",
-    "summary_source_head": "45a94e232de35032e1c5c9202b174c63171bf1ef",
+    "reproduction_commit": "20e4bd0df77bd2d1fe2c041f70bdf27471738f29",
+    "reproduction_tree": "df619544f3281f042b434f137dfc762880023e9f",
+    "canonical_state_task_commit": "20e4bd0df77bd2d1fe2c041f70bdf27471738f29",
+    "summary_candidate_commit": "20e4bd0df77bd2d1fe2c041f70bdf27471738f29",
+    "summary_source_head": "20e4bd0df77bd2d1fe2c041f70bdf27471738f29",
     "candidate_linkage_verified": true,
     "state_commit": "3b33b29baf132c98cd0d6985a852ed1b6f6d3360",
     "prior_state_commit": "de83b8382ec8bb62c37e2736b56cfcc396207f82",
     "metadata_commit_chain": [
       {"commit": "3b33b29baf132c98cd0d6985a852ed1b6f6d3360", "role": "state/evidence linkage metadata"},
       {"commit": "64df79671c7c9a54925f1fd4d80abac52a10ca11", "role": "evidence linkage metadata"},
-      {"commit": "20e4bd0df77bd2d1fe2c041f70bdf27471738f29", "role": "observed current branch metadata head"}
+      {"commit": "20e4bd0df77bd2d1fe2c041f70bdf27471738f29", "role": "completed candidate code/test/evidence-cleanup commit"},
+      {"commit": "fdac29dfcfeceada95bc27c83c58ea0fe1272caf", "role": "metadata-only verifier linkage"},
+      {"commit": "92d7e135a2ebabfee5bfb3a5d067780734aac273", "role": "metadata-only reproduction linkage"}
     ],
     "metadata_heads_observed": [
       "3b33b29baf132c98cd0d6985a852ed1b6f6d3360",
       "64df79671c7c9a54925f1fd4d80abac52a10ca11",
-      "20e4bd0df77bd2d1fe2c041f70bdf27471738f29"
+      "20e4bd0df77bd2d1fe2c041f70bdf27471738f29",
+      "fdac29dfcfeceada95bc27c83c58ea0fe1272caf",
+      "92d7e135a2ebabfee5bfb3a5d067780734aac273"
     ],
-    "note": "45a94e2 is the exact PARITY-001 source-candidate HEAD and reproduction_commit; reproduction_tree is its Git tree identity. The metadata_commit_chain records the observed linkage history through 20e4bd0, which was the current branch tip when this metadata was written. A fresh verifier must test 45a94e2/reproduction_tree while auditing the current branch tip. Future metadata-only commits must not alter the candidate code/tree; this summary cannot embed its own future commit hash."
+    "note": "20e4bd0 is the completed PARITY-001 candidate code/test/evidence-cleanup commit and reproduction_commit; reproduction_tree is its exact Git tree identity. fdac29d and 92d7e1 are metadata-only commits that preserve the candidate code/tree. A fresh verifier must test 20e4bd0/reproduction_tree while auditing current metadata. Later metadata-only commits must not alter the candidate code/tree; this summary cannot embed its own future commit hash."
   },
   "remaining_gaps": ["Stored composite fails closed on ICC profile mismatch and nonzero RGB delta", "Photoshop/Resolve host validation not run"]
 }
