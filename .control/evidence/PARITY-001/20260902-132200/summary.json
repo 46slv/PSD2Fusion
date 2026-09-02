@@ -52,6 +52,6 @@
   },
   "inputs_unchanged": true,
   "privacy": {"private_input_paths_committed": false, "safe_summary": true},
-  "verifier_start": {"source_candidate_commit": "45a94e232de35032e1c5c9202b174c63171bf1ef", "state_head_after_closeout": "4a2989fe7034bc8d291f55f059b14ecfa87f4c13"},
+  "verifier_start": {"source_candidate_commit": "45a94e232de35032e1c5c9202b174c63171bf1ef", "state_commit": "de83b8382ec8bb62c37e2736b56cfcc396207f82", "final_head_recorded_at_closeout": "pending-final-commit"},
   "remaining_gaps": ["Stored composite fails closed on ICC profile mismatch and nonzero RGB delta", "Photoshop/Resolve host validation not run"]
 }
