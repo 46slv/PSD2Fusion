@@ -2,9 +2,10 @@ import json
 import tempfile
 import unittest
 from pathlib import Path
+from unittest.mock import patch
 from PIL import Image
 
-from scripts.parity.parity import compare_images
+from scripts.parity.parity import compare_images, run_inspection
 
 
 class ComparatorFalsePassTests(unittest.TestCase):
@@ -40,6 +41,14 @@ class ComparatorFalsePassTests(unittest.TestCase):
         got = compare_images(p, ref)
         self.assertGreater(got["threshold_exceeding"]["count"], 0)
 
+    def test_threshold_relaxation_cannot_pass_material_one_pixel_delta(self):
+        reference = Image.new("RGBA", (4, 4), (20, 40, 60, 255))
+        candidate = reference.copy(); candidate.putpixel((0, 0), (30, 40, 60, 255))
+        for threshold in (0, 20, 31, 32):
+            got = compare_images(candidate, reference, threshold=threshold)
+            self.assertEqual("FAIL", got["status"], threshold)
+            self.assertEqual(threshold, got["threshold"])
+
     def test_wrong_crop_scale_fails(self):
         src = Image.new("RGBA", (8, 8), (20, 40, 60, 255)); src.putpixel((0, 0), (255, 0, 0, 255))
         ref = self.root / "crop-ref.png"; src.save(ref)
@@ -62,6 +71,26 @@ class ComparatorFalsePassTests(unittest.TestCase):
 
     def test_exact_no_profile_is_unverified(self):
         self.assertEqual("UNVERIFIED", compare_images(self.ref, self.ref)["status"])
+
+    @patch("scripts.parity.parity._environment", return_value={"python": "test"})
+    @patch("scripts.parity.parity.inspect_input")
+    @patch("scripts.parity.parity.inspect_psd")
+    @patch("scripts.parity.parity.compare_images")
+    @patch("psd_tools.PSDImage.open")
+    def test_run_inspection_fails_closed_on_stored_composite_failure(self, psd_open, compare, inspect_psd, inspect_input, _environment):
+        psd_path = self.root / "input.psd"; psd_path.write_bytes(b"psd")
+        ref_path = self.root / "reference.png"; Image.new("RGBA", (4, 4), (20, 40, 60, 255)).save(ref_path)
+        inspect_psd.return_value = {"exists": True, "error": None, "dimensions": {"width": 4, "height": 4}, "channels": 3, "profile": "icc", "icc_profile_sha256": "p"}
+        inspect_input.return_value = {"exists": True, "error": None, "dimensions": {"width": 4, "height": 4}, "channels": 4, "profile": "icc", "icc_profile_sha256": "p", "alpha": {"all_opaque": True}, "sha256_before": "unused"}
+        psd_open.return_value.composite.return_value = Image.new("RGB", (4, 4), (20, 40, 60))
+        compare.return_value = {"status": "FAIL", "hard_failure": "profile_mismatch"}
+        summary = self.root / "summary.json"
+        got = run_inspection(str(psd_path), str(ref_path), summary)
+        self.assertEqual("FAIL", got["status"])
+        self.assertEqual("PASS", got["inspection_status"])
+        self.assertEqual("FAIL", got["comparison_status"])
+        self.assertEqual(2, got["exit_codes"]["inspect"])
+        self.assertEqual("FAIL", json.loads(summary.read_text(encoding="utf-8"))["status"])
 
 
 if __name__ == "__main__":
