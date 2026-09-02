@@ -44,6 +44,33 @@ Do not forward the Coordinator transcript, old raw logs, or broad documentation 
 
 A read-only explorer returns paths/symbols/lines, relevant facts, uncertainty, and source refs rather than its transcript.
 
+## PARITY-004 delegation constraint
+
+When `PARITY-004` is active, delegate only the next unresolved gate from `.control/PARITY-004_TODO.md` and `docs/PARITY_004_HOST_PIXEL_GATE.md`.
+
+Current gate order is:
+
+```text
+P4-08 host load/readback
+-> P4-HOST-PIXEL micro renders
+-> P4-09 real Fusion/reference baseline
+-> smallest localized repair
+```
+
+P4-03 through P4-07 are preserved structural evidence. A Worker or Reviewer must not reopen them speculatively, start `PARITY-005`/`PARITY-006`, or launch a broad planner/compiler rewrite unless actual host/pixel evidence localizes the blocker there.
+
+For host/pixel work, the return packet must distinguish at least:
+
+```text
+structural
+host_loaded
+pixel_verified
+```
+
+and include exact candidate commit, Resolve/Fusion version, relevant project/color/alpha settings, rendered artifact path/hash when pixels are claimed, comparator metrics, and the smallest localized blocker when failing.
+
+A graph inspection or readback result is never sufficient to label `pixel_verified`.
+
 ## Evidence packet
 Worker/reviewer return should normally contain:
 
@@ -70,6 +97,8 @@ If essentially the same failure fingerprint/evidence state repeats twice without
 Parallel agents are allowed only for genuinely independent read scopes or explicitly partitioned write scopes.
 Do not let multiple workers edit the same files unsynchronized or choose competing next Goals.
 
+For `PARITY-004`, do not parallelize P4-08, the micro pixel gate, and P4-09 as independent implementation tracks because later interpretation depends on earlier host evidence. Read-only diagnostics may run in parallel if they cannot advance state or mutate the candidate graph.
+
 ## PSD2Fusion review targets
 When independent review is useful, prioritize:
 - Group / clipping semantic mistakes;
@@ -77,6 +106,8 @@ When independent review is useful, prioritize:
 - false-PASS fixtures;
 - serialization/load assumptions not backed by Fusion/Resolve evidence;
 - complexity that blocks the shortest path to a usable graph.
+
+During the current host/pixel phase, review the smallest evidence boundary first: Loader/alpha/color contract, then local clipping math, then group/backdrop scope, then real-PSD-only semantics. Do not recommend a global rewrite before localizing the failing class.
 
 Prefer reviewing exact diff/SHA + Goal + evidence before reading the implementer's narrative when practical.
 
