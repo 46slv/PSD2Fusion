@@ -11,6 +11,7 @@ from .fusion_comp import compile_comp
 from .manifest import write_manifest
 from .parse_psd import parse_psd
 from .semantic import walk_layers
+from .evaluation import evaluate_document
 
 
 def _parser() -> argparse.ArgumentParser:
@@ -86,7 +87,8 @@ def run(source: str, output: Optional[str] = None, force: bool = False) -> dict:
 
     comp_path = os.path.join(output_dir, "PSD2Fusion.comp")
     graph = compile_comp(document, comp_path)
-    manifest_path = write_manifest(document, output_dir, assets, graph)
+    evaluation = evaluate_document(document, policy="strict")
+    manifest_path = write_manifest(document, output_dir, assets, graph, evaluation)
     return {
         "source": source,
         "output": output_dir,
@@ -97,6 +99,7 @@ def run(source: str, output: Optional[str] = None, force: bool = False) -> dict:
         "warnings": len(document.warnings)
         + sum(len(layer.warnings) for layer in walk_layers(document.children)),
         "graph": graph,
+        "evaluation": evaluation.counts(),
     }
 
 

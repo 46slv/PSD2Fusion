@@ -197,12 +197,21 @@ def run_inspection(psd_path: str, reference_path: str, output: Path) -> Dict[str
 
 
 def main(argv: Optional[Iterable[str]] = None) -> int:
-    parser = argparse.ArgumentParser(description=__doc__); sub = parser.add_subparsers(dest="command", required=True); i = sub.add_parser("inspect"); i.add_argument("--psd", required=True); i.add_argument("--reference", required=True); i.add_argument("--output", required=True); v = sub.add_parser("convert"); v.add_argument("--psd", required=True); v.add_argument("--output", required=True); c = sub.add_parser("compare"); c.add_argument("--candidate", required=True); c.add_argument("--reference", required=True); c.add_argument("--output-dir"); c.add_argument("--threshold", type=float, default=0.0); c.add_argument("--json", required=True); args = parser.parse_args(argv)
+    parser = argparse.ArgumentParser(description=__doc__); sub = parser.add_subparsers(dest="command", required=True); i = sub.add_parser("inspect"); i.add_argument("--psd", required=True); i.add_argument("--reference", required=True); i.add_argument("--output", required=True); p = sub.add_parser("plan"); p.add_argument("--psd", required=True); p.add_argument("--output", required=True); p.add_argument("--policy", choices=("strict", "compatibility"), default="strict"); v = sub.add_parser("convert"); v.add_argument("--psd", required=True); v.add_argument("--output", required=True); c = sub.add_parser("compare"); c.add_argument("--candidate", required=True); c.add_argument("--reference", required=True); c.add_argument("--output-dir"); c.add_argument("--threshold", type=float, default=0.0); c.add_argument("--json", required=True); args = parser.parse_args(argv)
     if args.command == "inspect": result = run_inspection(args.psd, args.reference, Path(args.output)); print(json.dumps(result, indent=2, ensure_ascii=False)); return 0 if result.get("status") == "PASS" and result.get("inputs_unchanged") else 3
     if args.command == "convert":
         try:
             from psd_tools import PSDImage
             out = Path(args.output); out.parent.mkdir(parents=True, exist_ok=True); PSDImage.open(args.psd).composite().convert("RGBA").save(out); print(json.dumps({"status": "PASS", "origin": "psd_stored_composite", "path": str(out.resolve()), "sha256": _sha256(out)}, indent=2)); return 0
+        except Exception as exc: print(json.dumps({"status": "BLOCKED", "error": str(exc)})); return 3
+    if args.command == "plan":
+        try:
+            from psd2fusion.parse_psd import parse_psd
+            from psd2fusion.evaluation import evaluate_document
+            doc = parse_psd(args.psd); plan = evaluate_document(doc, args.policy)
+            payload = {"status": "PASS", "policy": args.policy, "source_sha256": doc.source_sha256,
+                       "structure_counts": {"descendants": sum(1 for _ in __import__('psd2fusion.semantic', fromlist=['walk_layers']).walk_layers(doc.children)), "groups": sum(1 for x in __import__('psd2fusion.semantic', fromlist=['walk_layers']).walk_layers(doc.children) if x.is_group), "clipping_chains": len(doc.clipping_chains), "clipped_members": sum(len(c.member_ids) for c in doc.clipping_chains)}, "plan": plan.to_dict()}
+            out = Path(args.output); out.parent.mkdir(parents=True, exist_ok=True); out.write_text(json.dumps(_safe_summary(payload), indent=2), encoding="utf-8"); print(json.dumps(payload, indent=2)); return 0
         except Exception as exc: print(json.dumps({"status": "BLOCKED", "error": str(exc)})); return 3
     result = compare_images(args.candidate, args.reference, args.output_dir, args.threshold); Path(args.json).write_text(json.dumps(result, indent=2), encoding="utf-8"); print(json.dumps(result, indent=2)); return 0 if result.get("status") == "PASS" else 2
 
