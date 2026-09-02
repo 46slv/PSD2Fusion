@@ -2,8 +2,8 @@
   "schema_version": 1,
   "task": "PARITY-002",
   "status": "awaiting_verification",
-  "candidate_source_commit": "686bf73ecdeedb491f5ee4b9be058dc88eeec759",
-  "candidate_source_tree": "395a4a5f3873ba4c45b64e59b04d69335feeb4e1",
+  "candidate_source_commit": "542ef549056259f73310dc062d502de05d13d038",
+  "candidate_source_tree": "65e15f8631dbdf833c69b242651a300e7a55fd1c",
   "branch": "codex/parity-002",
   "source_sha256": "574d8a6511b2aabe744835d81ed76c8fc8ffd0c9c5678f3359e8eda10f9174db",
   "structure_counts": {
@@ -32,8 +32,8 @@
     "full_renders_committed": false
   },
   "reproduction": {
-    "tested_source_commit": "686bf73ecdeedb491f5ee4b9be058dc88eeec759",
-    "tested_source_tree": "395a4a5f3873ba4c45b64e59b04d69335feeb4e1",
+    "tested_source_commit": "542ef549056259f73310dc062d502de05d13d038",
+    "tested_source_tree": "65e15f8631dbdf833c69b242651a300e7a55fd1c",
     "tested_branch": "codex/parity-002",
     "command": "python scripts/parity/parity.py plan --psd <private> --output <safe>",
     "result": "PASS (exit 0)",
@@ -43,20 +43,20 @@
     "decision_status_counts": {"verified_fusion_native": 160}
   },
   "metadata_chain": {
-    "current_head": "4525bbc89572084fb5bb09fbf7db9deb23c6ea3a",
-    "current_tree": "60b07bc0c0ba524c9ce49d0be0a917b68ae53068",
+    "current_head": "542ef549056259f73310dc062d502de05d13d038",
+    "current_tree": "65e15f8631dbdf833c69b242651a300e7a55fd1c",
     "metadata_only_commits": [
       "b0aca34273f1fdf6c9f0b4b37327a3f63d481e1c",
       "1d132cd (submission metadata)",
       "4525bbc89572084fb5bb09fbf7db9deb23c6ea3a"
     ],
-    "note": "Implementation and plan behavior are from 686bf73; later commits only record evidence/state linkage and do not claim code changes."
+    "note": "Implementation and plan behavior are from 542ef54; later commits only record evidence/state linkage and do not claim code changes."
   },
   "unresolved_issues": [
     "Fusion host capability remains unverified; strict planner rejects unsupported and clbl=false semantics."
   ],
   "verifier_reproduction": [
-    "checkout candidate implementation commit 686bf73ecdeedb491f5ee4b9be058dc88eeec759 (evidence/state commits follow)",
+    "checkout candidate implementation commit 542ef549056259f73310dc062d502de05d13d038 (evidence/state commits follow)",
     "run check.ps1",
     "run real plan command against read-only a.psd",
     "verify source_sha256, structure 136/34/23/59, plan nodes=137 decisions=160 clipping_spans=23 clipped_members=59, and 160 verified_fusion_native decisions"

@@ -41,7 +41,7 @@
       ],
       "verification": "pending",
       "branch": "codex/parity-002",
-      "commit": "686bf73ecdeedb491f5ee4b9be058dc88eeec759",
+      "commit": "542ef549056259f73310dc062d502de05d13d038",
       "evidence": [".control/evidence/PARITY-002/20260902-140000/summary.json"]
     },
     {
