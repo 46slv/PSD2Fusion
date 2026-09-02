@@ -1,0 +1,120 @@
+{
+  "schema_version": 1,
+  "task": "PARITY-004",
+  "verifier": "fresh_luna",
+  "candidate_head": "311b3f3236895650ca15210daca00ba029750b98",
+  "candidate_tree": "107f2655c43e2471acf1400414fc99a284eb7f82",
+  "branch": "codex/parity-004",
+  "branch_tip_before_verifier": "cb7102dbb054ca8cb12ae82cae40fa0342f1050a",
+  "base_origin_main": "fdc3a098548e0e628974307fc17d4da25f19fdfb",
+  "verdict": "BLOCKED",
+  "reproduced_checks": [
+    {
+      "name": "fixture_generate",
+      "command": "python .\\scripts\\parity\\parity004.py generate --output .local\\parity004-verifier-20260902\\fixtures",
+      "exit_code": 0,
+      "status": "PASS",
+      "metrics": {"case_count": 6997, "photoshop_default_true": 3500, "explicit_psd_clbl": 3497}
+    },
+    {
+      "name": "fixture_validate_independent_reference",
+      "command": "python .\\scripts\\parity\\parity004.py validate --fixtures .local\\parity004-verifier-20260902\\fixtures",
+      "exit_code": 0,
+      "status": "PASS",
+      "metrics": {
+        "case_count": 6997,
+        "recomputed_cases": 6997,
+        "max_reference_error": 0.0,
+        "max_oracle_error": 0.0,
+        "metamorphic_failures": [],
+        "reference_equations_independent": true
+      }
+    },
+    {
+      "name": "parity001_comparator",
+      "command": "python .\\scripts\\parity\\parity004.py compare --fixtures .local\\parity004-verifier-20260902\\fixtures --output .local\\parity004-verifier-20260902\\compare",
+      "exit_code": 0,
+      "status": "PASS",
+      "metrics": {"profile_status": "match", "threshold": 0.0, "rgba_max": 0, "rgba_mean": 0.0, "rgba_p99": 0.0, "outlier_guard_count": 0, "difference_bbox": null}
+    },
+    {
+      "name": "parity004_unit_tests",
+      "command": "python -m unittest tests.test_parity004_clipping -v",
+      "exit_code": 0,
+      "status": "PASS",
+      "metrics": {"tests": 7}
+    },
+    {
+      "name": "repository_check",
+      "command": "pwsh -NoProfile -File .\\scripts\\check.ps1",
+      "exit_code": 0,
+      "status": "PASS",
+      "metrics": {"tests": 42, "python_compile": "PASS", "git_diff_check": "PASS"}
+    },
+    {
+      "name": "real_psd_conversion",
+      "command": "python -m psd2fusion D:\\Downloads\\a.psd --output .local\\parity004-verifier-20260902\\real --force",
+      "exit_code": 0,
+      "status": "PASS",
+      "metrics": {"psd_sha256": "574d8a6511b2aabe744835d81ed76c8fc8ffd0c9c5678f3359e8eda10f9174db"}
+    },
+    {
+      "name": "real_psd_structural_validator",
+      "command": "python .\\scripts\\validate_clipping_subtrees.py D:\\Downloads\\a.psd .local\\parity004-verifier-20260902\\real\\PSD2Fusion.comp",
+      "exit_code": 0,
+      "status": "PASS",
+      "metrics": {"chains": 23, "clipped_members": 59, "visible_clipped_members": 59, "groups_semantic": 34, "groups_graph": 34, "failed_chains": []}
+    },
+    {
+      "name": "strict_plan",
+      "command": "python .\\scripts\\parity\\parity.py plan --psd D:\\Downloads\\a.psd --output .local\\parity004-verifier-20260902\\plan.json --policy strict",
+      "exit_code": 0,
+      "status": "PASS",
+      "metrics": {"source_sha256": "574d8a6511b2aabe744835d81ed76c8fc8ffd0c9c5678f3359e8eda10f9174db", "descendants": 136, "groups": 34, "clipping_chains": 23, "clipped_members": 59, "decisions": 160, "decision_status": "unverified"}
+    },
+    {
+      "name": "resolve_fusion_host_probe",
+      "command": "fuscript.exe -l Lua -x fusion-init .\\scripts\\resolve\\parity003_probe.lua .local\\parity004-verifier-20260902\\real\\PSD2Fusion.comp",
+      "exit_code": 0,
+      "status": "BLOCKED",
+      "metrics": {"resolve_version": "21.0.3.7", "fuscript_version": "15.0.0", "load_pass_count": 0, "render_output_count": 0, "reason": "Fusion scripting endpoint is unavailable"}
+    },
+    {
+      "name": "photoshop_reference_oracle",
+      "command": "Photoshop.exe -r scripts/photoshop/parity003_oracle.jsx (bounded fresh run)",
+      "exit_code": 0,
+      "status": "BLOCKED",
+      "metrics": {"photoshop_version": "27.8", "oracle_output_created": false, "reference_pixels_recorded": false, "reason": "locale JSX unknown non-ASCII escape sequence / no oracle-result.txt"}
+    }
+  ],
+  "false_pass_checks": [
+    {"check": "tampered_expected_pixel", "result": "PASS", "detail": "validator returned FAIL and max_reference_error exceeded 0.1"},
+    {"check": "outer_backdrop_isolation", "result": "PASS", "detail": "changing backdrop while local span is held fixed changes only outer composite"},
+    {"check": "local_alpha_invariant", "result": "PASS", "detail": "fractional base alpha remains unchanged through member evaluation"},
+    {"check": "transparent_rgb_fringe", "result": "PASS", "detail": "zero-alpha matte/member RGB is canonicalized and does not leak"},
+    {"check": "clbl_false_scope", "result": "PASS", "detail": "fixture policy and real plan contain only absent/default-true or explicit-true provenance; no clbl=false claim"},
+    {"check": "host_load_is_pixel_proof", "result": "PASS", "detail": "not accepted; host load/render counts are zero and full reference comparison remains NOT_RUN"},
+    {"check": "private_inputs_committed", "result": "PASS", "detail": "real PSD/reference PNG/full renders remain outside Git evidence"}
+  ],
+  "blockers": [
+    "Photoshop/reference oracle did not produce pixels because the committed locale JSX escape-sequence blocker remains.",
+    "Resolve/Fusion scripting endpoint is unavailable; no host load/render pixels were recorded.",
+    "Full output comparison against D:\\Downloads\\20260812.png is therefore NOT_RUN; Photoshop/Resolve pixel gates remain fail-closed.",
+    "No Fusion capability promotion is permitted from fixture, graph, load, or unit evidence alone."
+  ],
+  "permitted_state_transition": null,
+  "evidence_refs": [
+    ".control/evidence/PARITY-004/20260902-170000/summary.json",
+    ".local/parity004-verifier-20260902/fixtures/manifest.json",
+    ".local/parity004-verifier-20260902/compare/ (ignored local comparator artifacts)",
+    ".local/parity004-verifier-20260902/real/PSD2Fusion.comp (ignored local structural artifact)"
+  ],
+  "environment": {
+    "observed_at": "2026-09-02T17:45:00+09:00",
+    "python": "3.12.10",
+    "powershell": "7.6.5",
+    "git": "2.51.0.windows.1",
+    "psd_tools": "1.18.0",
+    "pillow": "12.3.0"
+  }
+}
