@@ -58,6 +58,28 @@ def _connection(block, field):
     return match.group(1) if match else None
 
 
+def _position(block):
+    match = re.search(
+        r"ViewInfo = (?:OperatorInfo|GroupInfo|StickyNoteInfo) "
+        r"\{ Pos = \{ ([^,]+), ([^}]+) \} \}",
+        block,
+    )
+    if not match:
+        return None
+    return (float(match.group(1)), float(match.group(2)))
+
+
+def _input_source_op(block, field):
+    match = re.search(
+        r'(?m)^\s*'
+        + re.escape(field)
+        + r'\s*=\s*InstanceInput\s*\{\s*'
+        r'SourceOp\s*=\s*"((?:\\.|[^"\\])*)",',
+        block,
+    )
+    return match.group(1) if match else None
+
+
 def parse_tools(path):
     text = Path(path).read_text(encoding="utf-8")
     tools = []
@@ -69,10 +91,15 @@ def parse_tools(path):
                 "name": match.group(2),
                 "type": match.group(3),
                 "start": match.start(),
+                "end": end,
                 "background": _connection(block, "Background"),
                 "foreground": _connection(block, "Foreground"),
+                "apply_mode": _value(block, "ApplyMode"),
+                "blend": _value(block, "Blend"),
                 "operator": _value(block, "Operator"),
                 "process_alpha": _value(block, "ProcessAlpha"),
+                "input_target": _input_source_op(block, "MainInput1"),
+                "position": _position(block),
                 "comments": _value(block, "Comments") or "",
             }
         )

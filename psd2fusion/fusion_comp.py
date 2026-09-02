@@ -278,6 +278,12 @@ class _Compiler:
         self.blend_modes: set[str] = set()
         self._x = 0.0
         self._external_input_target: Optional[str] = None
+        # Per-member rows keep the fixed-matte path readable in Flow without
+        # changing the deterministic PSD evaluation order.
+        self._clipping_loader_rows: Dict[str, int] = {}
+        self._clipping_clip_rows: Dict[str, int] = {}
+        self._clipping_stack_rows: Dict[str, int] = {}
+        self._clipping_outer_rows: Dict[str, int] = {}
 
     def name(self, role: str, layer_id: str) -> str:
         base = "%s_%s" % (role, layer_id[:10])
@@ -318,7 +324,8 @@ class _Compiler:
             filename = os.path.abspath(
                 os.path.join(os.path.dirname(self.output_path), layer.asset_path)
             )
-        x, y = self.position(1, depth)
+        row = self._clipping_loader_rows.get(layer.id, 1)
+        x, y = self.position(row, depth)
         self._current_tools.append(
             _loader(loader_name, filename, "PSD layer: %s" % layer.name, x, y)
         )
@@ -439,7 +446,10 @@ class _Compiler:
     ) -> _Source:
         merge_name = self.name("Merge" + scope, layer.id)
         self.merge_count += 1
-        x, y = self.position(0, depth)
+        row = 0
+        if comment_prefix == "PSD clipping chain merge":
+            row = self._clipping_outer_rows.get(layer.id, 0)
+        x, y = self.position(row, depth)
         if mode is None:
             mode_id = self.mode_id(layer)
         else:
@@ -454,7 +464,7 @@ class _Compiler:
             self._external_input_target = merge_name
         comment = "%s: %s" % (comment_prefix, layer.name)
         if comment_prefix == "PSD clipping chain merge":
-            comment += " [P4-01 outer boundary]"
+            comment += " [P4-01 outer boundary; P4-04 base blend/opacity once]"
         self._current_tools.append(
             _merge(
                 merge_name,
@@ -479,7 +489,8 @@ class _Compiler:
     ) -> _Source:
         clip_name = self.name("ClipIn" + scope, layer.id)
         self.clip_count += 1
-        x, y = self.position(2, depth)
+        row = self._clipping_clip_rows.get(layer.id, 2)
+        x, y = self.position(row, depth)
         self._current_tools.append(
             _merge(
                 clip_name,
@@ -558,13 +569,22 @@ class _Compiler:
         for member_index, member in enumerate(members, 1):
             if not member.effective_visible:
                 continue
+            # Put the member loaders on distinct rows above the base.  The
+            # corresponding ClipIn sits one row above, while ClipStack stays
+            # beside the member so the shared matte and local result are easy
+            # to identify in Flow.  These are display-only overrides; the
+            # node emission and stream order remain PSD bottom-to-top.
+            member_row = member_index - member_total
+            self._clipping_loader_rows[member.id] = member_row
+            self._clipping_clip_rows[member.id] = member_row - 1
+            self._clipping_stack_rows[member.id] = member_row
             member_result = self.item(member, current, depth, scope)
             clipped_source = self.clipping_merge(
                 fixed_matte, member_result, member, depth, scope
             )
             merge_name = self.name("ClipStack" + scope, member.id)
             self.merge_count += 1
-            x, y = self.position(0, depth)
+            x, y = self.position(self._clipping_stack_rows[member.id], depth)
             self._current_tools.append(
                 _merge(
                     merge_name,
@@ -575,8 +595,11 @@ class _Compiler:
                     "PSD clipping subtree member (base=%s): %s"
                     % (base.id, member.name)
                     + " [P4-01 local Merge; ProcessAlpha=0 preserves base alpha; "
-                    + "P4-02 shared matte member %d/%d]"
-                    % (member_index, member_total),
+                    + (
+                        "P4-02 shared base matte member %d/%d; "
+                        "P4-03 member blend/opacity local]"
+                        % (member_index, member_total)
+                    ),
                     x,
                     y,
                     # Photoshop clipping keeps the base alpha as the chain
@@ -633,6 +656,7 @@ class _Compiler:
                     subtree = self.clipping_subtree(
                         base_result, layer, members, depth, scope
                     )
+                    self._clipping_outer_rows[layer.id] = 0
                     current = self.merge_item(
                         current,
                         subtree,

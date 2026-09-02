@@ -8,7 +8,7 @@ Work these items in order. One item at a time. Prefer ordinary Fusion Loader / M
 
 ## P4-01 — Simplest 1:1 clipping recipe
 
-Status: COMPLETE (selected candidate A; P4-02 and later items remain not started)
+Status: COMPLETE (selected candidate A; P4-02 through P4-07 are now complete)
 
 Goal: represent one PSD base + one clipped member with the smallest readable Fusion graph.
 
@@ -42,7 +42,7 @@ Done when:
 ## P4-02 — Multiple clipped members share one base matte
 
 Status: COMPLETE (three-member fixture verifies the selected recipe; P4-03
-and later items remain not started)
+through P4-07 extend it without changing the recipe)
 
 Goal: base + N clipped members.
 
@@ -78,6 +78,65 @@ Implementation evidence:
   silently dropping a non-contiguous member.
 - `tests/test_parity004_p402_graph.py` covers the graph shape and malformed-span
   guard.
+
+## P4-03 — Member blend and opacity placement
+
+Status: COMPLETE
+
+Member `ApplyMode`/`Blend` controls are emitted on each local ClipStack Merge;
+the fixed `ClipIn` remains `Operator=In`, Normal, and Blend 1.  The focused
+fixture covers Normal, Multiply, Linear Dodge, Overlay, and 25/50/75% member
+opacity values.
+
+Evidence: `scripts/parity/p4_03.py`,
+`tests/test_parity004_p403_graph.py`.
+
+## P4-04 — Base blend and opacity boundary
+
+Status: COMPLETE
+
+The completed local stack enters exactly one outer chain Merge, which owns the
+base blend/overall opacity.  A paired fixture changes only the base controls
+and proves member-local controls remain unchanged.
+
+Evidence: `scripts/parity/p4_04.py`,
+`tests/test_parity004_p404_graph.py`.
+
+## P4-05 — Groups and nesting
+
+Status: COMPLETE
+
+The selected clipping recipe is covered inside isolated and Pass Through
+groups, nested isolated groups, and clipping spans adjacent to group
+boundaries.  Existing GroupOperator stream attachment remains unchanged;
+Pass Through exposes the one outer chain Merge as its input target.
+
+Evidence: `scripts/parity/p4_05.py`,
+`tests/test_parity004_p405_graph.py`.
+
+## P4-06 — Fusion Flow layout
+
+Status: COMPLETE
+
+Clipping member Loaders use deterministic per-member rows above the base;
+ClipIn/ClipStack pairs are clustered, the fixed matte connection remains
+visible, and the single outer Merge exits the cluster.  GroupOperator
+positions remain distinct.
+
+Evidence: `scripts/parity/p4_06.py`,
+`tests/test_parity004_p406_layout.py`.
+
+## P4-07 — Apply the recipe to the real PSD
+
+Status: COMPLETE
+
+The read-only `D:\Downloads\a.psd` expands to 23 default/true clipping chains
+and 59 members.  All chains pass the fixed-matte/Operator=In/ProcessAlpha=0
+structural checks and member/base control checks; representative chains span
+one-to-six members and nesting depths 2-4.
+
+Evidence: `scripts/parity/p4_07.py`, with full output kept under ignored
+`.local/`.
 
 ## P4-03 — Member blend and opacity placement
 
@@ -185,5 +244,6 @@ Pixel validation is feedback for the lowering recipe, not the design driver.
 
 ## Immediate next item
 
-P4-02 is complete. The next queued item is P4-03; do not start it in the
-current run.
+P4-03 through P4-07 are complete.  P4-08 may be attempted only as an
+immediately available ordinary Fusion load/readback sanity check; otherwise
+stop before P4-09 and leave pixel/reference validation deferred.
