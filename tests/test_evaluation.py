@@ -27,7 +27,8 @@ class EvaluationTests(unittest.TestCase):
         layer = SemanticLayer("x", "X", raw_blend="mul ", blend="Multiply")
         plan = evaluate_document(self.doc([layer]), "strict")
         self.assertEqual(plan.decisions[0].status, "unverified")
-        self.assertIn("Photoshop", plan.decisions[0].reason)
+        self.assertIn("deterministic semantic fixtures", plan.decisions[0].reason)
+        self.assertIn("actual Fusion render/reference comparison", plan.decisions[0].reason)
 
     def test_compatibility_is_explicit(self):
         layer = SemanticLayer("x", "X", raw_blend="zzzz", blend="Zzz", unsupported=["pixel-mask"])
