@@ -16,11 +16,14 @@ import sys
 from pathlib import Path
 from typing import Any, Dict, Iterable, List, Sequence, Tuple
 
+from PIL import Image, ImageCms
+
 ROOT = Path(__file__).resolve().parents[2]
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
 from psd2fusion.compositing import CORE_BLEND_MODES, composite_clipping_span
+from scripts.parity.parity import compare_images
 
 
 RGBA = Tuple[float, float, float, float]
@@ -424,6 +427,35 @@ def validate(fixtures: Path) -> Dict[str, Any]:
     }
 
 
+def compare(fixtures: Path, output: Path) -> Dict[str, Any]:
+    """Encode all expected/SUT pixels and run the PARITY-001 comparator."""
+
+    manifest = json.loads((fixtures / "manifest.json").read_text(encoding="utf-8"))
+    records = manifest.get("cases", [])
+    if not records:
+        return {"status": "FAIL", "reason": "fixture_manifest_empty", "case_count": 0}
+    output.mkdir(parents=True, exist_ok=True)
+    candidate_values = [_byte(value) for record in records for value in _evaluate(record)]
+    reference_values = [int(value) for record in records for value in record["expected_rgba8"]]
+    candidate = Image.new("RGBA", (len(records), 1))
+    reference = Image.new("RGBA", (len(records), 1))
+    candidate.putdata([tuple(candidate_values[index:index + 4]) for index in range(0, len(candidate_values), 4)])
+    reference.putdata([tuple(reference_values[index:index + 4]) for index in range(0, len(reference_values), 4)])
+    profile = ImageCms.ImageCmsProfile(ImageCms.createProfile("sRGB")).tobytes()
+    candidate_path = output / "candidate.png"
+    reference_path = output / "reference.png"
+    candidate.save(candidate_path, format="PNG", icc_profile=profile)
+    reference.save(reference_path, format="PNG", icc_profile=profile)
+    metrics = compare_images(candidate_path, reference_path, output / "diff")
+    return {
+        "status": "PASS" if metrics.get("status") == "PASS" else metrics.get("status", "BLOCKED"),
+        "case_count": len(records),
+        "candidate": str(candidate_path),
+        "reference": str(reference_path),
+        "comparator": metrics,
+    }
+
+
 def main() -> int:
     parser = argparse.ArgumentParser()
     sub = parser.add_subparsers(dest="command", required=True)
@@ -431,8 +463,16 @@ def main() -> int:
     gen.add_argument("--output", type=Path, required=True)
     val = sub.add_parser("validate")
     val.add_argument("--fixtures", type=Path, required=True)
+    cmp = sub.add_parser("compare")
+    cmp.add_argument("--fixtures", type=Path, required=True)
+    cmp.add_argument("--output", type=Path, required=True)
     args = parser.parse_args()
-    result = generate(args.output) if args.command == "generate" else validate(args.fixtures)
+    if args.command == "generate":
+        result = generate(args.output)
+    elif args.command == "validate":
+        result = validate(args.fixtures)
+    else:
+        result = compare(args.fixtures, args.output)
     print(json.dumps(result, ensure_ascii=False, indent=2))
     return 0 if result["status"] == "PASS" else 1
 
