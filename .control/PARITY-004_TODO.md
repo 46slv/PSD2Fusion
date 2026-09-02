@@ -1,249 +1,170 @@
 # PARITY-004 Fusion-first implementation TODO
 
-Purpose: finish grouped/default PSD clipping as a readable Fusion graph. The main work is node lowering: where layers enter, where masks are taken, where Merge happens, and where group/opacity boundaries live. Host render/reference work is validation after the graph recipe is stable.
+Purpose: finish grouped/default PSD clipping as a readable Fusion graph, then verify that the exact graph produces the required pixels in actual Fusion. Graph structure is a prerequisite, not pixel proof.
+
+Detailed remaining host/pixel procedure: `docs/PARITY_004_HOST_PIXEL_GATE.md`.
 
 ## Working rule
 
-Work these items in order. One item at a time. Prefer ordinary Fusion Loader / Merge / mask connections and readable Flow structure. Do not add new abstraction layers unless the existing Fusion nodes cannot express the required boundary.
+Work the remaining gates in order. Preserve the already-published P4-03 through P4-07 structural candidate unless host/pixel evidence identifies a concrete defect. Prefer ordinary Fusion Loader / Merge / mask connections and readable Flow structure. Do not add a new abstraction layer merely because a proof gate is pending.
+
+Do not start `PARITY-005`, `PARITY-006`, or a broad compiler/planner redesign before the first P4-09 baseline unless the current graph cannot load/render and the blocker is already localized to that architecture boundary.
+
+## Current recipe
+
+Canonical grouped/default `clbl=true` candidate:
+
+```text
+base Loader
+  -> fixed base matte reused by every member
+  -> one ClipIn Merge (`Operator=In`) per member
+  -> local ClipStack Merge per member (`ProcessAlpha=0`)
+  -> one outer chain Merge with base blend/overall opacity
+```
+
+The direct Effect Mask candidate was rejected for partial base alpha because ordinary source-over would expand coverage without an additional alpha-preserving stage.
 
 ## P4-01 — Simplest 1:1 clipping recipe
 
-Status: COMPLETE (selected candidate A; P4-02 through P4-07 are now complete)
+Status: `STRUCTURAL_COMPLETE / HOST_PIXEL_PENDING`
 
-Goal: represent one PSD base + one clipped member with the smallest readable Fusion graph.
+Selected candidate: explicit fixed-matte `Operator=In` lowering.
 
-Compare two concrete lowerings:
+Structural evidence proves one base + one member lowers with no outer backdrop inside the local clipping operation. Pixel truth remains subject to P4-HOST-PIXEL.
 
-A. current lowering
-
-```text
-Base -----------------------> local base/current
-  \-> fixed matte -> ClipIn(In) <- Clipped
-                         |
-                         v
-                    ClipStack Merge
-```
-
-B. direct mask lowering candidate
-
-```text
-Base --------------------------> Merge Background
-  \-> base alpha/mask ---------> Merge Effect Mask
-Clipped -----------------------> Merge Foreground
-```
-
-Determine whether B reproduces the same required boundary as A for Normal, partial base alpha and transparent pixels. If yes, prefer B because it is closer to how a Fusion user would manually build clipping. If not, retain A and document the exact reason.
-
-Done when:
-- one canonical 1:1 recipe is selected;
-- generated `.comp` shows the relationship clearly;
-- no outer backdrop participates in the local clipping operation.
+Evidence: `scripts/parity/p4_01.py`, `tests/test_parity004_p401_graph.py` and committed P4-01 evidence.
 
 ## P4-02 — Multiple clipped members share one base matte
 
-Status: COMPLETE (three-member fixture verifies the selected recipe; P4-03
-through P4-07 extend it without changing the recipe)
+Status: `STRUCTURAL_COMPLETE / HOST_PIXEL_PENDING`
 
-Goal: base + N clipped members.
+All members reuse the exact same base coverage. Member order follows PSD bottom-to-top order. The progressively composited local result is never used as the next member matte.
 
-Required shape:
+Evidence:
 
-```text
-                 Clip 1
-                   |
-Base alpha --------+---- mask
-                   v
-Base ----------> local Merge 1
-                   |
-                 Clip 2
-                   |
-Base alpha --------+---- mask
-                   v
-              local Merge 2
-                   |
-                  ...
-```
-
-All members reuse the same base coverage. Member order follows PSD bottom-to-top order. Do not derive the mask from the progressively composited local result.
-
-Done when one base with 2+ members lowers deterministically and remains readable.
-
-Implementation evidence:
-
-- `scripts/parity/p4_02.py` emits a deterministic three-member graph and checks
-  shared base matte, per-member `Operator=In`, PSD bottom-to-top order, local
-  `ProcessAlpha=0` stacks, and one outer Merge.
-- `psd2fusion/fusion_comp.py` captures the base matte once for the local span,
-  reuses it for every member, and rejects an incomplete true chain instead of
-  silently dropping a non-contiguous member.
-- `tests/test_parity004_p402_graph.py` covers the graph shape and malformed-span
-  guard.
+- `scripts/parity/p4_02.py`;
+- `psd2fusion/fusion_comp.py` strict contiguous-span handling;
+- `tests/test_parity004_p402_graph.py`.
 
 ## P4-03 — Member blend and opacity placement
 
-Status: COMPLETE
+Status: `STRUCTURAL_COMPLETE / HOST_PIXEL_PENDING`
 
-Member `ApplyMode`/`Blend` controls are emitted on each local ClipStack Merge;
-the fixed `ClipIn` remains `Operator=In`, Normal, and Blend 1.  The focused
-fixture covers Normal, Multiply, Linear Dodge, Overlay, and 25/50/75% member
-opacity values.
+Member `ApplyMode` and `Blend` controls live on each local ClipStack Merge. The fixed ClipIn remains `Operator=In`, Normal, Blend 1. Structural fixtures cover Normal, Multiply, Linear Dodge, Overlay and 25/50/75/100% member opacity.
 
-Evidence: `scripts/parity/p4_03.py`,
-`tests/test_parity004_p403_graph.py`.
+Evidence: `scripts/parity/p4_03.py`, `tests/test_parity004_p403_graph.py`.
 
 ## P4-04 — Base blend and opacity boundary
 
-Status: COMPLETE
+Status: `STRUCTURAL_COMPLETE / HOST_PIXEL_PENDING`
 
-The completed local stack enters exactly one outer chain Merge, which owns the
-base blend/overall opacity.  A paired fixture changes only the base controls
-and proves member-local controls remain unchanged.
+The completed local stack enters exactly one outer chain Merge. That Merge owns the base blend and overall opacity once.
 
-Evidence: `scripts/parity/p4_04.py`,
-`tests/test_parity004_p404_graph.py`.
+Evidence: `scripts/parity/p4_04.py`, `tests/test_parity004_p404_graph.py`.
 
 ## P4-05 — Groups and nesting
 
-Status: COMPLETE
+Status: `STRUCTURAL_COMPLETE / HOST_PIXEL_PENDING`
 
-The selected clipping recipe is covered inside isolated and Pass Through
-groups, nested isolated groups, and clipping spans adjacent to group
-boundaries.  Existing GroupOperator stream attachment remains unchanged;
-Pass Through exposes the one outer chain Merge as its input target.
+The same clipping recipe is structurally covered inside isolated and Pass Through groups, nested isolated groups, and clipping spans adjacent to group boundaries. Existing GroupOperator stream attachment remains unchanged.
 
-Evidence: `scripts/parity/p4_05.py`,
-`tests/test_parity004_p405_graph.py`.
+Evidence: `scripts/parity/p4_05.py`, `tests/test_parity004_p405_graph.py`.
 
 ## P4-06 — Fusion Flow layout
 
-Status: COMPLETE
+Status: `COMPLETE`
 
-Clipping member Loaders use deterministic per-member rows above the base;
-ClipIn/ClipStack pairs are clustered, the fixed matte connection remains
-visible, and the single outer Merge exits the cluster.  GroupOperator
-positions remain distinct.
+Clipping member Loaders use deterministic rows above the base; ClipIn/ClipStack pairs are clustered; the fixed matte connection is visible; one outer Merge exits the cluster; GroupOperator boundaries remain visually distinct.
 
-Evidence: `scripts/parity/p4_06.py`,
-`tests/test_parity004_p406_layout.py`.
+Evidence: `scripts/parity/p4_06.py`, `tests/test_parity004_p406_layout.py`.
 
 ## P4-07 — Apply the recipe to the real PSD
 
-Status: COMPLETE
+Status: `STRUCTURAL_COMPLETE / HOST_PIXEL_PENDING`
 
-The read-only `D:\Downloads\a.psd` expands to 23 default/true clipping chains
-and 59 members.  All chains pass the fixed-matte/Operator=In/ProcessAlpha=0
-structural checks and member/base control checks; representative chains span
-one-to-six members and nesting depths 2-4.
+The read-only `D:\Downloads\a.psd` currently expands to:
 
-Evidence: `scripts/parity/p4_07.py`, with full output kept under ignored
-`.local/`.
+- 23 default/true clipping chains;
+- 59 clipped members;
+- 34 groups;
+- 363 generated Fusion tools.
 
-## P4-03 — Member blend and opacity placement
+All chains pass structural fixed-matte, `Operator=In`, `ProcessAlpha=0`, member-control and one-outer-boundary checks. Representative chains span one-to-six members and nesting depths 2-4.
 
-Goal: establish which local Merge owns each clipped member's blend mode and overall opacity.
-
-Test at least:
-- Normal
-- Multiply
-- Linear Dodge
-- Overlay
-- 25/50/75% member opacity
-
-The member blend/opacity belongs to the local member Merge, not to the final outer Merge.
-
-Done when generated node controls match the PSD member semantics for the existing supported subset.
-
-## P4-04 — Base blend and opacity boundary
-
-Goal: keep base-local clipping construction separate from how the completed chain enters the lower PSD backdrop.
-
-Target:
-
-```text
-outer backdrop D ----------> Outer Merge Background
-local clipping result S ---> Outer Merge Foreground
-base blend / opacity ------> Outer Merge controls
-```
-
-Base blend/overall opacity is applied once at this outer boundary.
-
-Done when changing base opacity/blend changes only the chain-to-parent boundary, not each clipped member individually.
-
-## P4-05 — Groups and nesting
-
-Goal: make the same clipping recipe work inside existing group lowering.
-
-Cover:
-- clipping inside isolated group;
-- clipping inside Pass Through group;
-- nested isolated groups;
-- clipping base or member adjacent to group boundaries.
-
-Do not redesign GroupOperator. Fix only where clipping's local/outer Merge boundaries attach to the existing group stream.
-
-Done when the same clipping recipe composes correctly at each existing group boundary.
-
-## P4-06 — Fusion Flow layout
-
-Goal: make generated graphs understandable without reading the manifest.
-
-Layout conventions:
-- PSD flow continues primarily left-to-right;
-- base Loader is visually below/near its clipping chain;
-- clipped member Loaders stack visibly around the base;
-- mask connection is visually obvious;
-- local clipping Merges are clustered;
-- one outer Merge exits the clipping cluster;
-- GroupOperator boundaries remain visually distinct.
-
-Prefer stable deterministic positions over automatic layout heuristics.
-
-Done when a user can identify base, clipped members, local chain and outer Merge by looking at Flow.
-
-## P4-07 — Apply the recipe to the real PSD
-
-Input: `D:\Downloads\a.psd` read-only.
-
-Apply the selected graph recipe to all existing default/true clipping chains.
-
-Expected current structure:
-- 23 clipping chains;
-- 59 clipped members.
-
-Inspect representative chains of different sizes and nesting depths, not only aggregate counts.
-
-Done when all 23 chains use the same explicit recipe and no special-case graph is introduced without a PSD-semantic reason.
+Evidence: `scripts/parity/p4_07.py`, committed P4-07/P4-03-through-P4-07 evidence, with full outputs kept under ignored `.local/`.
 
 ## P4-08 — Ordinary Fusion load/readback sanity
 
-Goal: confirm the generated `.comp` is usable in Fusion/Resolve.
+Status: `PENDING — NEXT`
 
-Only check what is needed for the product artifact:
+Use a new Resolve/Fusion launch and new project when practical; a known disposable test project is also acceptable.
+
+Required checks:
+
 - `.comp` loads;
-- expected tools/connections exist;
 - Loader paths resolve;
 - MediaOut receives the final stream;
-- no missing/invalid tools introduced by the new lowering.
+- representative GroupOperator and clipping connections survive;
+- `ApplyMode`, `Blend`, `Operator=In`, `ProcessAlpha=0`, and Loader `PostMultiply` survive readback/reload;
+- no missing/invalid tools are introduced;
+- record exact candidate commit and Resolve/Fusion version.
 
-Do not turn this item into render-harness development.
+P4-08 may establish `host_loaded`. It cannot establish `pixel_verified`.
 
-## P4-09 — Pixel/reference validation after graph stabilization
+## P4-HOST-PIXEL — Minimum actual-Fusion pixel gate
 
-After P4-01 through P4-08 are stable, render the resulting Fusion graph and compare with the existing golden reference. Use pixel differences to identify a specific graph-boundary defect, then return to the smallest relevant P4 item.
+Status: `PENDING — REQUIRED BEFORE REAL P4-09 INTERPRETATION`
 
-Pixel validation is feedback for the lowering recipe, not the design driver.
+Render deterministic micro fixtures in actual Fusion before diagnosing the full real PSD. At minimum cover:
 
-## Out of scope for this queue
+- Loader straight/premult and `PostMultiply` boundary;
+- `Operator=In` with fractional base/member alpha;
+- `ProcessAlpha=0` fixed-alpha invariant;
+- Normal / Multiply / Linear Dodge / Overlay member modes;
+- 25/50/75/100% member opacity;
+- base opacity and at least one non-Normal base mode;
+- transparent / black / white / colored outer backdrops.
 
-- explicit `clbl=false` semantics: PARITY-005;
+Use the existing comparator. Record actual rendered artifact hashes and RGBA/alpha metrics. Graph text or host readback alone is not pixel evidence.
+
+Full procedure: `docs/PARITY_004_HOST_PIXEL_GATE.md`.
+
+## P4-09 — Real Fusion render / golden-reference baseline
+
+Status: `PENDING`
+
+After P4-08 and a usable micro pixel gate, render the current real graph and compare it directly with `D:\Downloads\20260812.png`.
+
+The first run is a diagnostic baseline, not a requirement to pass immediately. Classify material differences before editing compositor math. Possible categories include color/profile, alpha/premult edge, blend family, one clipping chain, isolated/Pass Through group scope, placement/canvas, asset materialization, or unsupported semantics.
+
+For a material failure:
+
+1. reduce it to the smallest deterministic fixture;
+2. repair the smallest responsible boundary;
+3. rerun that focused fixture;
+4. rerun the real comparison;
+5. retain before/after metrics.
+
+Do not fit the reference by threshold relaxation, global grade, resize, blur, flatten, or whole-image correction.
+
+## Known architecture debt — observe, do not preemptively redesign
+
+Two known debts remain visible:
+
+1. Evaluation IR / capability decisions currently do not drive backend selection before graph compilation;
+2. asset materialization still needs an explicitly verified ICC / straight-premult / transparent-RGB contract.
+
+Do not ignore these. Also do not perform a broad rewrite before the first host/pixel baseline merely because they exist. Use actual Fusion evidence to determine whether either is causal. Before adding multiple backends, custom operations, verified bake paths or broader PSD feature support, capability planning must be connected to lowering so strict mode cannot silently emit an unverified backend.
+
+## Out of scope until PARITY-004 closes
+
+- explicit `clbl=false` semantics (`PARITY-005`);
+- broad real-PSD convergence work before the first P4-09 baseline (`PARITY-006`);
 - new PSD importer mechanism;
-- Photoshop automation;
-- new render framework;
-- global visual fitting/grade/resize/blur/flatten;
+- Photoshop automation as a dependency;
+- blind reference fitting;
 - unrelated PSD feature expansion.
 
-## Immediate next item
+## Immediate next action
 
-P4-03 through P4-07 are complete.  P4-08 may be attempted only as an
-immediately available ordinary Fusion load/readback sanity check; otherwise
-stop before P4-09 and leave pixel/reference validation deferred.
+Run P4-08 on the published current candidate. If it loads, run the minimum actual-Fusion pixel gate. Then take the first P4-09 real baseline. Keep `PARITY-004` `in_progress` until required host/pixel evidence is complete and a fresh verifier permits state transition.
