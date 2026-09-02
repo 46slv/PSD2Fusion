@@ -1,0 +1,93 @@
+{
+  "schema_version": 1,
+  "task": "PARITY-004",
+  "status": "awaiting_verification",
+  "verification": "pending",
+  "packet_id": "PARITY-004-20260902-170000",
+  "branch": "codex/parity-004",
+  "base_origin_main": "fdc3a098548e0e628974307fc17d4da25f19fdfb",
+  "candidate_commit": "6ddbe3f845e5bb5ec23fc4b43b3ceac0c597da5e",
+  "scope": {
+    "included": [
+      "absent/default true clbl and explicit true clbl",
+      "fixed base coverage and local-alpha invariant",
+      "same-parent member order and outer-backdrop isolation",
+      "base/member opacity and fractional alpha",
+      "Normal, Multiply, Linear Dodge and Overlay members",
+      "transparent RGB and zero-alpha matte behavior",
+      "deterministic clipping oracle fixtures and metamorphic guards",
+      "real a.psd structural chain plan regression"
+    ],
+    "excluded": ["clbl=false semantics (PARITY-005)", "clbl=false promotion"]
+  },
+  "fixture_validation": {
+    "generate_command": "python .\\scripts\\parity\\parity004.py generate --output .\\.local\\parity004-fixtures",
+    "validate_command": "python .\\scripts\\parity\\parity004.py validate --fixtures .\\.local\\parity004-fixtures",
+    "status": "PASS",
+    "cases": 2160,
+    "recomputed_cases": 2160,
+    "max_oracle_error": 0.0,
+    "metamorphic_failures": [],
+    "axes": {
+      "modes": ["Normal", "Multiply", "Linear Dodge", "Overlay"],
+      "backdrops": ["transparent", "black", "white", "gray", "saturated", "partial-alpha"],
+      "base_alpha": [0.0, 0.25, 0.5, 0.75, 1.0],
+      "member_alpha": [0.0, 0.5, 1.0],
+      "opacity": [0.0, 0.5, 1.0],
+      "member_orders": ["base-member1-member2", "base-member2-member1"]
+    },
+    "alpha_contract": "straight-rgba; fixed base coverage for local span; premultiply only at source-over boundary",
+    "transparent_rgb_policy": "canonical_zero_for_zero_alpha_matte",
+    "clbl_policy": "absent/default true and explicit true only; false excluded"
+  },
+  "real_psd_structure_regression": {
+    "command": "python .\\scripts\\parity\\parity.py plan --psd D:\\Downloads\\a.psd --output .\\.local\\parity004-real\\plan.json --policy strict",
+    "status": "PASS",
+    "psd_sha256": "574d8a6511b2aabe744835d81ed76c8fc8ffd0c9c5678f3359e8eda10f9174db",
+    "descendants": 136,
+    "groups": 34,
+    "clipping_chains": 23,
+    "clipped_members": 59,
+    "clbl_false_claimed": false,
+    "pixel_parity_claim": false
+  },
+  "host_reference": {
+    "photoshop": {
+      "version": "27.8",
+      "status": "BLOCKED",
+      "blocker": "Error in locale file: Unknown escape sequence (\\プ) encountered; JSX oracle produced no reference pixels"
+    },
+    "resolve_fusion": {
+      "resolve_version": "21.0.3.7",
+      "fuscript_version": "21.0.3",
+      "status": "BLOCKED",
+      "blocker": "Fusion scripting endpoint unavailable; no host load/render pixels"
+    },
+    "full_reference_comparison": "NOT_RUN; Photoshop/Resolve pixel gates remain fail-closed"
+  },
+  "offline_checks": {
+    "command": "pwsh -NoProfile -File .\\scripts\\check.ps1",
+    "status": "PASS",
+    "tests": 39,
+    "python_compile": "PASS"
+  },
+  "environment": {
+    "windows": "Windows 11 build 26200",
+    "python": "3.12.10",
+    "psd_tools": "1.18.0",
+    "pillow": "12.3.0",
+    "powershell": "7.6.5",
+    "git": "2.51.0.windows.1"
+  },
+  "reference_inputs": {
+    "read_only": true,
+    "psd_sha256_before_after": "574d8a6511b2aabe744835d81ed76c8fc8ffd0c9c5678f3359e8eda10f9174db",
+    "reference_png_sha256": "91ff8daef941b3d9052497190fdc8aa6f4d56ba524c8d912cf011b6818535f54"
+  },
+  "promotion": {
+    "status": "blocked",
+    "reason": "Deterministic clipping semantics and real-PSD structural coverage pass, but Photoshop oracle and Resolve/Fusion render pixels remain unavailable; no capability promotion",
+    "silent_fallback": false
+  },
+  "verifier_starting_point": "Fresh Luna Verifier must independently checkout candidate_commit, rerun parity004 fixture generation/validation, check check.ps1, inspect real-PSD 23-chain structure, audit clbl=false exclusion and false-PASS risks, then record PASS/FAIL/BLOCKED."
+}
