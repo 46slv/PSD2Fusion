@@ -102,6 +102,14 @@ def evaluate_document(document: Any, policy: str = "strict") -> EvaluationPlan:
                                "opacity": layer.opacity, "fill_opacity": layer.fill_opacity,
                                "clipping_base_id": layer.clipping_base_id})
         plan.nodes.append(node); plan.decisions.append(dec)
+        if layer.opacity < 0.999999 or layer.fill_opacity is not None:
+            counter += 1
+            od = CapabilityDecision("verified_fusion_native", "opacity_stage", "explicit opacity boundary", policy, {"source_id": layer.id})
+            on = EvaluationNode("eval-%04d" % counter, "opacity_stage", [layer.id], node.id, order,
+                                "local" if layer.is_group else "parent", layer.blend, layer.raw_blend,
+                                layer.opacity, layer.fill_opacity, layer.effective_visible, od,
+                                {"source_id": layer.id, "overall_opacity": layer.opacity, "fill_opacity": layer.fill_opacity})
+            plan.nodes.append(on); plan.decisions.append(od)
         for idx, child in enumerate(layer.children):
             node.children.append(visit(child, node.id, idx))
         return node.id
