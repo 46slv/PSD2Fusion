@@ -101,6 +101,22 @@ class CapabilityAndFixtureTests(unittest.TestCase):
             self.assertEqual("unverified", record.status)
             self.assertFalse(proof_fields_complete({"candidate_commit": "x", "proof_id": "p", "photoshop": {"version": "not_run"}, "resolve_fusion": {"version": "not_run"}, "metrics": {}}))
 
+    def test_fusion_proof_does_not_require_photoshop(self):
+        evidence = {
+            "candidate_commit": "x",
+            "proof_id": "p",
+            "deterministic_fixtures": {"status": "PASS"},
+            "resolve_fusion": {
+                "version": "21.0.3.7",
+                "render_artifact": {"path": "render.png", "sha256": "a" * 64},
+            },
+            "reference_comparison": {"status": "PASS"},
+            "metrics": {"rgba_error": {"max": 0}, "alpha_error": {"max": 0}},
+        }
+        self.assertTrue(proof_fields_complete(evidence))
+        evidence["photoshop"] = {"version": "not_run"}
+        self.assertTrue(proof_fields_complete(evidence))
+
     def test_matrix_generation_and_validation(self):
         with tempfile.TemporaryDirectory() as directory:
             generated = generate(directory)

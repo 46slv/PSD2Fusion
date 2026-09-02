@@ -72,9 +72,10 @@ def _decision(layer: Any, policy: str) -> CapabilityDecision:
         return CapabilityDecision(status, "layer", ",".join(unsupported), policy,
                                   {"raw_blend": getattr(layer, "raw_blend", None), "source_id": layer.id})
     record = capability_for_blend(blend)
-    # A same-named Fusion ApplyMode is only a candidate lowering.  Until the
-    # PARITY-003 proof packet has both Photoshop/reference pixels and a tied
-    # Resolve render, preserve the explicit ``unverified`` state in strict IR.
+    # A same-named Fusion ApplyMode is only a candidate lowering. Until the
+    # deterministic semantic-fixture, PSD-provenance, actual Fusion-render,
+    # and golden-reference proof packet is complete, preserve the explicit
+    # ``unverified`` state in strict IR. Photoshop evidence is optional.
     status = record.status
     if policy == "compatibility" and status == "rejected":
         status = "verified_bake"

@@ -1,9 +1,10 @@
 """Strict compositing capability registry.
 
-Names in Fusion are not proof that Photoshop and Fusion produce the same
-pixels.  The registry therefore keeps the four PARITY-003 candidates
-``unverified`` until a summary packet contains both Photoshop/reference and
-Resolve/Fusion pixel evidence tied to one exact commit.
+Names in Fusion are not proof that the renderer produces the required pixels.
+The registry therefore keeps the four PARITY-003 candidates ``unverified``
+until a summary packet contains deterministic semantic-fixture evidence, PSD
+provenance, an actual Fusion pixel artifact, and a golden-reference comparison
+tied to one exact commit. Photoshop is optional historical/additional evidence.
 """
 
 from __future__ import annotations
@@ -50,14 +51,19 @@ def _unverified_blend(mode: str, fusion_id: str) -> CapabilityRecord:
         backend="fusion_native_candidate",
         fusion_id=fusion_id,
         reason=(
-            "Fusion ApplyMode name is not Photoshop pixel proof; "
-            "PARITY-003 requires a Photoshop oracle and a Resolve/Fusion "
-            "host render tied to the exact commit"
+            "Fusion ApplyMode name is not pixel proof; PARITY-004 requires "
+            "deterministic semantic fixtures, PSD provenance, and an actual "
+            "Fusion render/reference comparison tied to the exact commit"
         ),
         constraints={
             "color_space": "declared 8-bit RGB profile",
             "alpha": "straight/premult boundary must be recorded",
-            "proof_required": ["photoshop_reference_pixels", "fusion_host_render"],
+            "proof_required": [
+                "deterministic_fixture_evidence",
+                "fusion_render_artifact",
+                "reference_png_comparison",
+            ],
+            "optional_evidence": ["gimp_cross_renderer", "photoshop_historical"],
         },
     )
 
@@ -137,17 +143,34 @@ def proof_fields_complete(evidence: Mapping[str, Any]) -> bool:
     an evidence/state-transition decision after a fresh verifier pass.
     """
 
-    required = ("candidate_commit", "proof_id", "photoshop", "resolve_fusion", "metrics")
+    required = (
+        "candidate_commit",
+        "proof_id",
+        "deterministic_fixtures",
+        "resolve_fusion",
+        "reference_comparison",
+        "metrics",
+    )
     if any(not evidence.get(field) for field in required):
         return False
-    photoshop = evidence.get("photoshop")
+    fixtures = evidence.get("deterministic_fixtures")
     resolve = evidence.get("resolve_fusion")
+    comparison = evidence.get("reference_comparison")
     metrics = evidence.get("metrics")
+    artifact = resolve.get("render_artifact") if isinstance(resolve, Mapping) else None
+    artifact_complete = (
+        isinstance(artifact, Mapping)
+        and artifact.get("path") not in (None, "", "not_run")
+        and artifact.get("sha256") not in (None, "", "not_run")
+    )
     return (
-        isinstance(photoshop, Mapping)
-        and photoshop.get("version") not in (None, "", "not_run")
+        isinstance(fixtures, Mapping)
+        and fixtures.get("status") == "PASS"
         and isinstance(resolve, Mapping)
         and resolve.get("version") not in (None, "", "not_run")
+        and artifact_complete
+        and isinstance(comparison, Mapping)
+        and comparison.get("status") == "PASS"
         and isinstance(metrics, Mapping)
         and metrics.get("rgba_error") is not None
         and metrics.get("alpha_error") is not None
