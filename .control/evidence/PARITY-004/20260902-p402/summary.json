@@ -1,0 +1,85 @@
+{
+  "schema_version": 1,
+  "task": "PARITY-004",
+  "item": "P4-02",
+  "status": "PASS",
+  "verification": "pending_fresh_luna",
+  "branch": "codex/parity-004",
+  "candidate_head": "542d51916c060d0f4fb0a7c35f4c11d930674cd4",
+  "scope": {
+    "p4_01_recipe_preserved": true,
+    "p4_02_only": true,
+    "p4_03_and_later_started": false,
+    "host_render": "NOT_RUN_BY_SCOPE",
+    "photoshop": "NOT_RUN_BY_SCOPE",
+    "pixel_proof_infrastructure_changed": false,
+    "real_inputs_modified": false
+  },
+  "recipe": {
+    "selected": "operator_in_fixed_matte_local_stack",
+    "graph": "base Loader -> fixed shared matte / one ClipIn Operator=In per member -> local ClipStack Merge(ProcessAlpha=0) in PSD bottom-to-top order -> one outer chain Merge",
+    "base_matte": "every ClipIn background is the exact base Loader; no ClipIn uses a progressive ClipStack output",
+    "outer_boundary": "outer backdrop enters only the single chain Merge after the complete local stack"
+  },
+  "fixture": {
+    "command": "python scripts/parity/p4_02.py .local/p4-02-542d519-20260902",
+    "status": "PASS",
+    "members": 3,
+    "clbl_provenance": "photoshop_default_true",
+    "tool_count": 15,
+    "merge_count": 5,
+    "clip_count": 3,
+    "checks": {
+      "one_base_loader": true,
+      "all_members_reuse_exact_base_matte": true,
+      "every_member_has_operator_in_and_local_stack": true,
+      "member_order_is_bottom_to_top": true,
+      "outer_backdrop_not_in_local_chain": true,
+      "one_outer_merge_after_complete_stack": true
+    }
+  },
+  "artifacts": {
+    "output_root": ".local/p4-02-542d519-20260902",
+    "comp": {
+      "path": ".local/p4-02-542d519-20260902/p4_02.comp",
+      "size": 9142,
+      "sha256": "3efa149b51de52c4d9b721fea2ad868e4971f3b6131c7e265ce0d739af7f006f"
+    },
+    "report": {
+      "path": ".local/p4-02-542d519-20260902/report.json",
+      "size": 3356,
+      "sha256": "a043afc590a27f5e2563985397395462c97aa1f2b0632c62fb5828016e34d6e3"
+    }
+  },
+  "checks": {
+    "focused_tests": {
+      "status": "PASS",
+      "command": "python -m unittest tests.test_parity004_p402_graph tests.test_clipping_subtree tests.test_parity004_p401_graph tests.test_parity004_clipping -v",
+      "tests": 16
+    },
+    "repository_check": {
+      "status": "PASS",
+      "command": "pwsh -NoProfile -File .\\scripts\\check.ps1",
+      "tests": 50,
+      "control_state": "PASS",
+      "python_compile": "PASS"
+    },
+    "malformed_true_chain_guard": {
+      "status": "PASS",
+      "detail": "A non-contiguous true chain raises instead of silently dropping a member"
+    }
+  },
+  "claims": {
+    "graph_recipe": "PASS",
+    "structural": "P4-02 three-member micro-comp only",
+    "host_loaded": false,
+    "pixel_verified": false
+  },
+  "false_pass_checks": {
+    "progressive_stack_used_as_matte": "PASS; all three ClipIn backgrounds equal the base Loader",
+    "member_order_unverified": "PASS; stack emission order follows the declared PSD bottom-to-top chain order",
+    "outer_backdrop_inside_local_chain": "PASS; local ClipIn/ClipStack sources exclude outer Merge sources",
+    "load_or_graph_is_pixel_proof": "PASS; no host load/render or pixel claim was made",
+    "scope_advanced": "PASS; P4-03+, Photoshop and host/render infrastructure remain untouched"
+  }
+}
