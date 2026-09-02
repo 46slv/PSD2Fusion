@@ -1,0 +1,166 @@
+{
+  "schema_version": 1,
+  "task": "PARITY-003",
+  "status": "awaiting_verification",
+  "verification": "pending",
+  "packet_id": "PARITY-003-20260902-161254",
+  "branch": "codex/parity-003",
+  "base_origin_main": "53009c5688399da8fe76e6245f3304637150fdc6",
+  "candidate_commit": "2979e657959fe0b7bf7f271cf7d3d09d1a8e369a",
+  "scope": {
+    "included": [
+      "Normal",
+      "Multiply",
+      "Linear Dodge",
+      "Overlay",
+      "ordinary overall opacity",
+      "isolated-group opacity",
+      "nested opacity boundaries",
+      "source and partially transparent backdrop alpha",
+      "declared sRGB/linear-sRGB color space and ICC metadata",
+      "clamp and over-range behavior",
+      "transparent RGB canonicalization",
+      "straight/premultiplied edge boundary"
+    ],
+    "excluded": [
+      "PARITY-004 grouped/default clipping redesign",
+      "full a.psd pixel convergence"
+    ]
+  },
+  "fixture_validation": {
+    "command": "python .\\scripts\\parity\\parity003.py generate --output .\\.local\\parity003-fixtures && python .\\scripts\\parity\\parity003.py validate --fixtures .\\.local\\parity003-fixtures --summary .\\.local\\parity003-fixtures\\validation.json",
+    "status": "PASS",
+    "blend_cases": 1983,
+    "recomputed_cases": 1983,
+    "ordinary_opacity_cases": 5,
+    "recomputed_opacity_cases": 5,
+    "group_cases": 6,
+    "recomputed_group_cases": 6,
+    "max_oracle_error": 0.0,
+    "max_boundary_error": 0.0,
+    "metamorphic_failures": [],
+    "profile": {
+      "name": "sRGB IEC61966-2.1",
+      "icc_profile_sha256": "215d9fadbfc938862a82f2633b51fee128b58767f7d7ac55d32cb7e00031bb0d",
+      "transform": "none"
+    },
+    "alpha_contract": "straight-rgba; premultiply only at source-over boundary",
+    "transparent_rgb_policy": "canonical_zero_for_zero_alpha_backdrop",
+    "clamp_policy": "channel clamp enabled unless case.clamp=false",
+    "comparator": {
+      "harness": "PARITY-001 compare_images",
+      "status": "PASS",
+      "candidate_dimensions": [1983, 1],
+      "reference_dimensions": [1983, 1],
+      "candidate_channels": 4,
+      "reference_channels": 4,
+      "profile_status": "match",
+      "threshold": 0.0,
+      "rgba_error": {"max": 0, "mean": 0.0, "p99": 0.0},
+      "rgb_error": {"max": 0, "mean": 0.0, "p99": 0.0},
+      "alpha_error": {"max": 0, "mean": 0.0, "p99": 0.0},
+      "threshold_exceeding_count": 0,
+      "outlier_guard_count": 0,
+      "edge_band_max": 0,
+      "opaque_region_max": 0,
+      "transparent_region_max": 0,
+      "transparent_rgb_region_max": 0,
+      "difference_bbox": null
+    },
+    "capability_statuses": {
+      "Normal": "unverified",
+      "Multiply": "unverified",
+      "Linear Dodge": "unverified",
+      "Overlay": "unverified"
+    }
+  },
+  "real_psd_structure_regression": {
+    "command": "python .\\scripts\\parity\\parity.py plan --psd D:\\Downloads\\a.psd --output .\\.local\\parity003-real\\plan.json --policy strict",
+    "status": "PASS",
+    "psd_sha256": "574d8a6511b2aabe744835d81ed76c8fc8ffd0c9c5678f3359e8eda10f9174db",
+    "descendants": 136,
+    "groups": 34,
+    "clipping_chains": 23,
+    "clipped_members": 59,
+    "evaluation_nodes": 137,
+    "evaluation_decisions": 160,
+    "decision_statuses": {"unverified": 160},
+    "pixel_parity_claim": false
+  },
+  "offline_checks": {
+    "command": "pwsh -NoProfile -File .\\scripts\\check.ps1",
+    "status": "PASS",
+    "tests": 35,
+    "warnings": ["Pillow getdata deprecation warnings only"],
+    "git_diff_check": "PASS"
+  },
+  "photoshop": {
+    "executable": "C:\\Program Files\\Adobe\\Adobe Photoshop 2026\\Photoshop.exe",
+    "version": "27.8",
+    "fixture_script": "scripts/photoshop/parity003_oracle.jsx",
+    "attempt": "Photoshop.exe -r scripts/photoshop/parity003_oracle.jsx",
+    "status": "BLOCKED",
+    "oracle_output_created": false,
+    "blocker": "Error in locale file: Unknown escape sequence (\\プ) encountered",
+    "real_psd_opened": false,
+    "reference_pixels_recorded": false
+  },
+  "resolve_fusion": {
+    "resolve_version": "21.0.3.7",
+    "fuscript_version": "21.0.3",
+    "fuscript": "C:\\Program Files\\Blackmagic Design\\DaVinci Resolve\\fuscript.exe",
+    "probe": "scripts/resolve/parity003_probe.lua",
+    "wrapper": "scripts/parity/run_parity003_host.ps1",
+    "status": "BLOCKED",
+    "probe_summary": "parity-output/PARITY-003-host-final/summary.json",
+    "probe_log": "parity-output/PARITY-003-host-final/resolve-probe.txt",
+    "candidate_count": 5,
+    "load_pass_count": 0,
+    "render_output_count": 0,
+    "blocker": "Fusion scripting endpoint is unavailable",
+    "pixel_comparison_recorded": false,
+    "prior_load_only_evidence": "docs/host-smoke-handoff.md",
+    "load_only_is_not_pixel_proof": true
+  },
+  "environment": {
+    "observed_at": "2026-09-02T16:09:53.3524493+09:00",
+    "windows": "Windows 11 build 26200",
+    "python": "3.12.10",
+    "psd_tools": "1.18.0",
+    "pillow": "12.3.0",
+    "powershell": "7.6.5",
+    "git": "2.51.0.windows.1"
+  },
+  "reference_inputs": {
+    "read_only": true,
+    "psd": {
+      "path": "D:\\Downloads\\a.psd",
+      "sha256_before": "574d8a6511b2aabe744835d81ed76c8fc8ffd0c9c5678f3359e8eda10f9174db",
+      "sha256_after": "574d8a6511b2aabe744835d81ed76c8fc8ffd0c9c5678f3359e8eda10f9174db",
+      "unchanged": true
+    },
+    "reference_png": {
+      "path": "D:\\Downloads\\20260812.png",
+      "sha256": "91ff8daef941b3d9052497190fdc8aa6f4d56ba524c8d912cf011b6818535f54",
+      "used_for_parity003": false
+    }
+  },
+  "promotion": {
+    "status": "blocked",
+    "reason": "The software matrix is reproducible, but neither Photoshop reference pixels nor a Resolve/Fusion host render and PARITY-001 comparison were recorded.",
+    "required_for_verified_fusion_native_or_custom": [
+      "Photoshop/reference pixels",
+      "Resolve/Fusion rendered pixels",
+      "exact candidate commit and environment",
+      "project/color settings, input/output profile and alpha contract",
+      "measured RGBA and alpha error floor"
+    ],
+    "silent_fallback": false
+  },
+  "privacy": {
+    "real_psd_committed": false,
+    "reference_png_committed": false,
+    "full_resolution_or_per_layer_outputs_committed": false,
+    "safe_summary": true
+  }
+}

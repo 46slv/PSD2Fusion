@@ -46,14 +46,14 @@
     },
     {
       "id": "PARITY-003",
-      "status": "in_progress",
+      "status": "awaiting_verification",
       "requires": [
         "PARITY-002"
       ],
       "verification": "pending",
       "branch": "codex/parity-003",
-      "commit": null,
-      "evidence": []
+      "commit": "2979e657959fe0b7bf7f271cf7d3d09d1a8e369a",
+      "evidence": [".control/evidence/PARITY-003/20260902-161254/summary.json"]
     },
     {
       "id": "PARITY-004",
