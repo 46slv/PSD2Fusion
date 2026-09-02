@@ -31,7 +31,7 @@
       "verification": "pending",
       "branch": "codex/parity-001",
       "commit": null,
-      "evidence": [".control/evidence/PARITY-001/20260902-124844/summary.json"]
+      "evidence": [".control/evidence/PARITY-001/20260902-153600/summary.json"]
     },
     {
       "id": "PARITY-002",
