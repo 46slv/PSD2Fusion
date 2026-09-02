@@ -1,33 +1,46 @@
 # PSD2Fusion
 
+PSD2Fusion converts Photoshop PSD structure into a readable DaVinci Resolve/Fusion graph.
+
+## Current development program
+
+The active Goal is Photoshop compositing fidelity for blend modes, opacity, groups, and especially clipping.
+
+A fresh Codex/agent starts here:
+
+1. `AGENTS.md`
+2. `.control/current.json`
+3. `.control/CURRENT_GOAL.md`
+4. the current code/tests/evidence needed by `active_task_id`
+
+Chat history is not required. The real PSD/PNG target is recorded in the Goal as read-only local input and is never committed.
+
+Run repository-level offline checks with:
+
+```powershell
+pwsh -NoProfile -File .\scripts\check.ps1
+```
+
 ## First usable conversion
 
-Install the parser and raster dependencies, then generate a Fusion composition:
+Install dependencies and generate a Fusion composition:
 
 ```powershell
 python -m pip install -e .
 python -m psd2fusion path\to\art.psd --output path\to\art_fusion
-# Re-run into an existing generated directory only when intended:
 python -m psd2fusion path\to\art.psd --output path\to\art_fusion --force
 ```
 
-The output directory contains `PSD2Fusion.comp`, full-canvas RGBA derivatives
-under `assets/`, and `manifest.json`. The Resolve menu integration inserts the
-generated graph directly into the currently selected Fusion Composition; the
-`.comp`, assets, and manifest remain available as recovery/debug artifacts.
-The exact manual host-smoke procedure and any environment blocker are recorded
-in `docs/host-smoke-handoff.md`.
-Unsupported layer kinds are retained in the manifest and selectively baked
-when `psd-tools` can provide pixels; no Photoshop parity is implied.
+Output contains `PSD2Fusion.comp`, full-canvas RGBA derivatives under `assets/`, and `manifest.json`.
+
+FIRST_USABLE output is not automatically Photoshop pixel parity. The historical boundary is documented in `ARCHITECTURE.md`; the active parity contract is `.control/CURRENT_GOAL.md`.
 
 ## DaVinci Resolve launcher
 
-Install the per-user Resolve/Fusion menu launcher from the repository root:
+Install the per-user Resolve/Fusion menu launcher:
 
-    pwsh -NoProfile -File .\scripts\install_resolve.ps1
+```powershell
+pwsh -NoProfile -File .\scripts\install_resolve.ps1
+```
 
-Then run Workspace > Scripts > Comp > PSD2Fusion from Resolve's Fusion page.
-After selecting a PSD, the generated nodes appear in the current Fusion
-Composition without opening the generated `.comp` separately.
-The install, uninstall, output, and known-limitation details are in
-`docs/resolve-integration.md`.
+Then run Workspace > Scripts > Comp > PSD2Fusion from Resolve's Fusion page. Integration details are in `docs/resolve-integration.md`.

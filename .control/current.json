@@ -1,0 +1,105 @@
+{
+  "$schema": "./state.schema.json",
+  "schema_version": 1,
+  "program_id": "PSD2FUSION-COMPOSITING-PARITY",
+  "status": "active",
+  "updated_date": "2026-09-02",
+  "baseline": {
+    "repository": "46slv/PSD2Fusion",
+    "default_branch": "main",
+    "starting_head": "3ee00bfdb52f7f15a644c98a43bf9de723374d45",
+    "claim": "FIRST_USABLE structure exists; Photoshop/reference pixel parity is unverified"
+  },
+  "reference_case": {
+    "case_id": "REAL-A-20260812",
+    "psd_path_windows": "D:\\Downloads\\a.psd",
+    "reference_png_path_windows": "D:\\Downloads\\20260812.png",
+    "read_only": true,
+    "commit_inputs_or_full_renders": false,
+    "identity_status": "unverified",
+    "normalization_status": "unverified",
+    "psd_sha256": null,
+    "reference_png_sha256": null
+  },
+  "active_task_id": "PARITY-001",
+  "task_contract": ".control/CURRENT_GOAL.md",
+  "tasks": [
+    {
+      "id": "PARITY-001",
+      "status": "ready",
+      "requires": [],
+      "verification": "pending",
+      "branch": null,
+      "commit": null,
+      "evidence": []
+    },
+    {
+      "id": "PARITY-002",
+      "status": "blocked",
+      "requires": [
+        "PARITY-001"
+      ],
+      "verification": "pending",
+      "branch": null,
+      "commit": null,
+      "evidence": []
+    },
+    {
+      "id": "PARITY-003",
+      "status": "blocked",
+      "requires": [
+        "PARITY-002"
+      ],
+      "verification": "pending",
+      "branch": null,
+      "commit": null,
+      "evidence": []
+    },
+    {
+      "id": "PARITY-004",
+      "status": "blocked",
+      "requires": [
+        "PARITY-003"
+      ],
+      "verification": "pending",
+      "branch": null,
+      "commit": null,
+      "evidence": []
+    },
+    {
+      "id": "PARITY-005",
+      "status": "blocked",
+      "requires": [
+        "PARITY-004"
+      ],
+      "verification": "pending",
+      "branch": null,
+      "commit": null,
+      "evidence": []
+    },
+    {
+      "id": "PARITY-006",
+      "status": "blocked",
+      "requires": [
+        "PARITY-004"
+      ],
+      "verification": "pending",
+      "branch": null,
+      "commit": null,
+      "evidence": []
+    },
+    {
+      "id": "PARITY-007",
+      "status": "blocked",
+      "requires": [
+        "PARITY-005",
+        "PARITY-006"
+      ],
+      "verification": "pending",
+      "branch": null,
+      "commit": null,
+      "evidence": []
+    }
+  ],
+  "transition_rule": "Worker submits awaiting_verification; a fresh verifier PASS is required before done or advancing active_task_id."
+}

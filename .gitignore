@@ -8,3 +8,7 @@ fixture*.psd
 clipfixture*.psd
 smoke-output/
 smoke-*/
+.local/
+artifacts/
+parity-output/
+.control/evidence/**/private/

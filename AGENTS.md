@@ -1,56 +1,73 @@
 # PSD2Fusion agent entrypoint
 
 ## Purpose
-PSD2Fusion turns Photoshop PSD structure into a readable, editable DaVinci Resolve/Fusion graph.
-The practical core is correct layer compositing, readable PSD group structure, and Photoshop-style clipping reconstructed as graph logic instead of being silently flattened or dropped.
+
+PSD2Fusion turns Photoshop PSD structure into a readable, editable DaVinci Resolve/Fusion graph. The active program is correct Photoshop compositing for blend modes, opacity, groups, and especially clipping, verified against deterministic fixtures and the real reference case.
 
 ## Authority
+
 Use this order when facts conflict:
-1. current user / Goal instruction;
-2. current repository code, tests, committed design authority, and observed Resolve/Fusion runtime evidence;
-3. this `AGENTS.md` and any more-specific nested instructions;
-4. committed research / prior-art notes;
-5. inference.
 
-Do not treat chat history or an uncommitted local note as repository authority.
+1. current user/Goal instruction;
+2. `.control/current.json` for current task/status and the current repository HEAD;
+3. current code, tests, `.control/CURRENT_GOAL.md`, and observed Photoshop/Resolve runtime evidence;
+4. this `AGENTS.md` and more-specific nested instructions;
+5. committed research/prior-art notes;
+6. inference.
 
-## Read conditionally
-- `docs/AGENT_OPERATIONS.md` — only when delegation, multi-agent work, or a long-running worker loop is useful.
-- `docs/SOL_OPERATIONS.md` — only for an explicit architecture-reset / first-usable implementation phase; it is project-specific development policy, not a requirement to redesign architecture during ordinary implementation.
+Do not treat chat history, memory, an uncommitted local note, or an agent completion message as repository authority.
 
-Do not load every mapped document for every task.
+## Mandatory opening
+
+For non-trivial work:
+
+1. read `.control/current.json`;
+2. read `.control/CURRENT_GOAL.md`;
+3. work only the `active_task_id`;
+4. inspect current branch/HEAD, relevant code/tests, and committed evidence;
+5. establish the current baseline or failure before editing.
+
+Read `docs/AGENT_OPERATIONS.md` only when delegation or a persistent loop materially helps. Do not load all research files by default.
 
 ## Protected invariants
-- Keep PSD semantic structure separate from Fusion serialization/layout so one does not become the accidental source of truth for the other.
-- Do not confuse visual grouping with Photoshop compositing semantics; Group/Underlay organization must not silently change pixel behavior.
-- Reconstruct clipping relationships explicitly when supported; never omit a clipping member while claiming fidelity.
-- Prefer an explicit raster/bake fallback for unsupported semantics over an editable but knowingly wrong approximation.
-- Do not claim Photoshop or Resolve parity without evidence appropriate to that claim; host behavior requires actual Resolve/Fusion host evidence.
-- When materially copying prior-art code, use only license-compatible sources and preserve required attribution/provenance.
 
-## Work rules
-- For ordinary implementation, treat the committed architecture as a constraint. Understand the touched boundary, then implement; do not reopen architecture merely because a cleaner system is imaginable.
-- For an explicitly authorized architecture redesign, reason deeply about the expensive-to-reverse boundaries, persist the resulting design, then stop redesigning and move to implementation.
-- Prefer adapting proven prior-art mechanics over rewriting solved plumbing for originality.
-- Keep the current Goal bounded and preserve unrelated work.
-- Add a new abstraction only when current required behavior or observed evidence needs it.
+- Keep raw PSD extraction, Semantic IR, Evaluation IR, Fusion lowering/layout, and host/reference verification separate.
+- Do not confuse visual grouping with Photoshop compositing semantics.
+- Treat clipping as a same-parent ordered compositing relation, not a per-layer mask shortcut.
+- Preserve raw blend/opacity/clipping/group provenance even when the backend cannot render it.
+- In strict parity work, never silently use Normal, 100% opacity, enabled visibility, unlabeled resize/color correction, or flattening.
+- Prefer an explicit verified bake/reject over an editable but knowingly wrong approximation.
+- Do not claim Photoshop pixel parity from parser structure, graph text, Resolve load success, or agent self-report.
+- The real PSD, reference PNG, full-resolution renders, and per-layer exports must not be committed to this public repository.
+- Material prior-art code reuse must be license-compatible and preserve attribution/provenance.
 
-## Validation entrypoints
-Until dedicated scripts exist, use the smallest executable check that proves the changed boundary.
+## Work and verification
 
-For FIRST_USABLE work, the minimum host smoke is: produce the intended Fusion artifact, have Resolve/Fusion recognize or load it, and execute the primary path once without immediate destructive failure.
+- A Worker may submit the active task as `awaiting_verification`; it may not self-mark `done` or advance `active_task_id`.
+- A fresh Verifier evaluates the Goal, exact candidate diff/commit, tests, and reproducible evidence, not the Worker's reasoning transcript.
+- Prefer executable fixtures, validators, comparison metrics, and scripts over more prompt prose.
+- Retry the same unchanged failure once at most; then change hypothesis/diagnostic or escalate.
+- Preserve unrelated work and both read-only reference inputs.
 
-Run broader regression, compatibility, packaging, performance, or release validation only when the current Goal, changed risk surface, or release policy requires it. Do not encode “run everything after every edit” as the default.
+Repository-level offline check:
+
+```powershell
+pwsh -NoProfile -File .\scripts\check.ps1
+```
+
+Host/reference checks are defined by the active task. Offline checks cannot substitute for a required Photoshop/Resolve run.
 
 ## Authority boundary
-In-scope reversible repository edits and non-destructive validation are allowed.
-Do not merge/release/publish, change credentials, force-push shared history, or perform destructive/irreversible operations without explicit authority.
+
+In-scope reversible repository edits and non-destructive validation are allowed. Do not overwrite the real PSD/reference, merge/release/deploy, change credentials, force-push shared history, or perform destructive/irreversible operations without explicit authority.
 
 ## Ownership map
-- detailed architecture / rationale -> architecture docs / ADRs created for that purpose;
-- current objective and stopping condition -> current Goal / task prompt;
-- repeated deterministic procedure -> test / script / Harness;
-- delegation procedure -> `docs/AGENT_OPERATIONS.md`;
-- project-specific first-usable implementation posture -> `docs/SOL_OPERATIONS.md`.
 
-Keep this file a map. Do not grow it into the project manual.
+- active task/status -> `.control/current.json`;
+- active Goal, architecture, validation, Worker/Verifier rules -> `.control/CURRENT_GOAL.md`;
+- historical FIRST_USABLE architecture -> root `ARCHITECTURE.md`;
+- PSD/file-format evidence -> `docs/research/`;
+- repeatable procedure -> tests/scripts/Harness;
+- delegation procedure -> `docs/AGENT_OPERATIONS.md`.
+
+Keep this file a map, not the project manual.
