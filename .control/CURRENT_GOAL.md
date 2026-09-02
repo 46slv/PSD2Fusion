@@ -103,6 +103,11 @@ Verify Normal, Multiply, Linear Dodge, Overlay, ordinary opacity, isolated-group
 
 ### PARITY-004 — Grouped/default clipping
 
+The current implementation run is limited to P4-01 in
+`.control/PARITY-004_TODO.md`: select and implement the smallest 1:1 PSD
+base/member Fusion graph. Host/render validation, P4-02 and later queue items,
+Photoshop work, and pixel-proof infrastructure changes remain deferred.
+
 Verify absent/default true and explicit true `clbl`. Run the gates in order: deterministic independent fixtures as the semantic/math gate; real PSD bytes, structure and provenance; actual Fusion render with a fresh pixel artifact; full comparison with `D:\Downloads\20260812.png`; then, if available, an optional GIMP cross-renderer comparison. Establish base-coverage stage, fixed matte, local-alpha invariant, member order, outer-backdrop isolation, base/member opacity, fractional edges and mixed blends. PSD bytes/semantic provenance remain authoritative for structure, and graph/load evidence never promotes a pixel claim. Photoshop evidence is optional/additional. Do not claim `clbl=false`.
 
 ### PARITY-005 — `clbl=false` and group interaction

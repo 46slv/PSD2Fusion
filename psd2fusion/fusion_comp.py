@@ -172,12 +172,15 @@ def _merge(
     y: float,
     operator: Optional[str] = None,
     process_alpha: Optional[bool] = None,
+    effect_mask: Optional[_Source] = None,
 ) -> str:
     inputs: List[str] = []
     if background is not None:
         inputs.append(_input_connection("Background", background))
     if foreground is not None:
         inputs.append(_input_connection("Foreground", foreground))
+    if effect_mask is not None:
+        inputs.append(_input_connection("EffectMask", effect_mask))
     inputs.append(
         "ApplyMode = Input { Value = FuID { %s }, }," % _quote(mode_id)
     )
@@ -449,6 +452,9 @@ class _Compiler:
                 )
         if backdrop is not None and not backdrop.name:
             self._external_input_target = merge_name
+        comment = "%s: %s" % (comment_prefix, layer.name)
+        if comment_prefix == "PSD clipping chain merge":
+            comment += " [P4-01 outer boundary]"
         self._current_tools.append(
             _merge(
                 merge_name,
@@ -456,7 +462,7 @@ class _Compiler:
                 result.output,
                 mode_id,
                 layer.opacity if opacity is None else opacity,
-                "%s: %s" % (comment_prefix, layer.name),
+                comment,
                 x,
                 y,
             )
@@ -482,7 +488,8 @@ class _Compiler:
                 "Normal",
                 1.0,
                 "PSD clipping alpha (base=%s): %s"
-                % (layer.clipping_base_id or "unknown", layer.name),
+                % (layer.clipping_base_id or "unknown", layer.name)
+                + " [P4-01 fixed matte via Operator=In]",
                 x,
                 y,
                 operator="In",
@@ -520,7 +527,8 @@ class _Compiler:
                     self.mode_id(member),
                     member.opacity,
                     "PSD clipping subtree member (base=%s): %s"
-                    % (base.id, member.name),
+                    % (base.id, member.name)
+                    + " [P4-01 local Merge; ProcessAlpha=0 preserves base alpha]",
                     x,
                     y,
                     # Photoshop clipping keeps the base alpha as the chain
@@ -685,6 +693,7 @@ class _Compiler:
             "group_count": str(self.group_count),
             "clipping_count": str(self.clip_count),
             "blend_modes": ",".join(sorted(self.blend_modes)),
+            "clipping_recipe": "operator_in_fixed_matte_local_stack",
         }
 
 

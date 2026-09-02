@@ -118,6 +118,31 @@ Required invariants:
 
 The current fixed-matte `ClipStack` with `ProcessAlpha=0` is a candidate Fusion lowering, not the Photoshop specification.
 
+### P4-01 Fusion recipe decision
+
+P4-01 compares that lowering with a one-Merge direct-mask candidate. The
+canonical recipe remains the explicit `Operator=In` form:
+
+```text
+base Loader ------------------------------> local ClipStack Merge (Background)
+    |                                               ^
+    +--> ClipIn Merge (Operator=In) <--- member     |
+                                                ProcessAlpha=0
+outer backdrop ---------------------------> one outer Merge
+```
+
+The direct candidate (`base -> Merge Background` and `EffectMask`, member ->
+`Foreground`) is not equivalent for a partial base alpha. Even with an ideal
+alpha-only effect mask, ordinary source-over alpha produces
+`a + (a * m) * (1 - a)` for base coverage `a` and member coverage `m`; for
+`a=0.5, m=1` that is `0.75`, not the required fixed `0.5`. An additional
+alpha-preserving stage would be needed, so the direct form is larger in the
+only case where it could match. The selected graph keeps the alpha
+intersection explicit, applies the member blend/opacity at the local Merge,
+and applies the base blend/opacity once at the outer Merge. See the
+[Fusion Tool Reference](https://documents.blackmagicdesign.com/UserManuals/Fusion9_Tool_Reference.pdf?_v=1501601400000)
+for the documented `In` operator and Merge inputs.
+
 Treat explicit `clbl=false` as a separate policy. Until independent fixture and renderer evidence establishes member backdrop and base mode/opacity behavior, strict mode uses documented bake/reject rather than the grouped graph.
 
 ## Color and alpha

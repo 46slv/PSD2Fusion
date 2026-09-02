@@ -8,6 +8,8 @@ Work these items in order. One item at a time. Prefer ordinary Fusion Loader / M
 
 ## P4-01 — Simplest 1:1 clipping recipe
 
+Status: COMPLETE (selected candidate A; P4-02 and later items remain not started)
+
 Goal: represent one PSD base + one clipped member with the smallest readable Fusion graph.
 
 Compare two concrete lowerings:
@@ -169,4 +171,5 @@ Pixel validation is feedback for the lowering recipe, not the design driver.
 
 ## Immediate next item
 
-Start with P4-01. Build the smallest Fusion micro-comp for both candidate lowerings and choose the simpler recipe based on actual Fusion behavior and graph clarity.
+P4-01 is complete. The next queued item is P4-02; do not start it in the
+current run.
