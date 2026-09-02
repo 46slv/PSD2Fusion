@@ -1,0 +1,168 @@
+{
+  "schema_version": 1,
+  "task": "PARITY-004",
+  "items": ["P4-03", "P4-04", "P4-05", "P4-06", "P4-07"],
+  "status": "PASS",
+  "verification": "pending_fresh_luna",
+  "branch": "codex/parity-004",
+  "candidate_head": "a65339563dce878f0e3ddf438f811d00c50109a5",
+  "recipe": {
+    "selected": "operator_in_fixed_matte_local_stack",
+    "graph": "base Loader -> fixed shared matte / one ClipIn Operator=In per member -> local ClipStack Merge(ProcessAlpha=0) in PSD bottom-to-top order -> one outer chain Merge",
+    "base_matte": "every member reuses the exact base Loader; no progressive ClipStack is used as a matte",
+    "outer_boundary": "outer backdrop is consumed once by the completed local result"
+  },
+  "p4_03": {
+    "fixture": "scripts/parity/p4_03.py",
+    "focused_test": "tests/test_parity004_p403_graph.py",
+    "controls": [
+      {"mode": "Normal", "opacity": 0.25},
+      {"mode": "Multiply", "opacity": 0.5},
+      {"mode": "Linear Dodge", "opacity": 0.75},
+      {"mode": "Overlay", "opacity": 1.0}
+    ],
+    "status": "PASS",
+    "checks": {
+      "each_member_controls_on_local_stack": true,
+      "member_modes_are_not_outer_controls": true,
+      "member_order_is_bottom_to_top": true,
+      "one_outer_merge_after_complete_stack": true
+    },
+    "artifact": {
+      "path": ".local/p4-03-a653395/p4_03.comp",
+      "size": 11221,
+      "sha256": "30c180d172867bae16efdbf94a0f7724e9e0ed3ed494502d278636cc172834ad"
+    }
+  },
+  "p4_04": {
+    "fixture": "scripts/parity/p4_04.py",
+    "focused_test": "tests/test_parity004_p404_graph.py",
+    "base_variants": [
+      {"blend": "Multiply", "opacity": 0.5},
+      {"blend": "Screen", "opacity": 0.25}
+    ],
+    "status": "PASS",
+    "checks": {
+      "primary_outer_owns_base_controls": true,
+      "alternate_outer_tracks_changed_base_controls": true,
+      "local_member_controls_do_not_change_with_base": true,
+      "outer_boundary_is_after_complete_local_stack": true
+    },
+    "artifacts": [
+      {"path": ".local/p4-04-a653395/p4_04.comp", "size": 7262, "sha256": "e618b04bda4ec4e9d514cd5c9ece5a8af325b09d84e969ceea0c36370438855a"},
+      {"path": ".local/p4-04-a653395/p4_04_base_changed.comp", "size": 7256, "sha256": "15cade0ae14c5832792921a6820b7cb487fde40a734ad6d800de5efe3928ad85"}
+    ]
+  },
+  "p4_05": {
+    "fixture": "scripts/parity/p4_05.py",
+    "focused_test": "tests/test_parity004_p405_graph.py",
+    "cases": ["isolated", "pass_through", "nested_isolated", "adjacent"],
+    "status": "PASS",
+    "checks": {
+      "all_cases_keep_fixed_matte_recipe": true,
+      "pass_through_outer_merge_is_group_input": true,
+      "nested_chain_inside_both_group_boundaries": true,
+      "adjacent_chain_between_group_boundaries": true
+    },
+    "report": {
+      "path": ".local/p4-05-a653395/report.json",
+      "size": 30402,
+      "sha256": "fcfe2ae1ba9e09da57b0030674e91085a5c81d8df303862a0635bb7c95f305bc"
+    }
+  },
+  "p4_06": {
+    "fixture": "scripts/parity/p4_06.py",
+    "focused_test": "tests/test_parity004_p406_layout.py",
+    "status": "PASS",
+    "checks": {
+      "flow_is_left_to_right": true,
+      "base_is_below_member_loader_band": true,
+      "member_loaders_have_distinct_rows": true,
+      "clipin_and_stack_are_clustered": true,
+      "fixed_matte_connection_remains_obvious": true,
+      "one_outer_merge_exits_cluster": true,
+      "group_boundaries_remain_distinct": true
+    },
+    "artifacts": [
+      {"path": ".local/p4-06-a653395/p4_06_clip.comp", "size": 11221, "sha256": "753beaca23753403540802ebb86deff4d5e5a84dc9c94544b95db15425299c0b"},
+      {"path": ".local/p4-06-a653395/p4_06_group.comp", "size": 10905, "sha256": "d35786ee5ba1d809e12f28738f55612c6d3de8cadf7a943f45870dc63a89082e"}
+    ]
+  },
+  "p4_07": {
+    "fixture": "scripts/parity/p4_07.py",
+    "focused_test": "tests/test_parity004_p407.py",
+    "status": "PASS",
+    "source": {
+      "path": "D:\\Downloads\\a.psd",
+      "size": 63385140,
+      "sha256": "574d8a6511b2aabe744835d81ed76c8fc8ffd0c9c5678f3359e8eda10f9174db",
+      "read_only": true
+    },
+    "graph": {
+      "layers": 136,
+      "groups_semantic": 34,
+      "groups_graph": 34,
+      "tools": 363,
+      "chains": 23,
+      "members": 59,
+      "blend_modes": ["Linear Dodge", "Multiply", "Normal", "Overlay"]
+    },
+    "checks": {
+      "expected_chain_count": true,
+      "expected_member_count": true,
+      "all_default_true": true,
+      "all_structural_recipe_checks": true,
+      "all_member_controls_and_base_boundaries": true,
+      "group_count_matches_graph": true,
+      "all_flow_positions_present": true,
+      "representatives_span_size_and_depth": true
+    },
+    "representatives": [
+      {"chain": 10, "member_count": 6, "depth": 4, "provenance": "photoshop_default_true"},
+      {"chain": 14, "member_count": 1, "depth": 2, "provenance": "photoshop_default_true"}
+    ],
+    "artifacts": [
+      {"path": ".local/p4-07-real-a653395/PSD2Fusion.comp", "size": 249254, "sha256": "5e7c833858e4016f7f5554250992f90a4618377a261a612315226dd6b25fe2f6"},
+      {"path": ".local/p4-07-real-audit-a653395/report.json", "size": 76590, "sha256": "6ecfbf9289bc39085df13ebed344f74594c47ba4ffda2ab164aedac1e8d78d83"},
+      {"path": ".local/p4-07-real-a653395/structural.json", "size": 7050, "sha256": "ef3eaeb4627440cb240ab348983eefcf64080955c9a46a9709f3192513082a9a"}
+    ]
+  },
+  "checks": {
+    "focused_tests": {
+      "status": "PASS",
+      "command": "python -m unittest tests.test_parity004_p403_graph tests.test_parity004_p404_graph tests.test_parity004_p405_graph tests.test_parity004_p406_layout tests.test_parity004_p407 tests.test_parity004_p402_graph tests.test_clipping_subtree tests.test_parity004_p401_graph tests.test_parity004_clipping -v",
+      "tests": 26
+    },
+    "repository_check": {
+      "status": "PASS",
+      "command": "pwsh -NoProfile -File .\\scripts\\check.ps1",
+      "tests": 60,
+      "control_state": "PASS",
+      "python_compile": "PASS"
+    },
+    "real_structural_validator": {
+      "status": "PASS",
+      "command": "python scripts/validate_clipping_subtrees.py D:\\Downloads\\a.psd .local\\p4-07-real-a653395\\PSD2Fusion.comp",
+      "chains": 23,
+      "clipped_members": 59,
+      "failed_chains": []
+    }
+  },
+  "scope": {
+    "host_load": "NOT_RUN_BY_SCOPE",
+    "host_render": "NOT_RUN_BY_SCOPE",
+    "photoshop": "NOT_RUN_BY_SCOPE",
+    "pixel_reference": "NOT_RUN_BY_SCOPE",
+    "p4_08": "NOT_RUN_BY_SCOPE; no immediate ordinary Fusion load/readback path used",
+    "p4_09": "NOT_STARTED",
+    "parity_005": "NOT_STARTED",
+    "real_inputs_modified": false,
+    "pixel_proof_infrastructure_changed": false
+  },
+  "claims": {
+    "graph_recipe": "PASS",
+    "structural": "P4-03 through P4-07 deterministic fixtures plus real a.psd structure",
+    "host_loaded": false,
+    "pixel_verified": false
+  }
+}
