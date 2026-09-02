@@ -1,0 +1,57 @@
+{
+  "schema_version": 2,
+  "task": "PARITY-001",
+  "status": "FAIL",
+  "inspection_status": "PASS",
+  "qualification_status": "exact_canvas",
+  "candidate_commit": "45a94e232de35032e1c5c9202b174c63171bf1ef",
+  "source_head": "45a94e232de35032e1c5c9202b174c63171bf1ef",
+  "branch": "codex/parity-001",
+  "command_templates": [
+    {"command": "pwsh -NoProfile -File .\\scripts\\check.ps1", "exit_code": 0},
+    {"command": "pwsh -NoProfile -File .\\scripts\\parity\\run.ps1 -Mode baseline -Psd <private-input> -Reference <private-input> -Output parity-output\\20260902-131741-baseline", "exit_code": 2}
+  ],
+  "environment": {
+    "windows": "Windows-11-10.0.26200-SP0",
+    "python": "3.12.10",
+    "psd_tools": "1.18.0",
+    "pillow": "12.3.0",
+    "photoshop": "not_run",
+    "resolve_fusion": "not_run"
+  },
+  "psd": {
+    "path": "<private-input>", "size_bytes": 63385140,
+    "sha256_before": "574d8a6511b2aabe744835d81ed76c8fc8ffd0c9c5678f3359e8eda10f9174db",
+    "sha256_after": "574d8a6511b2aabe744835d81ed76c8fc8ffd0c9c5678f3359e8eda10f9174db",
+    "dimensions": [2304,1296], "mode": "RGB", "channels": 3, "bit_depth": 8,
+    "alpha": {"present": false}, "profile": "icc", "icc_profile_sha256": "2b3aa1645779a9e634744faf9b01e9102b0c9b88fd6deced7934df86b949af7e",
+    "metadata_keys": ["icc_profile"], "layer_count": 3,
+    "structure_counts": {"descendants": 136, "groups": 34, "clipping_chains": 23, "clipped_members": 59}
+  },
+  "reference": {
+    "path": "<private-input>", "size_bytes": 2725322,
+    "sha256_before": "91ff8daef941b3d9052497190fdc8aa6f4d56ba524c8d912cf011b6818535f54",
+    "sha256_after": "91ff8daef941b3d9052497190fdc8aa6f4d56ba524c8d912cf011b6818535f54",
+    "dimensions": [2304,1296], "mode": "RGBA", "channels": 4, "bit_depth": 8,
+    "alpha": {"present": true, "min": 255, "max": 255, "all_opaque": true},
+    "profile": "icc", "icc_profile_sha256": "2b3aa1645779a9e634744faf9b01e9102b0c9b88fd6deced7934df86b949af7e",
+    "metadata_keys": ["Software", "dpi", "icc_profile"]
+  },
+  "normalization": {"classification": "exact_canvas", "resize": false, "crop": false, "orient": false, "profile_transform": false, "dimensions_match": true, "channels_compatible": true, "profile_match": true, "channel_note": "PSD RGB gains explicit opaque alpha only when reference alpha is proven all-opaque"},
+  "psd_stored_composite": {"sha256": "cca19f07e0d071f5469dd7f866bbed2c8e70f928839060bf75e3ed6213769c4", "origin": "psd_stored_composite"},
+  "stored_composite_comparison": {
+    "status": "FAIL", "hard_failure": "profile_mismatch", "profile_status": "mismatch", "threshold": 0.0,
+    "candidate_dimensions": [2304,1296], "reference_dimensions": [2304,1296], "candidate_channels": 4, "reference_channels": 4,
+    "rgba_error": {"max": 3, "mean": 0.1856168686771262, "p99": 1.0},
+    "rgb_error": {"max": 3, "mean": 0.1856168686771262, "p99": 1.0},
+    "alpha_error": {"max": 0, "mean": 0.0, "p99": 0.0},
+    "threshold_exceeding": {"count": 543297, "ratio": 0.18194906603652264},
+    "difference_bbox": [0,0,2304,1296],
+    "reason": "ICC profiles differ; hidden conversion is forbidden",
+    "artifacts": "parity-output\\20260902-131741-baseline\\stored-composite-diff"
+  },
+  "inputs_unchanged": true,
+  "privacy": {"private_input_paths_committed": false, "safe_summary": true},
+  "verifier_start": {"source_candidate_commit": "45a94e232de35032e1c5c9202b174c63171bf1ef", "state_head_after_closeout": "4a2989fe7034bc8d291f55f059b14ecfa87f4c13"},
+  "remaining_gaps": ["Stored composite fails closed on ICC profile mismatch and nonzero RGB delta", "Photoshop/Resolve host validation not run"]
+}

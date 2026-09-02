@@ -30,8 +30,8 @@
       "requires": [],
       "verification": "pending",
       "branch": "codex/parity-001",
-      "commit": "2a5435934eca250ef4f7d1bf3a906540ceaff002",
-      "evidence": [".control/evidence/PARITY-001/20260902-153600/summary.json"]
+      "commit": "45a94e232de35032e1c5c9202b174c63171bf1ef",
+      "evidence": [".control/evidence/PARITY-001/20260902-132200/summary.json"]
     },
     {
       "id": "PARITY-002",
