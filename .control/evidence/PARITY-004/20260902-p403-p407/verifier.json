@@ -1,0 +1,36 @@
+{
+  "schema_version": 1,
+  "task": "PARITY-004",
+  "items": ["P4-03", "P4-04", "P4-05", "P4-06", "P4-07"],
+  "verifier": "fresh_luna",
+  "model": "gpt-5.6-luna",
+  "reasoning": "medium",
+  "candidate_head": "a65339563dce878f0e3ddf438f811d00c50109a5",
+  "branch": "codex/parity-004",
+  "verdict": "PASS",
+  "reproduced_checks": [
+    {"name": "focused_regression", "status": "PASS", "metrics": {"tests": 34, "scope": "P4-01/P4-02/P4-03/P4-04/P4-05/P4-06/P4-07 plus P4-03/P4-04/P4-05/P4-06/P4-07 focused tests"}},
+    {"name": "repository_check", "status": "PASS", "command": "pwsh -NoProfile -File .\\scripts\\check.ps1", "metrics": {"tests": 60, "control_state": "PASS", "python_compile": "PASS"}},
+    {"name": "real_psd_structure", "status": "PASS", "command": "python scripts/parity/p4_07.py D:\\Downloads\\a.psd .local\\verifier-p4-07-0902\\PSD2Fusion.comp .local\\verifier-p4-07-audit-0902", "metrics": {"psd_sha256": "574d8a6511b2aabe744835d81ed76c8fc8ffd0c9c5678f3359e8eda10f9174db", "chains": 23, "members": 59, "groups": 34, "tools": 363, "warnings": 0, "all_checks": true, "representative_chain_indices": [14, 10], "representative_member_counts": [1, 6], "representative_depths": [2, 4]}},
+    {"name": "p4_08_host_availability", "status": "NOT_RUN_NO_ORDINARY_FUSION_AVAILABLE", "metrics": {"resolve_process": false, "host_load": "NOT_RUN_BY_SCOPE"}},
+    {"name": "pixel_reference", "status": "NOT_RUN_BY_SCOPE", "metrics": {"p4_09": false, "pixel_verified": false}},
+    {"name": "parity_005_scope", "status": "PASS", "metrics": {"started": false}}
+  ],
+  "findings": [
+    {"path": "psd2fusion/fusion_comp.py", "lines": "281-301, 569-611", "result": "deterministic Flow row overrides preserve fixed base matte and place member blend/opacity on local ClipStack merges"},
+    {"path": "psd2fusion/fusion_comp.py", "lines": "639-669", "result": "true/default clipping span emits one outer Merge with base blend/opacity after the complete local stack"},
+    {"path": "scripts/parity/p4_03.py", "lines": "1-228", "result": "Normal/Multiply/Linear Dodge/Overlay and member opacity controls are checked on local merges"},
+    {"path": "scripts/parity/p4_04.py", "lines": "1-218", "result": "paired base-control fixture proves the outer boundary changes without rewriting member controls"},
+    {"path": "scripts/parity/p4_05.py", "lines": "1-319", "result": "isolated, Pass Through, nested isolated and adjacent group boundaries use the same recipe"},
+    {"path": "scripts/parity/p4_06.py", "lines": "1-169", "result": "stable readable Flow positions and distinct GroupOperator boundaries are checked"},
+    {"path": "scripts/parity/p4_07.py", "lines": "1-272", "result": "all 23 real-PSD chains are audited with representative size/depth coverage"}
+  ],
+  "false_pass_checks": [
+    {"check": "fixed_matte_not_progressive_stack", "result": "PASS", "detail": "every real-chain ClipIn background equals its base Loader"},
+    {"check": "base_controls_not_repeated_per_member", "result": "PASS", "detail": "one outer base boundary is checked per chain and member-local controls are compared independently"},
+    {"check": "structural_or_load_is_pixel_proof", "result": "PASS", "detail": "host_loaded and pixel_verified remain false without a Fusion render artifact and direct golden comparison"},
+    {"check": "representative_real_psd_coverage", "result": "PASS", "detail": "representatives span one-to-six members and depths two-to-four"},
+    {"check": "parity_005_started", "result": "PASS", "detail": "PARITY-005 remains untouched"}
+  ],
+  "permitted_state_transition": "Publish candidate a653395..., fresh-read the published branch/evidence, run the remote completion guard using the still-active PARITY-004 state, report through ChatGPT Web Bridge, and stop without P4-09 or PARITY-005."
+}

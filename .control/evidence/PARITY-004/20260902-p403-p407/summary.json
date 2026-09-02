@@ -1,0 +1,117 @@
+{
+  "schema_version": 1,
+  "task": "PARITY-004",
+  "items": ["P4-03", "P4-04", "P4-05", "P4-06", "P4-07"],
+  "status": "PASS",
+  "verification": "fresh_luna_pass",
+  "branch": "codex/parity-004",
+  "candidate_head": "a65339563dce878f0e3ddf438f811d00c50109a5",
+  "scope": {
+    "p4_02_preserved": true,
+    "p4_03_through_p4_07": true,
+    "p4_08": "NOT_RUN_NO_ORDINARY_FUSION_AVAILABLE",
+    "p4_09_pixel_reference": "NOT_RUN_BY_SCOPE",
+    "host_render": "NOT_RUN_BY_SCOPE",
+    "photoshop": "NOT_RUN_BY_SCOPE",
+    "clbl_false": "NOT_IN_SCOPE",
+    "parity_005_started": false,
+    "real_inputs_modified": false,
+    "pixel_proof_infrastructure_changed": false
+  },
+  "recipe": {
+    "selected": "operator_in_fixed_matte_local_stack",
+    "graph": "base Loader -> fixed base matte / one ClipIn Operator=In per member -> local ClipStack Merge(ProcessAlpha=0) in PSD bottom-to-top order -> one outer chain Merge",
+    "member_controls": "member ApplyMode and Blend live on each local ClipStack Merge",
+    "base_controls": "base ApplyMode and overall Blend live once on the outer chain Merge",
+    "outer_backdrop": "enters only the outer chain Merge"
+  },
+  "focused_items": {
+    "P4-03": {
+      "status": "PASS",
+      "command": "python scripts/parity/p4_03.py .local/p4-03-a653395",
+      "tests": "python -m unittest tests.test_parity004_p403_graph -v",
+      "fixture": "Normal/Multiply/Linear Dodge/Overlay with 25/50/75/100% member opacity",
+      "checks": "4 member-local controls, fixed Operator=In matte, PSD order, one outer Merge",
+      "graph": {"tools": 18, "merges": 6, "clipping": 4},
+      "artifact": {"path": ".local/p4-03-a653395/p4_03.comp", "size": 11221, "sha256": "30c180d172867bae16efdbf94a0f7724e9e0ed3ed494502d278636cc172834ad"}
+    },
+    "P4-04": {
+      "status": "PASS",
+      "command": "python scripts/parity/p4_04.py .local/p4-04-a653395",
+      "tests": "python -m unittest tests.test_parity004_p404_graph -v",
+      "fixture": "Multiply/50% base versus Screen/25% base with unchanged member controls",
+      "checks": "base controls change only at the single outer boundary after the complete local stack",
+      "graph": {"tools": 12, "merges": 4, "clipping": 2},
+      "artifacts": {
+        "primary": {"path": ".local/p4-04-a653395/p4_04.comp", "size": 7262, "sha256": "e618b04bda4ec4e9d514cd5c9ece5a8af325b09d84e969ceea0c36370438855a"},
+        "alternate": {"path": ".local/p4-04-a653395/p4_04_base_changed.comp", "size": 7256, "sha256": "15cade0ae14c5832792921a6820b7cb487fde40a734ad6d800de5efe3928ad85"}
+      }
+    },
+    "P4-05": {
+      "status": "PASS",
+      "command": "python scripts/parity/p4_05.py .local/p4-05-a653395",
+      "tests": "python -m unittest tests.test_parity004_p405_graph -v",
+      "cases": ["isolated", "pass_through", "nested_isolated", "adjacent"],
+      "checks": "same clipping recipe at existing GroupOperator boundaries; no GroupOperator redesign",
+      "artifact": {"path": ".local/p4-05-a653395/report.json", "size": 30402, "sha256": "fcfe2ae1ba9e09da57b0030674e91085a5c81d8df303862a0635bb7c95f305bc"}
+    },
+    "P4-06": {
+      "status": "PASS",
+      "command": "python scripts/parity/p4_06.py .local/p4-06-a653395",
+      "tests": "python -m unittest tests.test_parity004_p406_layout -v",
+      "checks": "stable left-to-right Flow, distinct member rows, clustered ClipIn/ClipStack, visible fixed matte and one outer exit",
+      "artifact": {"path": ".local/p4-06-a653395/report.json", "size": 10958, "sha256": "69734dc5232817d77b513d38874b7a8e269cf7de4e7eead09c3a260cf601feb9"}
+    },
+    "P4-07": {
+      "status": "PASS",
+      "command": "python -m psd2fusion D:\\Downloads\\a.psd --output .local/p4-07-real-a653395 --force; python scripts/parity/p4_07.py D:\\Downloads\\a.psd .local/p4-07-real-a653395/PSD2Fusion.comp .local/p4-07-real-audit-a653395",
+      "checks": "all 23 default/true chains use fixed matte, Operator=In, ProcessAlpha=0, member controls and one outer base boundary",
+      "real_psd": {
+        "path": "D:\\Downloads\\a.psd",
+        "size": 63385140,
+        "sha256": "574d8a6511b2aabe744835d81ed76c8fc8ffd0c9c5678f3359e8eda10f9174db",
+        "chains": 23,
+        "members": 59,
+        "visible_members": 59,
+        "groups": 34,
+        "graph_tools": 363,
+        "warnings": 0,
+        "blend_modes": ["Linear Dodge", "Multiply", "Normal", "Overlay"],
+        "representative_chain_indices": [14, 10],
+        "representative_spans": {"member_counts": [1, 6], "nesting_depths": [2, 4]}
+      },
+      "artifacts": {
+        "composition": {"path": ".local/p4-07-real-a653395/PSD2Fusion.comp", "size": 249254, "sha256": "5e7c833858e4016f7f5554250992f90a4618377a261a612315226dd6b25fe2f6"},
+        "audit": {"path": ".local/p4-07-real-audit-a653395/report.json", "size": 76590, "sha256": "6ecfbf9289bc39085df13ebed344f74594c47ba4ffda2ab164aedac1e8d78d83"}
+      }
+    }
+  },
+  "verification": {
+    "verifier": "fresh_luna",
+    "model": "gpt-5.6-luna",
+    "reasoning": "medium",
+    "focused_regression": {"status": "PASS", "tests": 34},
+    "repository_check": {"status": "PASS", "tests": 60, "control_state": "PASS", "python_compile": "PASS"},
+    "real_psd_reproduction": {"status": "PASS", "chains": 23, "members": 59, "groups": 34, "tools": 363, "warnings": 0},
+    "working_tree": "clean",
+    "verdict": "PASS"
+  },
+  "claims": {
+    "parsed": "PASS",
+    "planned": "PASS",
+    "structural": "PASS for P4-03 through P4-07",
+    "host_loaded": false,
+    "pixel_verified": false,
+    "parity_004_overall": "pending; P4-09 pixel/reference gate intentionally deferred"
+  },
+  "false_pass_checks": {
+    "fixed_matte_not_progressive_stack": "PASS; every ClipIn background is the exact base Loader",
+    "member_order": "PASS; local stack emission follows PSD bottom-to-top order",
+    "member_and_base_controls": "PASS; local member controls and one outer base boundary are independently checked",
+    "group_scope": "PASS; isolated, Pass Through, nested and adjacent fixtures retain GroupOperator boundaries",
+    "real_structure": "PASS; all 23 chains and 59 members are individually audited",
+    "structural_is_not_pixel_proof": "PASS; no Fusion render or reference comparison was claimed",
+    "scope": "PASS; P4-09, Photoshop, render infrastructure and PARITY-005 were not entered"
+  },
+  "next_safe_action": "Publish the candidate branch, fresh-read the published ref and evidence, run the inspection-only remote guard, report through ChatGPT Web Bridge, then stop before P4-09 and PARITY-005."
+}
