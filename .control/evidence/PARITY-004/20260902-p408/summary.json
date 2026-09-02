@@ -3,7 +3,7 @@
   "task": "PARITY-004",
   "items": ["P4-08"],
   "status": "PASS",
-  "verification": "pending_fresh_luna",
+  "verification": "fresh_luna_pass",
   "branch": "codex/parity-004",
   "candidate_head": "2343e7f9f84dc911c06f42eb7fdfe78375ba1c11",
   "scope": {

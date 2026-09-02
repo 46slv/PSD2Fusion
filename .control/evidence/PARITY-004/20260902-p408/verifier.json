@@ -1,0 +1,57 @@
+{
+  "schema_version": 1,
+  "task": "PARITY-004",
+  "item": "P4-08",
+  "verifier": "fresh_luna",
+  "model": "gpt-5.6-luna",
+  "reasoning": "medium",
+  "candidate_head": "4738b5c67f11fac353a8d5e1b6ba01e871b96a47",
+  "branch": "codex/parity-004",
+  "verdict": "PASS",
+  "reproduced_checks": [
+    {
+      "name": "repository_check",
+      "status": "PASS",
+      "command": "pwsh -NoProfile -File .\\scripts\\check.ps1",
+      "metrics": {"tests": 60, "control_state": "PASS", "python_compile": "PASS"}
+    },
+    {
+      "name": "real_structural_validator",
+      "status": "PASS",
+      "command": "python scripts/validate_clipping_subtrees.py D:\\Downloads\\a.psd .local\\p4-07-real-a653395\\PSD2Fusion.comp",
+      "metrics": {"chains": 23, "clipped_members": 59, "visible_clipped_members": 59, "groups_semantic": 34, "groups_graph": 34, "failed_chains": []}
+    },
+    {
+      "name": "ordinary_resolve_fusion_load_readback",
+      "status": "PASS",
+      "environment": {"application": "DaVinci Resolve Studio", "version": "21.0.3.7"},
+      "evidence": [".local/p4_08-host-probe.txt", ".local/p4_08-inspect_comp.txt", ".local/p4_08-current-probe.txt"],
+      "metrics": {
+        "load_comp_tools": 363,
+        "loader_paths_resolved": "100/100",
+        "clipping_chains": 23,
+        "clipped_members": 59,
+        "clipin_connections": "59/59",
+        "clipstack_connections": "59/59",
+        "clipin_operator_in": "59/59",
+        "clipstack_process_alpha_zero": "59/59",
+        "group_operators_with_children": "34/34",
+        "mediaout_connected": true,
+        "unknown_tools": 0,
+        "invalid_tools": 0,
+        "flow_readback": true
+      }
+    }
+  ],
+  "findings": [
+    {"path": ".control/evidence/PARITY-004/20260902-p408/summary.json", "result": "P4-08 ordinary host load/readback is PASS; P4-09 pixel/reference, Photoshop, Composition:Render, new import/render infrastructure and PARITY-005 are explicitly out of scope."},
+    {"path": ".local/p4_08-host-probe.txt", "result": "Resolve readback independently reports 363 tools, 100 resolved loaders, 23 clipping chains/59 members, complete ClipIn and ClipStack wiring, Operator=In, ProcessAlpha=0, 34 populated GroupOperators, connected MediaOut, unknown/invalid zero."},
+    {"path": ".local/p4_08-inspect_comp.txt", "result": "Load and readback probe PASS (LOAD_PASS tools=363; READBACK_CALL=true)."}
+  ],
+  "false_pass_checks": [
+    {"check": "structural_or_load_is_pixel_proof", "result": "PASS", "detail": "No Fusion render artifact or comparison to D:\\Downloads\\20260812.png is claimed; pixel_verified remains false."},
+    {"check": "scope_boundary", "result": "PASS", "detail": "P4-09, Photoshop, Composition:Render, new import/render infrastructure and PARITY-005 were not run."},
+    {"check": "real_inputs_read_only", "result": "PASS", "detail": "PSD hash matches canonical 574d8a6511b2aabe744835d81ed76c8fc8ffd0c9c5678f3359e8eda10f9174db and evidence declares inputs unmodified."}
+  ],
+  "permitted_state_transition": "Record fresh P4-08 verification PASS; task may proceed to the repository-defined publication/remote-guard step, then stop before P4-09 and PARITY-005. Do not claim pixel parity or advance those tasks."
+}
