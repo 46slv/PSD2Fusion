@@ -15,7 +15,7 @@ Push-Location $Root
 try {
     switch ($Mode) {
         'offline' { & pwsh -NoProfile -File .\scripts\check.ps1; if ($LASTEXITCODE) { exit $LASTEXITCODE }; break }
-        'host-required' { $payload = @{ status = 'BLOCKED'; reason = 'HOST_REQUIRED'; message = 'Photoshop/Resolve host validation is unavailable in this environment.' } | ConvertTo-Json; $payload | Tee-Object -FilePath (Join-Path $Output 'host-required.json'); exit 3 }
+        'host-required' { $payload = @{ status = 'BLOCKED'; reason = 'FUSION_RENDER_REQUIRED'; message = 'Actual Fusion render/reference validation is unavailable in this environment; Photoshop is optional.' } | ConvertTo-Json; $payload | Tee-Object -FilePath (Join-Path $Output 'host-required.json'); exit 3 }
         'inspect' { & python .\scripts\parity\parity.py inspect --psd $Psd --reference $Reference --output (Join-Path $Output 'summary.json'); exit $LASTEXITCODE }
         'convert' {
             # Keep stored composite and PSD2Fusion candidate as separate origins.

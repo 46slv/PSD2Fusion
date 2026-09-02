@@ -1,4 +1,4 @@
-# PSD2Fusion current Goal — Photoshop compositing parity
+# PSD2Fusion current Goal — PSD compositing parity
 
 Status: ACTIVE  
 Program: `PSD2FUSION-COMPOSITING-PARITY`  
@@ -8,7 +8,7 @@ A fresh Codex or lower-reasoning coding agent must be able to continue from this
 
 ## Objective
 
-Reproduce Photoshop blend modes, overall opacity, group scope, and especially clipping semantics in an inspectable Fusion graph, then converge the generated image toward the supplied reference PNG.
+Reproduce PSD-defined blend modes, overall opacity, group scope, and especially clipping semantics in an inspectable Fusion graph, then compare an actual Fusion render with the supplied real-case golden PNG. PSD bytes and semantic provenance are authoritative for structure; Photoshop is optional historical/additional evidence and is not a prerequisite for verification.
 
 Read-only real inputs:
 
@@ -31,9 +31,9 @@ Detailed contracts:
 The program is done only when:
 
 1. the supported subset is explicit and executable structural plus RGB/alpha gates exist;
-2. the real PSD is reproducibly rendered and compared with the supplied PNG;
+2. the real PSD is reproducibly lowered, rendered by actual Fusion, and compared with the supplied PNG;
 3. no unsupported/unverified semantic silently becomes Normal, 100% opacity, dropped, resized, graded, flattened, or hidden;
-4. a fresh verifier reproduces the claim from Git, the two read-only files, and documented commands;
+4. a fresh verifier reproduces the claim from Git, the two read-only files, deterministic independent fixtures, and documented Fusion/reference commands (optional GIMP cross-render evidence may supplement; Photoshop evidence is optional);
 5. reports distinguish `parsed`, `planned`, `structural`, `host_loaded`, and `pixel_verified` claims.
 
 ## Opening sequence
@@ -83,7 +83,7 @@ Commit safe summaries under:
 .control/evidence/<task-id>/<run-id>/summary.json
 ```
 
-Store real files and full-size outputs only under ignored `.local/`, `artifacts/`, or `parity-output/`. Keep user PNG, Photoshop output, PSD stored composite, psd-tools raster, Resolve native importer and PSD2Fusion render as distinct origins.
+Store real files and full-size outputs only under ignored `.local/`, `artifacts/`, or `parity-output/`. Keep the user PNG, PSD stored composite, psd-tools raster, actual Fusion render, optional GIMP render, and any optional Photoshop output as distinct origins.
 
 ## Ordered tasks
 
@@ -103,11 +103,11 @@ Verify Normal, Multiply, Linear Dodge, Overlay, ordinary opacity, isolated-group
 
 ### PARITY-004 — Grouped/default clipping
 
-Verify absent/default true and explicit true `clbl`. Establish base-coverage stage, fixed matte, local-alpha invariant, member order, outer-backdrop isolation, base/member opacity, fractional edges and mixed blends. Run structural and pixel checks over every real chain and compare the full output with the supplied PNG. Do not claim `clbl=false`.
+Verify absent/default true and explicit true `clbl`. Run the gates in order: deterministic independent fixtures as the semantic/math gate; real PSD bytes, structure and provenance; actual Fusion render with a fresh pixel artifact; full comparison with `D:\Downloads\20260812.png`; then, if available, an optional GIMP cross-renderer comparison. Establish base-coverage stage, fixed matte, local-alpha invariant, member order, outer-backdrop isolation, base/member opacity, fractional edges and mixed blends. PSD bytes/semantic provenance remain authoritative for structure, and graph/load evidence never promotes a pixel claim. Photoshop evidence is optional/additional. Do not claim `clbl=false`.
 
 ### PARITY-005 — `clbl=false` and group interaction
 
-Use Photoshop-backed on/off fixtures to determine member backdrop and base mode/opacity. Verify isolated, Pass Through, nested and group-as-base/member cases. Reconstruct only with evidence; otherwise use explicit verified bake/reject.
+Use independent on/off fixtures and available renderer cross-checks to determine member backdrop and base mode/opacity. Verify isolated, Pass Through, nested and group-as-base/member cases. Reconstruct only with evidence; otherwise use explicit verified bake/reject. Photoshop evidence, if available, is optional/additional and never the sole semantic authority.
 
 ### PARITY-006 — Real PSD convergence
 

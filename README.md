@@ -4,7 +4,7 @@ PSD2Fusion converts Photoshop PSD structure into a readable DaVinci Resolve/Fusi
 
 ## Current development program
 
-The active Goal is Photoshop compositing fidelity for blend modes, opacity, groups, and especially clipping.
+The active Goal is PSD compositing fidelity for blend modes, opacity, groups, and especially clipping, verified by deterministic fixtures and actual Fusion renders. Photoshop is optional historical evidence, not a required long-term runtime.
 
 A fresh Codex/agent starts here:
 
@@ -33,7 +33,7 @@ python -m psd2fusion path\to\art.psd --output path\to\art_fusion --force
 
 Output contains `PSD2Fusion.comp`, full-canvas RGBA derivatives under `assets/`, and `manifest.json`.
 
-FIRST_USABLE output is not automatically Photoshop pixel parity. The historical boundary is documented in `ARCHITECTURE.md`; the active parity contract is `.control/CURRENT_GOAL.md`.
+FIRST_USABLE output is not automatically Fusion pixel parity. The historical boundary is documented in `ARCHITECTURE.md`; the active parity contract is `.control/CURRENT_GOAL.md`.
 
 ## DaVinci Resolve launcher
 

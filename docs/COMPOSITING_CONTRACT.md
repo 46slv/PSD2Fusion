@@ -14,6 +14,16 @@ Raw extraction owns file/header/resource/layer/channel/tag facts. Semantic IR ow
 
 Claims are separate: `parsed`, `planned`, `structural`, `host_loaded`, `pixel_verified`. A lower claim never implies a higher one.
 
+## Verification authorities and renderer roles
+
+- PSD bytes and extracted semantic provenance are authoritative for structure, order, group identity and `clbl` meaning. A renderer cannot rewrite those structural facts.
+- Deterministic independent fixtures are the semantic/math gate. They must pass before real-case pixel evidence is interpreted.
+- `D:\Downloads\20260812.png` remains the real-case golden reference. Qualify its canvas, channels, profile and alpha, then compare without fitting.
+- An actual Fusion-rendered pixel artifact is required for a Fusion `pixel_verified` claim. Graph text, composition load, or host readback alone never earns pixel verification.
+- GIMP may provide independent cross-renderer evidence, but it is neither the semantic authority nor a replacement for PSD bytes or the deterministic fixtures.
+- Photoshop evidence is optional historical/additional evidence only; its absence must not block the contract.
+- No blind grade, resize, blur, flatten, or reference fitting is allowed.
+
 ## Capability decisions
 
 Every relevant operation has one explicit state:
@@ -108,7 +118,7 @@ Required invariants:
 
 The current fixed-matte `ClipStack` with `ProcessAlpha=0` is a candidate Fusion lowering, not the Photoshop specification.
 
-Treat explicit `clbl=false` as a separate policy. Until Photoshop-backed fixtures establish member backdrop and base mode/opacity behavior, strict mode uses documented bake/reject rather than the grouped graph.
+Treat explicit `clbl=false` as a separate policy. Until independent fixture and renderer evidence establishes member backdrop and base mode/opacity behavior, strict mode uses documented bake/reject rather than the grouped graph.
 
 ## Color and alpha
 

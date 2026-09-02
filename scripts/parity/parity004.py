@@ -3,8 +3,10 @@
 The fixture manifest is an executable contract oracle for ``clbl`` absent /
 default-true and explicit-true spans.  Expected pixels are calculated by the
 independent reference equations below, then compared with the implementation
-under test.  Photoshop pixels and a tied Resolve render are still required
-before any Fusion capability can be promoted.
+under test.  An actual Fusion render and comparison with the real-case golden
+PNG are required before any Fusion pixel claim can be promoted. Photoshop
+evidence is optional historical/additional evidence; an optional GIMP
+cross-render may supplement the independent fixture and PSD-structure gates.
 """
 
 from __future__ import annotations

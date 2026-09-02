@@ -1,10 +1,10 @@
 # PSD2Fusion parity validation contract
 
-This file defines the evidence needed to promote any Photoshop-compositing claim.
+This file defines the evidence needed to promote PSD-compositing and Fusion-pixel claims.
 
 ## Environment and evidence packet
 
-Every host/reference run records exact Git HEAD; Windows, Python, psd-tools and Pillow versions; Photoshop version; Resolve/Fusion version and edition; PSD mode/depth/profile; project color settings; Loader alpha settings; output format; input SHA-256 values; commands and exit codes.
+Every host/reference run records exact Git HEAD; Windows, Python, psd-tools and Pillow versions; Resolve/Fusion version and edition when a Fusion claim is made; PSD mode/depth/profile; project color settings; Loader alpha settings; output format; input SHA-256 values; commands and exit codes. Photoshop version is recorded only when optional historical evidence is used. GIMP version/path is recorded only when optional cross-renderer evidence is used.
 
 Commit only safe summaries at `.control/evidence/<task-id>/<run-id>/summary.json`. Full-resolution/private files stay in ignored local directories.
 
@@ -18,6 +18,16 @@ For `D:\Downloads\a.psd` and `D:\Downloads\20260812.png`, establish before compa
 - PSD stored composite as a separate origin from recomposition;
 - hard failure for unexplained dimensions/channels;
 - no hidden resize, crop, grade, alpha discard or threshold tuning to the candidate.
+
+## Verification authority and renderer roles
+
+- PSD bytes and semantic provenance are authoritative for structure, order, group identity and `clbl`; renderer output cannot replace those facts.
+- Deterministic independent fixtures are the semantic/math gate and precede real-case interpretation.
+- The supplied `D:\Downloads\20260812.png` is the real-case golden reference. Compare against its qualified canvas/channels/profile/alpha without reference fitting.
+- Actual Fusion rendered pixels are required for a Fusion `pixel_verified` claim. Structural or load evidence remains at its own claim level.
+- GIMP is optional independent cross-renderer evidence and is never the sole semantic authority.
+- Photoshop is optional historical/additional evidence and is not a long-term runtime or verification dependency.
+- Blind grade/resize/blur/flatten and other reference-fitting operations are prohibited.
 
 Known historical `a.psd` structure, to re-measure after hashing: 136 objects, 34 groups, 23 clipping chains and 59 clipped members.
 
@@ -104,6 +114,7 @@ Metamorphic invariants: transparent/opacity-zero member is a no-op; changing mem
 - existing composition/tools are preserved;
 - partial failure cleanup/recovery is actionable;
 - evidence names the exact candidate commit.
+- a fresh Fusion render artifact exists for any `pixel_verified` claim and the comparator records its direct comparison with the golden PNG; load/readback alone is insufficient.
 
 ## Promotion gates
 
@@ -113,5 +124,5 @@ Metamorphic invariants: transparent/opacity-zero member is a no-op; changing mem
 4. Grouped clipping: fixed coverage, ordering, opacity, mixed blends and fractional edges pass.
 5. Group interaction: isolated, Pass Through and nested cases pass.
 6. `clbl`: absent/true are verified; false is either verified or explicitly baked/rejected.
-7. Real PSD: all chains have structural evidence, full output is compared with the supplied PNG and material failures are reduced to fixtures.
+7. Real PSD: all chains have structural evidence; an actual Fusion render is compared with the supplied PNG; material failures are reduced to fixtures; optional GIMP/Photoshop evidence is labelled separately.
 8. Fresh verifier: clean checkout reproduction and false-PASS audit pass.
