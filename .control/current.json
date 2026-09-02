@@ -8,7 +8,7 @@
     "repository": "46slv/PSD2Fusion",
     "default_branch": "main",
     "starting_head": "3ee00bfdb52f7f15a644c98a43bf9de723374d45",
-    "claim": "FIRST_USABLE structure exists; Photoshop/reference pixel parity is unverified"
+    "claim": "FIRST_USABLE structure exists; Fusion/reference pixel parity is unverified"
   },
   "reference_case": {
     "case_id": "REAL-A-20260812",
@@ -63,12 +63,14 @@
       ],
       "verification": "blocked",
       "branch": "codex/parity-004",
-      "commit": "311b3f3236895650ca15210daca00ba029750b98",
+      "commit": "8863f5ec2cd5be006bf776ab4dc237b449437e3c",
       "evidence": [
         ".control/evidence/PARITY-004/20260902-170000/summary.json",
         ".control/evidence/PARITY-004/20260902-174500/verifier.json",
         ".control/evidence/PARITY-004/20260902-182424/summary.json",
-        ".control/evidence/PARITY-004/20260902-182424/verifier.json"
+        ".control/evidence/PARITY-004/20260902-182424/verifier.json",
+        ".control/evidence/PARITY-004/20260902-192107/summary.json",
+        ".control/evidence/PARITY-004/20260902-192107/verifier.json"
       ]
     },
     {

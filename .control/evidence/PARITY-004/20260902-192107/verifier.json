@@ -1,0 +1,41 @@
+{
+  "schema_version": 1,
+  "task": "PARITY-004",
+  "verifier": "fresh_luna",
+  "candidate_head": "8863f5ec2cd5be006bf776ab4dc237b449437e3c",
+  "branch": "codex/parity-004",
+  "verdict": "BLOCKED",
+  "reproduced_checks": [
+    {"name": "repository_check", "status": "PASS", "metrics": {"tests": 43, "control_state": "PASS", "python_compile": "PASS"}},
+    {"name": "parity004_fixtures", "status": "PASS", "metrics": {"case_count": 6997, "max_oracle_error": 0.0, "max_reference_error": 0.0, "metamorphic_failures": [], "rgba_max": 0, "clbl_false": "excluded"}},
+    {"name": "real_psd_structure", "status": "PASS", "metrics": {"descendants": 136, "groups": 34, "clipping_chains": 23, "clipped_members": 59, "validate_clipping_subtrees": "PASS", "strict_plan": "PASS"}},
+    {"name": "reference_qualification", "status": "PASS_WITH_KNOWN_STORED_COMPOSITE_FAIL", "metrics": {"qualification": "exact_canvas", "stored_composite_profile": "mismatch", "inputs_unchanged": true}},
+    {"name": "fusion_pixel_gate", "status": "BLOCKED", "metrics": {"actual_render_artifact": false, "reference_comparison": "NOT_RUN", "reason": "Fusion load/render-call evidence produced no image artifact"}},
+    {"name": "gimp_cross_renderer", "status": "OPTIONAL_NOT_RUN", "metrics": {"semantic_authority": false}},
+    {"name": "photoshop", "status": "OPTIONAL_NOT_RUN", "metrics": {"historical_additional_only": true}}
+  ],
+  "contract_findings": {
+    "psd_bytes_and_semantic_provenance_authoritative": true,
+    "deterministic_fixtures_semantic_math_gate": true,
+    "golden_reference": "D:\\Downloads\\20260812.png",
+    "actual_fusion_pixels_required": true,
+    "gimp_never_sole_authority": true,
+    "photoshop_not_required": true,
+    "claim_levels_preserved": true,
+    "no_blind_fitting": true,
+    "parity_005_started": false
+  },
+  "false_pass_checks": [
+    {"check": "structural_or_load_is_pixel_proof", "result": "PASS", "detail": "No pixel claim without an actual Fusion image artifact and golden comparison"},
+    {"check": "photoshop_is_mandatory", "result": "PASS", "detail": "Executable capability proof requires fixtures, PSD provenance, Fusion artifact and reference comparison; Photoshop is optional"},
+    {"check": "gimp_replaces_semantic_authority", "result": "PASS", "detail": "GIMP is optional cross-renderer evidence only"},
+    {"check": "parity_005_started", "result": "PASS", "detail": "PARITY-005 remains untouched"},
+    {"check": "reference_fitting", "result": "PASS", "detail": "No grade, resize, blur, flatten or fitting"}
+  ],
+  "blockers": [
+    "No actual Fusion rendered pixel artifact was produced",
+    "Full comparison with D:\\Downloads\\20260812.png is therefore NOT_RUN"
+  ],
+  "permitted_state_transition": "Update PARITY-004 evidence/claim to the revised contract while retaining blocked_host; do not mark done or advance active_task_id.",
+  "environment": {"model": "gpt-5.6-luna", "reasoning": "medium", "observed_at": "2026-09-02", "working_tree": "clean"}
+}

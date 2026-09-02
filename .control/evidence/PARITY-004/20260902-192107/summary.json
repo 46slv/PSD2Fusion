@@ -1,0 +1,134 @@
+{
+  "schema_version": 1,
+  "task": "PARITY-004",
+  "status": "blocked_host",
+  "verification": "blocked",
+  "packet_id": "PARITY-004-20260902-192107-contract-revised",
+  "branch": "codex/parity-004",
+  "candidate_head": "8863f5ec2cd5be006bf776ab4dc237b449437e3c",
+  "scope": {
+    "host_only": false,
+    "implementation_changed": true,
+    "compositing_semantics_changed": false,
+    "contract_only": true,
+    "parity_005_started": false,
+    "real_inputs_modified": false
+  },
+  "contract_revision": {
+    "photoshop_role": "optional_historical_additional_only",
+    "gimp_role": "optional_independent_cross_renderer_only",
+    "semantic_authority": "PSD bytes and semantic provenance",
+    "semantic_math_gate": "deterministic independent fixtures",
+    "real_case_golden": "D:\\Downloads\\20260812.png",
+    "fusion_pixel_gate": "actual Fusion rendered pixel artifact plus direct golden comparison",
+    "forbidden_fitting": ["blind_grade", "resize", "blur", "flatten", "reference_fitting"],
+    "claim_levels": ["parsed", "planned", "structural", "host_loaded", "pixel_verified"]
+  },
+  "checks": {
+    "fixture_generate": {
+      "status": "PASS",
+      "case_count": 6997,
+      "clbl_policy": "absent/default true and explicit true only",
+      "clbl_provenance_counts": {
+        "photoshop_default_true": 3500,
+        "explicit_psd_clbl": 3497
+      }
+    },
+    "fixture_validate": {
+      "status": "PASS",
+      "case_count": 6997,
+      "recomputed_cases": 6997,
+      "max_oracle_error": 0.0,
+      "max_reference_error": 0.0,
+      "metamorphic_failures": [],
+      "reference_equations_independent": true
+    },
+    "fixture_compare": {
+      "status": "PASS",
+      "threshold": 0.0,
+      "rgba_max": 0,
+      "rgba_mean": 0.0,
+      "alpha_max": 0,
+      "alpha_mean": 0.0
+    },
+    "unit_tests": {
+      "status": "PASS",
+      "parity003_and_clipping": "17/17",
+      "repository_check": "43/43"
+    },
+    "real_psd_structure": {
+      "status": "PASS",
+      "psd_sha256": "574d8a6511b2aabe744835d81ed76c8fc8ffd0c9c5678f3359e8eda10f9174db",
+      "descendants": 136,
+      "groups": 34,
+      "clipping_chains": 23,
+      "clipped_members": 59,
+      "graph_tools": 363,
+      "warnings": 0,
+      "validate_clipping_subtrees": "PASS",
+      "strict_plan": "PASS; 160 decisions remain unverified"
+    },
+    "reference_qualification": {
+      "inspection_status": "PASS",
+      "qualification_status": "exact_canvas",
+      "psd": {
+        "path": "D:\\Downloads\\a.psd",
+        "sha256": "574d8a6511b2aabe744835d81ed76c8fc8ffd0c9c5678f3359e8eda10f9174db",
+        "size_bytes": 63385140,
+        "dimensions": [2304, 1296],
+        "mode": "RGB",
+        "channels": 3,
+        "alpha": false,
+        "icc_profile_sha256": "2b3aa1645779a9e634744faf9b01e9102b0c9b88fd6deced7934df86b949af7e"
+      },
+      "reference_png": {
+        "path": "D:\\Downloads\\20260812.png",
+        "sha256": "91ff8daef941b3d9052497190fdc8aa6f4d56ba524c8d912cf011b6818535f54",
+        "size_bytes": 2725322,
+        "dimensions": [2304, 1296],
+        "mode": "RGBA",
+        "channels": 4,
+        "alpha_all_opaque": true,
+        "icc_profile_sha256": "2b3aa1645779a9e634744faf9b01e9102b0c9b88fd6deced7934df86b949af7e"
+      },
+      "stored_composite_comparison": {
+        "status": "FAIL",
+        "profile_status": "mismatch",
+        "rgb_max": 3,
+        "rgb_mean": 0.1856168686771262,
+        "reason": "existing ICC/profile mismatch; hidden conversion and fitting are forbidden"
+      },
+      "inputs_unchanged": true
+    },
+    "fusion_render": {
+      "status": "BLOCKED",
+      "resolve_version": "21.0.3.7",
+      "actual_render_artifact": null,
+      "full_reference_comparison": "NOT_RUN",
+      "evidence": "The initialized Resolve composition accepted load/render calls in prior probes but produced no image artifact; the current Resolve session is non-responsive after the failed render warning. Load/readback is not pixel proof.",
+      "output_root": ".local\\p4-fusion-render-20260902",
+      "output_file_count": 0
+    },
+    "gimp_cross_renderer": {
+      "status": "NOT_RUN",
+      "version": "3.2.4",
+      "role": "optional independent cross-renderer evidence; not semantic authority"
+    },
+    "photoshop": {
+      "status": "NOT_RUN",
+      "role": "optional historical/additional evidence; absence is not a blocker"
+    }
+  },
+  "claims": {
+    "parsed": "PASS",
+    "planned": "PASS",
+    "structural": "PASS",
+    "host_loaded": "prior load evidence only; not a fresh pixel claim",
+    "pixel_verified": false
+  },
+  "blockers": [
+    "FUSION_RENDER_REQUIRED: no actual Fusion rendered pixel artifact",
+    "REAL_REFERENCE_COMPARISON_NOT_RUN: the Fusion artifact is absent"
+  ],
+  "next_safe_action": "Keep PARITY-004 blocked_host, rerun only the Fusion render and direct comparison when a responsive Fusion session is available, optionally add a labelled GIMP cross-check, and do not start PARITY-005."
+}
