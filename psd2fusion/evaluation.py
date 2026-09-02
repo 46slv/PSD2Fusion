@@ -90,7 +90,20 @@ def evaluate_document(document: Any, policy: str = "strict") -> EvaluationPlan:
         nonlocal counter
         counter += 1
         kind = "transparent_subtree" if layer.is_group and not layer.effective_visible else ("pass_through" if layer.is_group and layer.pass_through else ("isolated_group" if layer.is_group else "composition"))
-        dec = CapabilityDecision("verified_fusion_native" if kind in ("composition", "transparent_subtree", "pass_through", "isolated_group") else "unverified", kind, "group scope", policy, {"source_id": layer.id}) if layer.is_group else _decision(layer, policy)
+        if layer.is_group:
+            # Group scope is native only when the parser found no unsupported
+            # semantics.  In particular, Pass Through groups with fractional
+            # opacity carry ``pass-through-opacity`` provenance and must not be
+            # silently treated as a native Fusion group.
+            unsupported = list(getattr(layer, "unsupported", []) or [])
+            if unsupported:
+                status = "rejected" if policy == "strict" else "verified_bake"
+                dec = CapabilityDecision(status, kind, ",".join(unsupported), policy,
+                                         {"source_id": layer.id, "raw_blend": getattr(layer, "raw_blend", None)})
+            else:
+                dec = CapabilityDecision("verified_fusion_native", kind, "group scope", policy, {"source_id": layer.id})
+        else:
+            dec = _decision(layer, policy)
         node = EvaluationNode("eval-%04d" % counter, kind, [layer.id], parent, order,
                               "parent" if layer.is_group and layer.pass_through else ("isolated" if layer.is_group else "parent"),
                               layer.blend, layer.raw_blend, layer.opacity, layer.fill_opacity,
@@ -104,7 +117,14 @@ def evaluate_document(document: Any, policy: str = "strict") -> EvaluationPlan:
         plan.nodes.append(node); plan.decisions.append(dec)
         if layer.opacity < 0.999999 or layer.fill_opacity is not None:
             counter += 1
-            od = CapabilityDecision("verified_fusion_native", "opacity_stage", "explicit opacity boundary", policy, {"source_id": layer.id})
+            unsupported = list(getattr(layer, "unsupported", []) or [])
+            if unsupported:
+                status = "rejected" if policy == "strict" else "verified_bake"
+                od = CapabilityDecision(status, "opacity_stage", ",".join(unsupported), policy,
+                                        {"source_id": layer.id, "overall_opacity": layer.opacity,
+                                         "fill_opacity": layer.fill_opacity})
+            else:
+                od = CapabilityDecision("verified_fusion_native", "opacity_stage", "explicit opacity boundary", policy, {"source_id": layer.id})
             on = EvaluationNode("eval-%04d" % counter, "opacity_stage", [layer.id], node.id, order,
                                 "local" if layer.is_group else "parent", layer.blend, layer.raw_blend,
                                 layer.opacity, layer.fill_opacity, layer.effective_visible, od,

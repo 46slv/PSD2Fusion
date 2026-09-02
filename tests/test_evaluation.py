@@ -35,4 +35,24 @@ class EvaluationTests(unittest.TestCase):
         self.assertEqual(plan.nodes[0].kind, "transparent_subtree")
         self.assertEqual(plan.decisions[-1].status, "rejected")
 
+    def test_unsupported_pass_through_group_rejected_with_opacity_stage(self):
+        group = SemanticGroup("g", "G", pass_through=True, opacity=.5,
+                              unsupported=["pass-through-opacity"])
+        plan = evaluate_document(self.doc([group]), "strict")
+        self.assertEqual(plan.nodes[0].kind, "pass_through")
+        self.assertEqual(plan.nodes[0].decision.status, "rejected")
+        self.assertIn("pass-through-opacity", plan.nodes[0].decision.reason)
+        self.assertEqual(plan.nodes[1].kind, "opacity_stage")
+        self.assertEqual(plan.nodes[1].decision.status, "rejected")
+        self.assertIn("pass-through-opacity", plan.nodes[1].decision.reason)
+
+    def test_unsupported_pass_through_group_compatibility_is_explicit_bake(self):
+        group = SemanticGroup("g", "G", pass_through=True, opacity=.5,
+                              unsupported=["pass-through-opacity"])
+        plan = evaluate_document(self.doc([group]), "compatibility")
+        self.assertEqual(plan.nodes[0].kind, "pass_through")
+        self.assertEqual(plan.nodes[0].decision.status, "verified_bake")
+        self.assertEqual(plan.nodes[1].decision.status, "verified_bake")
+        self.assertEqual(plan.nodes[0].decision.policy, "compatibility")
+
 if __name__ == "__main__": unittest.main()
