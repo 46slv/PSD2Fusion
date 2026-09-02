@@ -26,12 +26,12 @@
   "tasks": [
     {
       "id": "PARITY-001",
-      "status": "ready",
+      "status": "awaiting_verification",
       "requires": [],
       "verification": "pending",
-      "branch": null,
+      "branch": "codex/parity-001",
       "commit": null,
-      "evidence": []
+      "evidence": [".control/evidence/PARITY-001/20260902-124844/summary.json"]
     },
     {
       "id": "PARITY-002",
