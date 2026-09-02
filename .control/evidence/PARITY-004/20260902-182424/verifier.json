@@ -1,0 +1,67 @@
+{
+  "schema_version": 1,
+  "task": "PARITY-004",
+  "verifier": "fresh_luna",
+  "candidate_head": "5702be6366012db90b42e5c3f920d87a7c8408b8",
+  "candidate_tree": "b8ccaae3df6ac84b38bad76cfffca6a8b585a434",
+  "branch": "codex/parity-004",
+  "verdict": "BLOCKED",
+  "reproduced_checks": [
+    {
+      "name": "repository_check",
+      "command": "pwsh -NoProfile -File .\\scripts\\check.ps1",
+      "exit_code": 0,
+      "status": "PASS",
+      "metrics": {"tests": 42, "python_compile": "PASS", "control_state": "PASS"}
+    },
+    {
+      "name": "fixture_generate_validate_compare",
+      "command": "scripts/parity/parity004.py generate/validate/compare (fresh Luna verification)",
+      "exit_code": 0,
+      "status": "PASS",
+      "metrics": {"case_count": 6997, "max_reference_error": 0.0, "max_oracle_error": 0.0, "metamorphic_failures": [], "rgba_max": 0}
+    },
+    {
+      "name": "photoshop_reference_oracle",
+      "command": "Photoshop.exe -r scripts/photoshop/parity003_oracle.jsx and ASCII staging probe",
+      "exit_code": 0,
+      "status": "BLOCKED",
+      "metrics": {"photoshop_version": "27.8", "oracle_output_created": false, "reference_pixels_recorded": false, "reason": "Japanese login dialog blocks document/JSX execution before the ASCII-only probe is reached"}
+    },
+    {
+      "name": "resolve_fusion_host_probe",
+      "command": "fuscript.exe -l Lua -x fusion-init scripts/resolve/parity003_probe.lua <real-comp>",
+      "exit_code": 0,
+      "status": "BLOCKED",
+      "metrics": {"resolve_version": "21.0.3.7", "fuscript_file_version": "21.0.3", "fuscript_dash_v": "15.0.0", "load_pass": true, "render_call": true, "render_output_created": false, "reason": "stopped endpoint reproduces unavailable; fresh project-manager session has bmd.scriptapp=nil; initialized load/render calls produced no pixel artifact"}
+    },
+    {
+      "name": "real_reference_comparison",
+      "command": "PARITY-004 Photoshop/reference pixel comparison",
+      "exit_code": null,
+      "status": "NOT_RUN",
+      "metrics": {"reason": "required Photoshop and Resolve pixel artifacts are unavailable"}
+    }
+  ],
+  "false_pass_checks": [
+    {"check": "host_load_is_pixel_proof", "result": "PASS", "detail": "load and render-call acceptance are not accepted without a fresh image artifact and pixel metrics"},
+    {"check": "gimp_replaces_photoshop_oracle", "result": "PASS", "detail": "GIMP 3.2.4 is recorded as non-authoritative sanity/export only"},
+    {"check": "parity_005_started", "result": "PASS", "detail": "PARITY-005 remains untouched"},
+    {"check": "private_inputs_committed", "result": "PASS", "detail": "real PSD/reference PNG/full renders remain outside Git evidence"}
+  ],
+  "blockers": [
+    "Photoshop 27.8 is held at its login dialog, so no reference pixels or oracle-result.txt were produced.",
+    "Resolve exposes a usable FusionUI endpoint only in one initialized session; the fresh project-manager session has no bmd.scriptapp Fusion endpoint despite port 49152 listening.",
+    "No fresh Resolve render image artifact was produced, so the full real PSD/reference comparison is NOT_RUN.",
+    "GIMP cannot satisfy the Photoshop reference-pixel gate under the PARITY-004 contract."
+  ],
+  "permitted_state_transition": null,
+  "evidence_refs": [
+    ".control/evidence/PARITY-004/20260902-182424/summary.json"
+  ],
+  "environment": {
+    "observed_at": "2026-09-02T18:24:24+09:00",
+    "model": "gpt-5.6-luna",
+    "reasoning": "medium"
+  }
+}

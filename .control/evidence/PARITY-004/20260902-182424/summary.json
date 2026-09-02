@@ -1,0 +1,158 @@
+{
+  "schema_version": 1,
+  "task": "PARITY-004",
+  "status": "blocked_host",
+  "verification": "blocked",
+  "packet_id": "PARITY-004-20260902-182424-host-repro",
+  "branch": "codex/parity-004",
+  "candidate_head_before_evidence": "5702be6366012db90b42e5c3f920d87a7c8408b8",
+  "scope": {
+    "host_only": true,
+    "implementation_changed": false,
+    "compositing_semantics_changed": false,
+    "parity_005_started": false,
+    "real_inputs_modified": false
+  },
+  "photoshop": {
+    "executable": "C:\\Program Files\\Adobe\\Adobe Photoshop 2026\\Photoshop.exe",
+    "version": "27.8",
+    "observed_process": {
+      "pid": 128648,
+      "command_line": "Photoshop.exe -r D:\\Documents\\PSD2Fusion\\scripts\\photoshop\\parity003_oracle.jsx",
+      "window_state": "Adobe Photoshop 2026 shows the Japanese login dialog; document/script workspace is blocked before JSX execution"
+    },
+    "committed_oracle_source": {
+      "path": "scripts/photoshop/parity003_oracle.jsx",
+      "sha256": "89974A9E20ABC7CAD141F5A750F5568B63327D4ADE0916ACC40EB46E4049635C",
+      "byte_length": 4441,
+      "non_ascii_byte_count": 0,
+      "bom": "none"
+    },
+    "current_original_attempt": {
+      "command": "Photoshop.exe -r D:\\Documents\\PSD2Fusion\\scripts\\photoshop\\parity003_oracle.jsx",
+      "cwd": "D:\\Documents\\PSD2Fusion",
+      "output_root": "D:\\Documents\\PSD2Fusion\\.local\\parity004-photoshop-20260902",
+      "oracle_result_created": false,
+      "reference_pixels_recorded": false
+    },
+    "ascii_staging_probe": {
+      "script": ".local/p4-ascii-probe.jsx",
+      "script_sha256": "9C5EB871BC6F81BEA2C6D40D4476C56D5F1F395D2278A08C9C87EC801B9E2413",
+      "script_byte_length": 1011,
+      "script_non_ascii_byte_count": 0,
+      "script_bom": "none",
+      "absolute_output": "D:\\Documents\\PSD2Fusion\\.local\\p4-ascii-probe-20260902",
+      "launcher_process_exited": true,
+      "existing_photoshop_process_unchanged": true,
+      "probe_output_created": false
+    },
+    "diagnosis": "The current run cannot reproduce a JSX parser/encoding failure because Photoshop is stopped at its login gate. The source, cwd, absolute script path and ASCII staging path are all ASCII-only; no output means the script was not reached. Authentication was not automated. GIMP is not accepted as a Photoshop oracle."
+  },
+  "resolve_fusion": {
+    "resolve_executable": "C:\\Program Files\\Blackmagic Design\\DaVinci Resolve\\Resolve.exe",
+    "resolve_version": "21.0.3.7",
+    "resolve_sha256": "77FD83A5A7CD5A9E50797B41E1D76ADDF9B372EFFF7D1A95FC7AF77249CF7539",
+    "fuscript_executable": "C:\\Program Files\\Blackmagic Design\\DaVinci Resolve\\fuscript.exe",
+    "fuscript_file_version": "21.0.3",
+    "fuscript_product_version": "21.0.3",
+    "fuscript_sha256": "0F835EA3259E201479CE5AC62ABF4DDF7661012A6548CB302122196DD2E7E73E",
+    "fuscript_dash_v": "15.0.0; Built Jul 21 2026",
+    "version_observation": "The apparent 15.0.0 versus 21.0.3 mismatch is the interpreter -v banner versus PE metadata; only one fuscript.exe path was found."
+  },
+  "resolve_probes": [
+    {
+      "name": "stopped_endpoint_reproduction",
+      "command": "fuscript.exe -l Lua -x fusion-init scripts/resolve/parity003_probe.lua <real-comp>",
+      "resolve_running": false,
+      "port_49152_listening": false,
+      "endpoint": "nil",
+      "probe_exit_code": 0,
+      "observed_error": "Fusion scripting endpoint is unavailable",
+      "log": ".local/p4-resolve-unavailable-20260902/stopped-exact-probe.log",
+      "log_sha256": "03403A91A394455A2F472353C4056BD11D1282D4E03DE96B36D44CF0B34C967C",
+      "log_length": 201
+    },
+    {
+      "name": "running_real_load_render",
+      "command": "fuscript.exe -l Lua -x fusion-init scripts/resolve/parity003_probe.lua D:\\Documents\\PSD2Fusion\\.local\\parity004-verifier-20260902\\real\\PSD2Fusion.comp",
+      "resolve_version": "21.0.3.7",
+      "endpoint": "FusionUI on 127.0.0.1",
+      "load_pass": true,
+      "tools": 363,
+      "media_out": true,
+      "render_call": true,
+      "render_result": true,
+      "render_output_created": false,
+      "probe_exit_code": 0,
+      "log": ".local/p4-resolve-probe-20260902/exact-probe.log",
+      "log_sha256": "172946724B12B02C23FB0F4B669FC206F86E3B56E6F7E0C35D1F29BCF9B446AA",
+      "log_length": 1815,
+      "interpretation": "Load and render-call acceptance did not create a pixel artifact; this is not pixel proof."
+    },
+    {
+      "name": "running_load_only",
+      "command": "fuscript.exe -l Lua -x fusion-init .local/p4_resolve_load_only.lua <real-comp>",
+      "load_pass": true,
+      "tools": 363,
+      "media_out": true,
+      "probe_exit_code": 0,
+      "log": ".local/p4-resolve-load-20260902/load-only-ready.log",
+      "log_sha256": "D0EC6E0D7F84BE90EFA72C7E5FD71D8BDC34D2839CB9ECB167D927DBCA239ACF",
+      "log_length": 132
+    },
+    {
+      "name": "smallest_16x16_marker_render",
+      "command": "fuscript.exe -l Lua -x fusion-init .local/p4_resolve_min_render_marker.lua <16x16-comp> <render.png> <marker.txt>",
+      "fixture_dimensions": [16, 16],
+      "marker_sha256": "2B54DBD4D82AB1ABE28DEA72ACFF77102431E0199B916001409CDF7B4B430ABA",
+      "marker_contents": ["START"],
+      "wait_seconds": 20,
+      "render_output_created": false,
+      "client_completed_before_timeout": false,
+      "client_was_stopped_after_exact_commandline_check": true,
+      "resolve_project_manager_remained_responsive": true,
+      "interpretation": "The smallest probe did not reach an observable completed render; no pixel artifact was accepted."
+    },
+    {
+      "name": "fresh_restart_session",
+      "resolve_pid": 68196,
+      "window_state": "project manager; no current Fusion Composition",
+      "port_49152_listening": true,
+      "fuscript_server_child_present": false,
+      "bmd_scriptapp_fusion": "nil",
+      "endpoint_logs": [
+        ".local/p4-resolve-load-20260902/fresh-endpoint.log",
+        ".local/p4-resolve-load-20260902/fresh-endpoint-ready.log"
+      ],
+      "endpoint_log_sha256": "E1D73230246BC923E222A5AE8C6E6D7561622584BF643204CC92A1AD7FC87B69",
+      "diagnosis": "A listening Resolve port alone is insufficient; the Fusion scripting session is not exposed from the empty project-manager state until the required host session is initialized."
+    }
+  ],
+  "gimp": {
+    "executable": "C:\\Users\\shiro\\AppData\\Local\\Programs\\GIMP 3\\bin\\gimp-3.exe",
+    "version": "3.2.4",
+    "sha256": "B4EA813A747EE419657BC3E1289EBBE79F90A28BDF6FBBD445F7C5B3FBE41E99",
+    "role": "non-authoritative sanity/export option only; cannot satisfy the Photoshop reference-pixel gate"
+  },
+  "reference_inputs": {
+    "read_only": true,
+    "psd_path": "D:\\Downloads\\a.psd",
+    "reference_png_path": "D:\\Downloads\\20260812.png",
+    "psd_sha256": "574d8a6511b2aabe744835d81ed76c8fc8ffd0c9c5678f3359e8eda10f9174db",
+    "reference_png_sha256": "91ff8daef941b3d9052497190fdc8aa6f4d56ba524c8d912cf011b6818535f54",
+    "unchanged": true
+  },
+  "pixel_proof": {
+    "photoshop_reference_pixels": false,
+    "resolve_render_pixels": false,
+    "full_real_reference_comparison": "NOT_RUN",
+    "claim": "pixel_verified not earned"
+  },
+  "blockers": [
+    "Photoshop 27.8 is held at the login dialog; the ASCII-only JSX probe produced no output before script execution.",
+    "Resolve 21.0.3.7 exposes a usable FusionUI endpoint only in one initialized session; the fresh project-manager session has bmd.scriptapp=nil despite port 49152 listening.",
+    "The real load/render call and the 16x16 render probe produced no fresh image artifact; load or render-call acceptance is not pixel proof.",
+    "GIMP 3.2.4 cannot replace Photoshop as the required compositing oracle under the PARITY-004 contract."
+  ],
+  "next_safe_action": "Keep PARITY-004 blocked_host. A user-initialized Photoshop session (or explicitly authorized equivalent Photoshop host access) and a Resolve Fusion-page/current-composition session are required before rerunning the contract pixel gates."
+}
