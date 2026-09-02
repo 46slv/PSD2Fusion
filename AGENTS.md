@@ -56,6 +56,7 @@ pwsh -NoProfile -File .\scripts\check.ps1
 ```
 
 Host/reference checks are defined by the active task. Offline checks cannot substitute for a required Photoshop/Resolve run.
+Before reporting `done`/`verification=pass`, publish commits and run the inspection-only remote completion guard after a fresh fetch/readback of `origin/main:.control/current.json`; offline `check.ps1` alone never proves canonical completion.
 
 ## Authority boundary
 

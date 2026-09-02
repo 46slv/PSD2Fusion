@@ -126,3 +126,4 @@ pwsh -NoProfile -File .\scripts\check.ps1
 ```
 
 This validates canonical state, unit tests and Python compilation. It never implies host/reference success.
+Task completion additionally requires publishing commits and using the remote completion guard after a fresh fetch/readback of `origin/main:.control/current.json`; network or remote mismatch is not PASS.
