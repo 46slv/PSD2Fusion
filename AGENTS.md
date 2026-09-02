@@ -27,6 +27,8 @@ For non-trivial work:
 4. inspect current branch/HEAD, relevant code/tests, and committed evidence;
 5. establish the current baseline or failure before editing.
 
+When `active_task_id` is `PARITY-004`, also read `.control/PARITY-004_TODO.md` and `docs/PARITY_004_HOST_PIXEL_GATE.md` before changing compositor code or advancing work.
+
 Read `docs/AGENT_OPERATIONS.md` only when delegation or a persistent loop materially helps. Do not load all research files by default.
 
 ## Protected invariants
@@ -40,6 +42,30 @@ Read `docs/AGENT_OPERATIONS.md` only when delegation or a persistent loop materi
 - Do not claim Photoshop pixel parity from parser structure, graph text, Resolve load success, or agent self-report.
 - The real PSD, reference PNG, full-resolution renders, and per-layer exports must not be committed to this public repository.
 - Material prior-art code reuse must be license-compatible and preserve attribution/provenance.
+
+## PARITY-004 execution guard
+
+While `PARITY-004` is active, P4-01 through P4-07 are a preserved structural candidate, not a completed pixel claim. Do not roll them back merely because host/pixel proof is pending.
+
+Unless actual Fusion evidence localizes a blocker elsewhere, the remaining order is mandatory:
+
+```text
+P4-08 ordinary Fusion load/readback
+-> P4-HOST-PIXEL deterministic micro renders
+-> P4-09 real Fusion/reference baseline
+-> smallest evidence-driven repair
+-> rerun focused micro fixture and real comparison
+```
+
+Until that baseline exists:
+
+- do not start `PARITY-005` or `PARITY-006`;
+- do not mark `PARITY-004` done;
+- do not treat structural/load evidence as `pixel_verified`;
+- do not perform a broad Evaluation IR / Lowering Plan / compiler redesign merely because known architecture debt exists;
+- do not fit the reference with threshold relaxation, grading, resize, blur, flattening, or whole-image correction.
+
+Known architecture debts must remain visible: capability decisions do not yet drive backend selection before graph compilation, and asset materialization still needs a verified ICC/straight-premult/transparent-RGB contract. Use host/pixel evidence to determine whether either debt is causal. Before introducing multiple backends, custom operations, verified bake paths, or broad feature expansion, capability planning must be connected to lowering so strict mode cannot silently emit an unverified backend.
 
 ## Work and verification
 
@@ -66,6 +92,8 @@ In-scope reversible repository edits and non-destructive validation are allowed.
 
 - active task/status -> `.control/current.json`;
 - active Goal, architecture, validation, Worker/Verifier rules -> `.control/CURRENT_GOAL.md`;
+- active PARITY-004 queue -> `.control/PARITY-004_TODO.md`;
+- active PARITY-004 host/pixel procedure -> `docs/PARITY_004_HOST_PIXEL_GATE.md`;
 - historical FIRST_USABLE architecture -> root `ARCHITECTURE.md`;
 - PSD/file-format evidence -> `docs/research/`;
 - repeatable procedure -> tests/scripts/Harness;
