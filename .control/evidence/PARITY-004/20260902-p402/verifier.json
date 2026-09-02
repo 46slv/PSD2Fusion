@@ -1,0 +1,68 @@
+{
+  "schema_version": 1,
+  "task": "PARITY-004",
+  "item": "P4-02",
+  "verifier": "fresh_luna",
+  "candidate_head": "542d51916c060d0f4fb0a7c35f4c11d930674cd4",
+  "state_head": "5fb8b72829360d2c634f198cbe657e0a87fa1879",
+  "branch": "codex/parity-004",
+  "verdict": "PASS",
+  "reproduced_checks": [
+    {
+      "name": "p4_02_graph_fixture",
+      "status": "PASS",
+      "command": "python scripts/parity/p4_02.py .local/p4-02-verifier-20260902-rerun",
+      "metrics": {
+        "tools": 15,
+        "merges": 5,
+        "clipping": 3,
+        "all_graph_checks": true,
+        "artifact": ".local/p4-02-verifier-20260902-rerun/p4_02.comp",
+        "artifact_size": 9177,
+        "artifact_sha256": "4cc357cb433269d0235d2e3e09fa9d33b3cde326b5e06462c80bfa247c127cb5"
+      }
+    },
+    {
+      "name": "focused_tests",
+      "status": "PASS",
+      "command": "python -m unittest tests.test_parity004_p402_graph tests.test_clipping_subtree tests.test_parity004_p401_graph tests.test_parity004_clipping -v",
+      "metrics": {"tests": 16}
+    },
+    {
+      "name": "repository_check",
+      "status": "PASS",
+      "command": "pwsh -NoProfile -File .\\scripts\\check.ps1",
+      "metrics": {"tests": 50, "control_state": "PASS", "python_compile": "PASS"}
+    }
+  ],
+  "findings": [
+    {
+      "path": "psd2fusion/fusion_comp.py",
+      "lines": "539-588",
+      "result": "fixed matte captured once; each member receives its own Operator=In and local ProcessAlpha=0 ClipStack Merge"
+    },
+    {
+      "path": "psd2fusion/fusion_comp.py",
+      "lines": "623-645",
+      "result": "strict true-chain collection preserves contiguous PSD order and emits one outer chain Merge"
+    },
+    {
+      "path": "scripts/parity/p4_02.py",
+      "lines": "171-192",
+      "result": "independent checks assert exact base matte reuse, order, local isolation and one outer Merge"
+    },
+    {
+      "path": "tests/test_parity004_p402_graph.py",
+      "lines": "23-120",
+      "result": "graph shape, progressive stack-only backgrounds, outer isolation and malformed-span guard are covered"
+    }
+  ],
+  "false_pass_checks": {
+    "fixed_matte_not_progressive_stack": "PASS; all ClipIn backgrounds equal LoaderR_p402base01",
+    "member_order": "PASS; ClipStack emission follows PSD bottom-to-top member order",
+    "outer_backdrop_isolation": "PASS; no outer source is connected to local ClipIn/ClipStack nodes",
+    "structural_is_not_pixel_proof": "PASS; summary explicitly keeps host_loaded=false and pixel_verified=false",
+    "scope": "PASS; no Photoshop/Resolve/host/render, P4-03+, PARITY-005 or real-input changes"
+  },
+  "permitted_state_transition": "Record P4-02 as verified while retaining PARITY-004 in_progress with verification pending; do not advance active_task_id or start P4-03."
+}
