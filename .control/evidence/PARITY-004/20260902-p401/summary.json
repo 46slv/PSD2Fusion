@@ -1,0 +1,91 @@
+{
+  "schema_version": 1,
+  "task": "PARITY-004",
+  "item": "P4-01",
+  "status": "PASS",
+  "verification": "pending_fresh_luna",
+  "branch": "codex/parity-004",
+  "candidate_head": "fc29eb86916ce396fcbe18262f9d80858ad6f06f",
+  "scope": {
+    "selected_recipe_only": true,
+    "p4_02_started": false,
+    "parity_005_started": false,
+    "host_render": "NOT_RUN_BY_SCOPE",
+    "photoshop": "NOT_RUN_BY_SCOPE",
+    "pixel_proof_infrastructure_changed": false,
+    "real_inputs_modified": false
+  },
+  "decision": {
+    "selected_candidate": "A",
+    "recipe": "operator_in_fixed_matte_local_stack",
+    "graph": "base Loader -> shared matte / ClipIn Operator=In <- member Loader -> local ClipStack Merge(ProcessAlpha=0) -> one outer chain Merge",
+    "candidate_b": "rejected_direct_effect_mask",
+    "reason": "With an ideal alpha-only EffectMask, ordinary source-over alpha is a + (a*m) * (1-a); a=0.5 and m=1 gives 0.75 instead of the fixed 0.5 base coverage. B would need an additional alpha-preserving stage and is therefore not the smaller equivalent recipe."
+  },
+  "witness": {
+    "base_alpha": 0.5,
+    "member_alpha": 1.0,
+    "candidate_a_local_alpha": 0.5,
+    "candidate_b_ideal_effect_mask_alpha": 0.75,
+    "zero_alpha_base_candidate_a_alpha": 0.0,
+    "candidate_b_transparent_rgb_requires_explicit_alpha": true
+  },
+  "artifacts": {
+    "output_root": ".local/p4-01-fc29eb8",
+    "comparison": {
+      "path": ".local/p4-01-fc29eb8/comparison.json",
+      "size": 2955,
+      "sha256": "9062e2d952fb6e79fded60dfee5a2c3133abfff0257a79305b6f7c05ba4c2a9"
+    },
+    "candidate_a": {
+      "path": ".local/p4-01-fc29eb8/candidate_a.comp",
+      "size": 5226,
+      "sha256": "7ce2d4cd1c8ec03fba5c773b445925334cd6daef1020afe83829e753c11d3cf4"
+    },
+    "candidate_b": {
+      "path": ".local/p4-01-fc29eb8/candidate_b.comp",
+      "size": 4604,
+      "sha256": "02b3e8d90b55974cd613774598c41f31c7171dcc05fc2755eecaee44546795b0"
+    }
+  },
+  "checks": {
+    "p4_01_script": {
+      "status": "PASS",
+      "command": "python scripts/parity/p4_01.py .local/p4-01-fc29eb8",
+      "selected": "A",
+      "candidate_a": {
+        "operator_in": 1,
+        "process_alpha_zero": 1,
+        "outer_chain_merge": 1,
+        "no_outer_backdrop_in_local": true
+      },
+      "candidate_b": {
+        "effect_mask_connection": true,
+        "operator_in": 0,
+        "direct_merge": 1
+      }
+    },
+    "focused_tests": {
+      "status": "PASS",
+      "command": "python -m unittest tests.test_parity004_p401_graph -v",
+      "tests": 3
+    },
+    "repository_check": {
+      "status": "PASS",
+      "command": "pwsh -NoProfile -File .\\scripts\\check.ps1",
+      "tests": 46,
+      "compileall": "PASS",
+      "control_state": "PASS"
+    }
+  },
+  "claims": {
+    "graph_recipe": "PASS",
+    "structural": "P4-01 micro-comp only",
+    "host_loaded": false,
+    "pixel_verified": false
+  },
+  "provenance": {
+    "fusion_operator_basis": "Fusion Tool Reference: Operator In uses the background alpha to clip foreground pixels; Merge Effect Mask is an effect/matte input.",
+    "reference_url": "https://documents.blackmagicdesign.com/UserManuals/Fusion9_Tool_Reference.pdf?_v=1501601400000"
+  }
+}
