@@ -23,6 +23,12 @@ class EvaluationTests(unittest.TestCase):
         self.assertEqual(plan.nodes[0].blend, "Zzz")
         self.assertNotEqual(plan.nodes[0].blend, "Normal")
 
+    def test_same_named_core_mode_is_not_promoted_without_host_proof(self):
+        layer = SemanticLayer("x", "X", raw_blend="mul ", blend="Multiply")
+        plan = evaluate_document(self.doc([layer]), "strict")
+        self.assertEqual(plan.decisions[0].status, "unverified")
+        self.assertIn("Photoshop", plan.decisions[0].reason)
+
     def test_compatibility_is_explicit(self):
         layer = SemanticLayer("x", "X", raw_blend="zzzz", blend="Zzz", unsupported=["pixel-mask"])
         plan = evaluate_document(self.doc([layer]), "compatibility")

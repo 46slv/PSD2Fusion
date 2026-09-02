@@ -295,11 +295,13 @@ class _Compiler:
         self.blend_modes.add(layer.blend)
         mode_id = FUSION_BLEND_IDS.get(layer.blend)
         if mode_id is None:
-            if not any("Fusion blend fallback" in item for item in layer.warnings):
-                layer.warnings.append(
-                    "Fusion blend fallback: %s -> Normal" % layer.blend
-                )
-            return "Normal"
+            # A same-named Fusion control is not a Photoshop proof, and an
+            # unknown control must never be silently changed to Normal.  The
+            # caller can choose an explicit bake/reject path instead.
+            raise ValueError(
+                "Cannot lower unsupported/unverified blend mode without an "
+                "explicit capability decision: %s" % layer.blend
+            )
         return mode_id
 
     def leaf(self, layer: SemanticLayer, depth: int, scope: str) -> _ItemResult:
@@ -324,6 +326,10 @@ class _Compiler:
         # Pass-through groups retain the parent's backdrop through an exposed
         # GroupOperator input. The wrapper is organizational; child Merge nodes
         # still evaluate against the caller's stream.
+        if layer.pass_through and layer.opacity < 0.999999:
+            raise ValueError(
+                "Pass Through group opacity requires a verified host boundary"
+            )
         native_pass = layer.pass_through and layer.opacity >= 0.999999
         if native_pass:
             group_name = self.name("Group" + scope, layer.id)
@@ -371,9 +377,10 @@ class _Compiler:
             return _ItemResult(
                 _Source(group_name, "MainOutput1"),
                 _Source(group_name, "MainOutput1"),
-                # The parent merge keeps the existing backdrop visible even
-                # when the host has not yet resolved the exposed group input.
-                consumed_backdrop=False,
+                # The GroupOperator consumes the caller's stream through its
+                # exposed MainInput1.  Adding a parent Normal merge would
+                # double-composite the pass-through result.
+                consumed_backdrop=True,
             )
 
         # Isolated group: build a self-contained transparent subtree, then let
@@ -434,9 +441,12 @@ class _Compiler:
             mode_id = self.mode_id(layer)
         else:
             self.blend_modes.add(mode)
-            mode_id = FUSION_BLEND_IDS.get(mode, "Normal")
-            if mode not in FUSION_BLEND_IDS:
-                layer.warnings.append("Fusion blend fallback: %s -> Normal" % mode)
+            mode_id = FUSION_BLEND_IDS.get(mode)
+            if mode_id is None:
+                raise ValueError(
+                    "Cannot lower unsupported/unverified blend mode without an "
+                    "explicit capability decision: %s" % mode
+                )
         if backdrop is not None and not backdrop.name:
             self._external_input_target = merge_name
         self._current_tools.append(

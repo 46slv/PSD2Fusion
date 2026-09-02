@@ -7,6 +7,8 @@ carried through every operation so unsupported semantics cannot disappear.
 from dataclasses import asdict, dataclass, field
 from typing import Any, Dict, List, Optional
 
+from .capabilities import capability_for, capability_for_blend
+
 CAPABILITIES = (
     "verified_fusion_native", "verified_custom", "verified_bake",
     "detected_unsupported", "rejected", "unverified",
@@ -65,19 +67,31 @@ class EvaluationPlan:
 def _decision(layer: Any, policy: str) -> CapabilityDecision:
     unsupported = list(getattr(layer, "unsupported", []) or [])
     blend = getattr(layer, "blend", "Normal")
-    # Only modes with an explicit proof entry are native.  This is an IR
-    # decision, not a claim that Fusion's same-named control is pixel-correct.
-    native = {"Normal", "Multiply", "Linear Dodge", "Overlay"}
     if unsupported:
         status = "rejected" if policy == "strict" else "verified_bake"
         return CapabilityDecision(status, "layer", ",".join(unsupported), policy,
                                   {"raw_blend": getattr(layer, "raw_blend", None), "source_id": layer.id})
-    if blend in native:
-        return CapabilityDecision("verified_fusion_native", "layer", "fixture registry", policy,
-                                  {"raw_blend": getattr(layer, "raw_blend", None), "source_id": layer.id})
-    status = "rejected" if policy == "strict" else "unverified"
-    return CapabilityDecision(status, "blend", "blend mode lacks promotion proof", policy,
-                              {"raw_blend": getattr(layer, "raw_blend", None), "source_id": layer.id})
+    record = capability_for_blend(blend)
+    # A same-named Fusion ApplyMode is only a candidate lowering.  Until the
+    # PARITY-003 proof packet has both Photoshop/reference pixels and a tied
+    # Resolve render, preserve the explicit ``unverified`` state in strict IR.
+    status = record.status
+    if policy == "compatibility" and status == "rejected":
+        status = "verified_bake"
+    return CapabilityDecision(
+        status,
+        "blend",
+        record.reason,
+        policy,
+        {
+            "raw_blend": getattr(layer, "raw_blend", None),
+            "source_id": layer.id,
+            "capability": record.operation,
+            "backend": record.backend,
+            "fusion_id": record.fusion_id,
+            "proof_id": record.proof_id,
+        },
+    )
 
 
 def evaluate_document(document: Any, policy: str = "strict") -> EvaluationPlan:
@@ -91,17 +105,33 @@ def evaluate_document(document: Any, policy: str = "strict") -> EvaluationPlan:
         counter += 1
         kind = "transparent_subtree" if layer.is_group and not layer.effective_visible else ("pass_through" if layer.is_group and layer.pass_through else ("isolated_group" if layer.is_group else "composition"))
         if layer.is_group:
-            # Group scope is native only when the parser found no unsupported
-            # semantics.  In particular, Pass Through groups with fractional
-            # opacity carry ``pass-through-opacity`` provenance and must not be
-            # silently treated as a native Fusion group.
+            # Group scope stays explicit in the Evaluation IR.  The strict
+            # registry, rather than a same-named Fusion operator, decides
+            # whether that boundary has a reproducible proof packet.
             unsupported = list(getattr(layer, "unsupported", []) or [])
             if unsupported:
                 status = "rejected" if policy == "strict" else "verified_bake"
                 dec = CapabilityDecision(status, kind, ",".join(unsupported), policy,
                                          {"source_id": layer.id, "raw_blend": getattr(layer, "raw_blend", None)})
             else:
-                dec = CapabilityDecision("verified_fusion_native", kind, "group scope", policy, {"source_id": layer.id})
+                operation = (
+                    "isolated_group_opacity"
+                    if kind == "isolated_group"
+                    else kind
+                )
+                record = capability_for(operation)
+                dec = CapabilityDecision(
+                    record.status,
+                    kind,
+                    record.reason or "group scope",
+                    policy,
+                    {
+                        "source_id": layer.id,
+                        "capability": record.operation,
+                        "backend": record.backend,
+                        "proof_id": record.proof_id,
+                    },
+                )
         else:
             dec = _decision(layer, policy)
         node = EvaluationNode("eval-%04d" % counter, kind, [layer.id], parent, order,
@@ -124,7 +154,20 @@ def evaluate_document(document: Any, policy: str = "strict") -> EvaluationPlan:
                                         {"source_id": layer.id, "overall_opacity": layer.opacity,
                                          "fill_opacity": layer.fill_opacity})
             else:
-                od = CapabilityDecision("verified_fusion_native", "opacity_stage", "explicit opacity boundary", policy, {"source_id": layer.id})
+                operation = "nested_opacity" if layer.is_group else "ordinary_opacity"
+                record = capability_for(operation)
+                od = CapabilityDecision(
+                    record.status,
+                    "opacity_stage",
+                    record.reason or "explicit opacity boundary",
+                    policy,
+                    {
+                        "source_id": layer.id,
+                        "overall_opacity": layer.opacity,
+                        "fill_opacity": layer.fill_opacity,
+                        "capability": record.operation,
+                    },
+                )
             on = EvaluationNode("eval-%04d" % counter, "opacity_stage", [layer.id], node.id, order,
                                 "local" if layer.is_group else "parent", layer.blend, layer.raw_blend,
                                 layer.opacity, layer.fill_opacity, layer.effective_visible, od,
@@ -141,6 +184,15 @@ def evaluate_document(document: Any, policy: str = "strict") -> EvaluationPlan:
                 "clbl_provenance": chain.blend_clipped_as_group_provenance,
                 "backdrop_scope": "local_span", "coverage": "base_evaluated_coverage"}
         plan.clipping_spans.append(span)
-        status = "verified_fusion_native" if chain.blend_clipped_as_group else ("rejected" if policy == "strict" else "verified_bake")
-        plan.decisions.append(CapabilityDecision(status, "clipping_span", "clbl=false requires explicit fallback" if not chain.blend_clipped_as_group else "same-parent local span", policy, span))
+        status = (
+            "unverified"
+            if chain.blend_clipped_as_group
+            else ("rejected" if policy == "strict" else "verified_bake")
+        )
+        reason = (
+            "clbl=false requires explicit fallback"
+            if not chain.blend_clipped_as_group
+            else "same-parent local span requires core blend and alpha proof"
+        )
+        plan.decisions.append(CapabilityDecision(status, "clipping_span", reason, policy, span))
     return plan
