@@ -1,0 +1,67 @@
+{
+  "schema_version": 1,
+  "task": "PARITY-004",
+  "item": "P4-01",
+  "verifier": "fresh_luna",
+  "candidate_head": "fc29eb86916ce396fcbe18262f9d80858ad6f06f",
+  "state_head": "c75b73fcfb51a35c4e5635bd0475e41f95525d9c",
+  "branch": "codex/parity-004",
+  "verdict": "PASS",
+  "reproduced_checks": [
+    {
+      "name": "focused_graph_tests",
+      "status": "PASS",
+      "metrics": {"tests": 3, "operator_in": 1, "process_alpha_zero": 1}
+    },
+    {
+      "name": "repository_check",
+      "status": "PASS",
+      "metrics": {"tests": 46, "control_state": "PASS", "python_compile": "PASS"}
+    },
+    {
+      "name": "p4_01_recipe_fixture",
+      "status": "PASS",
+      "metrics": {
+        "selected_candidate": "A",
+        "candidate_a": "operator_in_fixed_matte_local_stack",
+        "candidate_b": "rejected_direct_effect_mask",
+        "candidate_a_local_alpha": 0.5,
+        "candidate_b_ideal_effect_mask_alpha": 0.75
+      }
+    }
+  ],
+  "contract_findings": {
+    "graph_recipe_verified": true,
+    "actual_fusion_render": false,
+    "pixel_parity_claim": false,
+    "p4_02_started": false,
+    "parity_005_started": false,
+    "host_render_photoshop": "NOT_RUN_BY_SCOPE",
+    "pixel_proof_infrastructure_changed": false,
+    "real_inputs_modified": false
+  },
+  "false_pass_checks": [
+    {
+      "check": "graph_or_load_is_pixel_proof",
+      "result": "PASS",
+      "detail": "The verdict is limited to the P4-01 Fusion graph recipe; no host render or pixel claim was made."
+    },
+    {
+      "check": "direct_effect_mask_is_equivalent_for_partial_base_alpha",
+      "result": "PASS",
+      "detail": "The fixture witness distinguishes fixed base alpha 0.5 from ideal direct-mask source-over alpha 0.75."
+    },
+    {
+      "check": "scope_advanced",
+      "result": "PASS",
+      "detail": "P4-02+, Photoshop, render-harness work, pixel-proof infrastructure, and PARITY-005 remain untouched."
+    }
+  ],
+  "permitted_state_transition": "Record P4-01 as verified while retaining PARITY-004 in progress with verification pending; do not advance active_task_id or start P4-02.",
+  "environment": {
+    "model": "gpt-5.6-luna",
+    "reasoning": "medium",
+    "observed_at": "2026-09-02",
+    "working_tree": "clean"
+  }
+}

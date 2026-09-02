@@ -57,7 +57,7 @@
     },
     {
       "id": "PARITY-004",
-      "status": "awaiting_verification",
+      "status": "in_progress",
       "requires": [
         "PARITY-003"
       ],
@@ -71,7 +71,8 @@
         ".control/evidence/PARITY-004/20260902-182424/verifier.json",
         ".control/evidence/PARITY-004/20260902-192107/summary.json",
         ".control/evidence/PARITY-004/20260902-192107/verifier.json",
-        ".control/evidence/PARITY-004/20260902-p401/summary.json"
+        ".control/evidence/PARITY-004/20260902-p401/summary.json",
+        ".control/evidence/PARITY-004/20260902-p401/verifier.json"
       ]
     },
     {
