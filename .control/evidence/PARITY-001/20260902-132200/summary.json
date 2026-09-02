@@ -12,6 +12,9 @@
     {"command": "pwsh -NoProfile -File .\\scripts\\parity\\run.ps1 -Mode baseline -Psd <private-input> -Reference <private-input> -Output parity-output\\20260902-131741-baseline", "exit_code": 3}
   ],
   "environment": {
+    "git_head": "45a94e232de35032e1c5c9202b174c63171bf1ef",
+    "git_branch": "codex/parity-001",
+    "git_head_role": "Exact PARITY-001 source candidate used for reproduction; subsequent branch commits are metadata-only",
     "windows": "Windows-11-10.0.26200-SP0",
     "python": "3.12.10",
     "psd_tools": "1.18.0",
