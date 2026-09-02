@@ -16,26 +16,26 @@
     "reference_png_path_windows": "D:\\Downloads\\20260812.png",
     "read_only": true,
     "commit_inputs_or_full_renders": false,
-    "identity_status": "unverified",
-    "normalization_status": "unverified",
-    "psd_sha256": null,
-    "reference_png_sha256": null
+    "identity_status": "verified",
+    "normalization_status": "verified",
+    "psd_sha256": "574d8a6511b2aabe744835d81ed76c8fc8ffd0c9c5678f3359e8eda10f9174db",
+    "reference_png_sha256": "91ff8daef941b3d9052497190fdc8aa6f4d56ba524c8d912cf011b6818535f54"
   },
-  "active_task_id": "PARITY-001",
+  "active_task_id": "PARITY-002",
   "task_contract": ".control/CURRENT_GOAL.md",
   "tasks": [
     {
       "id": "PARITY-001",
-      "status": "awaiting_verification",
+      "status": "done",
       "requires": [],
-      "verification": "pending",
+      "verification": "pass",
       "branch": "codex/parity-001",
       "commit": "20e4bd0df77bd2d1fe2c041f70bdf27471738f29",
       "evidence": [".control/evidence/PARITY-001/20260902-132200/summary.json"]
     },
     {
       "id": "PARITY-002",
-      "status": "blocked",
+      "status": "ready",
       "requires": [
         "PARITY-001"
       ],
