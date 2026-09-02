@@ -57,7 +57,7 @@
     },
     {
       "id": "PARITY-004",
-      "status": "awaiting_verification",
+      "status": "in_progress",
       "requires": [
         "PARITY-003"
       ],
@@ -75,7 +75,9 @@
         ".control/evidence/PARITY-004/20260902-p401/verifier.json",
         ".control/evidence/PARITY-004/20260902-p402/summary.json",
         ".control/evidence/PARITY-004/20260902-p402/verifier.json",
-        ".control/evidence/PARITY-004/20260902-p407/summary.json"
+        ".control/evidence/PARITY-004/20260902-p407/summary.json",
+        ".control/evidence/PARITY-004/20260902-p403-p407/summary.json",
+        ".control/evidence/PARITY-004/20260902-p403-p407/verifier.json"
       ]
     },
     {
