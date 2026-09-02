@@ -52,6 +52,13 @@
   },
   "inputs_unchanged": true,
   "privacy": {"private_input_paths_committed": false, "safe_summary": true},
-  "verifier_start": {"source_candidate_commit": "45a94e232de35032e1c5c9202b174c63171bf1ef", "state_commit": "de83b8382ec8bb62c37e2736b56cfcc396207f82", "final_head_recorded_at_closeout": "pending-final-commit"},
+  "verifier_start": {
+    "source_candidate_commit": "45a94e232de35032e1c5c9202b174c63171bf1ef",
+    "state_commit": "3b33b29baf132c98cd0d6985a852ed1b6f6d3360",
+    "prior_state_commit": "de83b8382ec8bb62c37e2736b56cfcc396207f82",
+    "final_head_recorded_at_closeout": "3b33b29baf132c98cd0d6985a852ed1b6f6d3360",
+    "fresh_verifier_test_commit": "3b33b29baf132c98cd0d6985a852ed1b6f6d3360",
+    "note": "45a94e2 is the PARITY-001 source candidate; 3b33b29 is the state/linkage commit. The cleanup-only commit carrying this summary does not alter candidate code; a fresh verifier should test candidate 45a94e2 with state linkage from 3b33b29."
+  },
   "remaining_gaps": ["Stored composite fails closed on ICC profile mismatch and nonzero RGB delta", "Photoshop/Resolve host validation not run"]
 }
