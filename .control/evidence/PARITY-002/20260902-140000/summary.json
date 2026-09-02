@@ -35,7 +35,7 @@
     "Fusion host capability remains unverified; strict planner rejects unsupported and clbl=false semantics."
   ],
   "verifier_reproduction": [
-    "checkout candidate commit e7526bf...",
+    "checkout candidate implementation commit 686bf73ecdeedb491f5ee4b9be058dc88eeec759 (evidence/state commits follow)",
     "run check.ps1",
     "run real plan command against read-only a.psd",
     "verify source_sha256 and 136/34/23/59 counts"
