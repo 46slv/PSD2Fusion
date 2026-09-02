@@ -6,72 +6,124 @@
   "packet_id": "PARITY-004-20260902-170000",
   "branch": "codex/parity-004",
   "base_origin_main": "fdc3a098548e0e628974307fc17d4da25f19fdfb",
-  "candidate_commit": "6ddbe3f845e5bb5ec23fc4b43b3ceac0c597da5e",
+  "candidate_commit": "311b3f3236895650ca15210daca00ba029750b98",
+  "candidate_tree": "107f2655c43e2471acf1400414fc99a284eb7f82",
+  "candidate_commits": [
+    "6ddbe3f845e5bb5ec23fc4b43b3ceac0c597da5e",
+    "36f6c53915fbc935e6505c265b85ac701212e7e8",
+    "31a7a159ffc44bc89df98395b76681a425f5056b",
+    "311b3f3236895650ca15210daca00ba029750b98"
+  ],
   "scope": {
     "included": [
-      "absent/default true clbl and explicit true clbl",
+      "absent/default true clbl and explicit true clbl provenance",
       "fixed base coverage and local-alpha invariant",
       "same-parent member order and outer-backdrop isolation",
-      "base/member opacity and fractional alpha",
+      "independent base/member opacity and fractional alpha",
       "Normal, Multiply, Linear Dodge and Overlay members",
-      "transparent RGB and zero-alpha matte behavior",
-      "deterministic clipping oracle fixtures and metamorphic guards",
-      "real a.psd structural chain plan regression"
+      "transparent RGB, zero-alpha matte, linear-sRGB and clamp boundary",
+      "independent reference equations, comparator and metamorphic guards",
+      "real a.psd structural chain regression over every chain"
     ],
-    "excluded": ["clbl=false semantics (PARITY-005)", "clbl=false promotion"]
+    "excluded": ["clbl=false semantics (PARITY-005)", "clbl=false promotion", "full convergence redesign"]
+  },
+  "implementation": {
+    "compositing": "composite_clipping_span evaluates each member in the fixed base matte with relative member coverage and applies base mode/opacity once at the outer boundary",
+    "fixture_script": "scripts/parity/parity004.py",
+    "tests": "tests/test_parity004_clipping.py",
+    "clbl_false_claimed": false
   },
   "fixture_validation": {
-    "generate_command": "python .\\scripts\\parity\\parity004.py generate --output .\\.local\\parity004-fixtures",
-    "validate_command": "python .\\scripts\\parity\\parity004.py validate --fixtures .\\.local\\parity004-fixtures",
+    "generate_command": "python .\\scripts\\parity\\parity004.py generate --output .\\.local\\parity004-fixtures-final-20260902",
+    "validate_command": "python .\\scripts\\parity\\parity004.py validate --fixtures .\\.local\\parity004-fixtures-final-20260902",
+    "comparator_command": "python .\\scripts\\parity\\parity004.py compare --fixtures .\\.local\\parity004-fixtures-final-20260902 --output .\\.local\\parity004-comparison-final-20260902",
     "status": "PASS",
-    "cases": 2160,
-    "recomputed_cases": 2160,
+    "cases": 6997,
+    "recomputed_cases": 6997,
+    "max_reference_error": 0.0,
     "max_oracle_error": 0.0,
+    "comparator": {
+      "status": "PASS",
+      "dimensions": [6997, 1],
+      "profile_status": "match",
+      "threshold": 0.0,
+      "rgba_error": {"max": 0, "mean": 0.0, "p99": 0.0},
+      "rgb_error": {"max": 0, "mean": 0.0, "p99": 0.0},
+      "alpha_error": {"max": 0, "mean": 0.0, "p99": 0.0},
+      "threshold_exceeding_count": 0,
+      "outlier_guard_count": 0,
+      "difference_bbox": null
+    },
     "metamorphic_failures": [],
+    "clbl_provenance_counts": {"photoshop_default_true": 3500, "explicit_psd_clbl": 3497},
     "axes": {
       "modes": ["Normal", "Multiply", "Linear Dodge", "Overlay"],
       "backdrops": ["transparent", "black", "white", "gray", "saturated", "partial-alpha"],
-      "base_alpha": [0.0, 0.25, 0.5, 0.75, 1.0],
-      "member_alpha": [0.0, 0.5, 1.0],
-      "opacity": [0.0, 0.5, 1.0],
-      "member_orders": ["base-member1-member2", "base-member2-member1"]
+      "base_alpha": [0.0, 0.125, 0.25, 0.375, 0.5, 0.625, 0.75, 0.875, 1.0],
+      "member_alpha": [0.0, 0.125, 0.25, 0.375, 0.5, 0.625, 0.75, 0.875, 1.0],
+      "base_opacity": [0.0, 0.25, 0.5, 0.75, 1.0],
+      "member_opacity": [0.0, 0.25, 0.5, 0.75, 1.0],
+      "member_orders": ["base-member1-member2", "base-member2-member1"],
+      "color_spaces": ["sRGB", "linear-sRGB"],
+      "clbl_provenance": ["photoshop_default_true", "explicit_psd_clbl"]
     },
-    "alpha_contract": "straight-rgba; fixed base coverage for local span; premultiply only at source-over boundary",
+    "alpha_contract": "straight-rgba; member coverage is relative to fixed base matte; local span alpha remains base alpha; premultiply only at source-over boundary",
     "transparent_rgb_policy": "canonical_zero_for_zero_alpha_matte",
-    "clbl_policy": "absent/default true and explicit true only; false excluded"
+    "clamp_policy": "channel clamp enabled except explicit over-range case with clamp=false"
   },
   "real_psd_structure_regression": {
-    "command": "python .\\scripts\\parity\\parity.py plan --psd D:\\Downloads\\a.psd --output .\\.local\\parity004-real\\plan.json --policy strict",
+    "conversion_command": "python -m psd2fusion D:\\Downloads\\a.psd --output .\\.local\\parity004-real-struct-final-20260902 --force",
+    "structural_command": "python .\\scripts\\validate_clipping_subtrees.py D:\\Downloads\\a.psd .\\.local\\parity004-real-struct-final-20260902\\PSD2Fusion.comp",
+    "plan_command": "python .\\scripts\\parity\\parity.py plan --psd D:\\Downloads\\a.psd --output .\\.local\\parity004-real-plan-final-20260902\\plan.json --policy strict",
     "status": "PASS",
     "psd_sha256": "574d8a6511b2aabe744835d81ed76c8fc8ffd0c9c5678f3359e8eda10f9174db",
     "descendants": 136,
-    "groups": 34,
+    "groups_semantic": 34,
+    "groups_graph": 34,
     "clipping_chains": 23,
     "clipped_members": 59,
+    "visible_clipped_members": 59,
+    "failed_chains": [],
     "clbl_false_claimed": false,
     "pixel_parity_claim": false
   },
   "host_reference": {
     "photoshop": {
+      "executable": "C:\\Program Files\\Adobe\\Adobe Photoshop 2026\\Photoshop.exe",
       "version": "27.8",
+      "fresh_attempt": "Photoshop.exe -r scripts/photoshop/parity003_oracle.jsx; bounded wait produced no oracle-result.txt",
       "status": "BLOCKED",
-      "blocker": "Error in locale file: Unknown escape sequence (\\プ) encountered; JSX oracle produced no reference pixels"
+      "oracle_output_created": false,
+      "blocker": "Committed PARITY-003 blocker remains: Photoshop locale file reports an unknown non-ASCII escape sequence; no Photoshop reference pixels",
+      "real_psd_opened": false,
+      "reference_pixels_recorded": false
     },
     "resolve_fusion": {
       "resolve_version": "21.0.3.7",
-      "fuscript_version": "21.0.3",
+      "fuscript_version": "15.0.0",
+      "fuscript": "C:\\Program Files\\Blackmagic Design\\DaVinci Resolve\\fuscript.exe",
+      "probe": "scripts/resolve/parity003_probe.lua",
+      "command": "fuscript.exe -l Lua -x fusion-init scripts/resolve/parity003_probe.lua .local/parity004-real-struct-final-20260902/PSD2Fusion.comp",
       "status": "BLOCKED",
-      "blocker": "Fusion scripting endpoint unavailable; no host load/render pixels"
+      "exit_code": 0,
+      "log_sha256": "03403A91A394455A2F472353C4056BD11D1282D4E03DE96B36D44CF0B34C967C",
+      "blocker": "Fusion scripting endpoint is unavailable; no host load/render pixels",
+      "load_pass_count": 0,
+      "render_output_count": 0,
+      "pixel_comparison_recorded": false,
+      "load_only_is_not_pixel_proof": true
     },
     "full_reference_comparison": "NOT_RUN; Photoshop/Resolve pixel gates remain fail-closed"
   },
   "offline_checks": {
     "command": "pwsh -NoProfile -File .\\scripts\\check.ps1",
     "status": "PASS",
-    "tests": 39,
-    "python_compile": "PASS"
+    "tests": 42,
+    "python_compile": "PASS",
+    "git_diff_check": "PASS"
   },
   "environment": {
+    "observed_at": "2026-09-02T17:37:07+09:00",
     "windows": "Windows 11 build 26200",
     "python": "3.12.10",
     "psd_tools": "1.18.0",
@@ -81,13 +133,20 @@
   },
   "reference_inputs": {
     "read_only": true,
+    "psd_path": "D:\\Downloads\\a.psd",
+    "reference_png_path": "D:\\Downloads\\20260812.png",
     "psd_sha256_before_after": "574d8a6511b2aabe744835d81ed76c8fc8ffd0c9c5678f3359e8eda10f9174db",
     "reference_png_sha256": "91ff8daef941b3d9052497190fdc8aa6f4d56ba524c8d912cf011b6818535f54"
   },
   "promotion": {
     "status": "blocked",
-    "reason": "Deterministic clipping semantics and real-PSD structural coverage pass, but Photoshop oracle and Resolve/Fusion render pixels remain unavailable; no capability promotion",
+    "reason": "Deterministic grouped clipping contract and all real-chain structural checks pass, but Photoshop oracle and Resolve/Fusion render pixels remain unavailable; no capability promotion",
     "silent_fallback": false
   },
-  "verifier_starting_point": "Fresh Luna Verifier must independently checkout candidate_commit, rerun parity004 fixture generation/validation, check check.ps1, inspect real-PSD 23-chain structure, audit clbl=false exclusion and false-PASS risks, then record PASS/FAIL/BLOCKED."
+  "privacy": {
+    "real_psd_committed": false,
+    "reference_png_committed": false,
+    "full_resolution_or_per_layer_outputs_committed": false
+  },
+  "verifier_starting_point": "Fresh Luna Verifier must independently inspect candidate_commit, rerun fixture validate/compare, check.ps1, real conversion plus all-chain structural validator, host blockers and false-PASS guards, then record PASS/FAIL/BLOCKED without editing implementation or canonical state."
 }
