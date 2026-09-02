@@ -330,6 +330,12 @@ def composite_clipping_span(
         if source_alpha <= 0.0:
             continue
         # Blend in the declared working space, then keep the fixed base alpha.
+        # ``member`` is restricted by the base matte before this local blend;
+        # its alpha is therefore relative to the fixed matte, not a second
+        # full-canvas coverage.  Multiplying the source premultiplied color by
+        # ``base_alpha`` and dividing by it again would double-count partial
+        # matte coverage and create over-range/fringe colors at antialiased
+        # base edges.
         local_rgb = local[:3]
         blend_rgb_value = blend_rgb(
             local_rgb,
@@ -339,19 +345,14 @@ def composite_clipping_span(
             clamp=clamp,
         )
         local_work = _to_working(local_rgb, color_space)
-        member_work = _to_working(member[:3], color_space)
         blended_work = _to_working(blend_rgb_value, color_space)
-        mixed_source = tuple(
-            (1.0 - base_alpha) * member_work[channel]
-            + base_alpha * blended_work[channel]
-            for channel in range(3)
-        )
-        # Premultiplied source-over within the fixed matte.  Dividing by the
-        # unchanged base alpha preserves the local-alpha invariant.
+        # Source-over in the local matte domain.  ``source_alpha`` is the
+        # member coverage inside M, so the local color is simply the weighted
+        # blend result and the previous local color; the output alpha remains
+        # the fixed base coverage M.
         out_work = tuple(
-            (source_alpha * mixed_source[channel]
-             + base_alpha * (1.0 - source_alpha) * local_work[channel])
-            / base_alpha
+            source_alpha * blended_work[channel]
+            + (1.0 - source_alpha) * local_work[channel]
             for channel in range(3)
         )
         if clamp:
