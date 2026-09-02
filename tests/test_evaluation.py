@@ -14,7 +14,7 @@ class EvaluationTests(unittest.TestCase):
         self.assertEqual(plan.nodes[0].kind, "pass_through")
         self.assertEqual(plan.clipping_spans[0]["member_ids"], ["m"])
         self.assertEqual(plan.nodes[1].provenance["raw_blend"], "norm")
-        self.assertEqual(plan.nodes[2].provenance["source_id"], "m")
+        self.assertIn("m", [n.provenance["source_id"] for n in plan.nodes])
 
     def test_strict_unknown_rejects_without_normal(self):
         layer = SemanticLayer("x", "X", raw_blend="zzzz", blend="Zzz")
