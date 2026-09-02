@@ -23,6 +23,7 @@ Detailed contracts:
 
 - compositing semantics and lowering boundaries: `docs/COMPOSITING_CONTRACT.md`
 - fixtures, metrics, evidence and gates: `docs/PARITY_VALIDATION.md`
+- remaining PARITY-004 host/pixel execution: `docs/PARITY_004_HOST_PIXEL_GATE.md`
 - PSD/file-format evidence: `docs/research/`
 - historical FIRST_USABLE architecture: `ARCHITECTURE.md`
 
@@ -103,23 +104,45 @@ Verify Normal, Multiply, Linear Dodge, Overlay, ordinary opacity, isolated-group
 
 ### PARITY-004 — Grouped/default clipping
 
-The current implementation run covers P4-03 through P4-07 in
-`.control/PARITY-004_TODO.md`, extending the selected P4-01/P4-02 recipe to
-member controls, the base outer boundary, existing group/nesting boundaries,
-readable deterministic Flow layout, and the read-only real `a.psd` structure.
-P4-08 is optional only when an ordinary Fusion load/readback check is already
-available. Photoshop work, render infrastructure, P4-09 pixel/reference
-validation, and PARITY-005 remain deferred.
+P4-01 through P4-07 have a published structural candidate. Preserve that work unless actual Fusion host/pixel evidence identifies a concrete defect. Structural completion does not imply host or pixel completion.
 
-Verify absent/default true and explicit true `clbl`. Run the gates in order: deterministic independent fixtures as the semantic/math gate; real PSD bytes, structure and provenance; actual Fusion render with a fresh pixel artifact; full comparison with `D:\Downloads\20260812.png`; then, if available, an optional GIMP cross-renderer comparison. Establish base-coverage stage, fixed matte, local-alpha invariant, member order, outer-backdrop isolation, base/member opacity, fractional edges and mixed blends. PSD bytes/semantic provenance remain authoritative for structure, and graph/load evidence never promotes a pixel claim. Photoshop evidence is optional/additional. Do not claim `clbl=false`.
+Current structural candidate:
+
+```text
+base Loader
+  -> one fixed base matte reused by every clipped member
+  -> one `Operator=In` ClipIn per member
+  -> local ClipStack Merge per member with `ProcessAlpha=0`
+  -> one outer chain Merge carrying base blend/overall opacity
+```
+
+The real read-only `a.psd` structural audit currently covers 23 clipping chains, 59 clipped members, 34 groups, and 363 generated Fusion tools.
+
+Remaining work must run in this order:
+
+```text
+P4-08 ordinary Fusion load/readback
+-> P4-HOST-PIXEL deterministic micro renders
+-> P4-09 real Fusion render/reference baseline
+-> smallest evidence-driven repair, if needed
+-> rerun focused micro fixture then real comparison
+```
+
+Do not start PARITY-005 or PARITY-006, and do not perform a broad compiler/planner redesign, before the first P4-09 baseline unless the current graph cannot load/render and that blocker is already localized to such an architecture boundary.
+
+Verify absent/default true and explicit true `clbl`. The final gate order is: deterministic semantic/math fixtures; real PSD bytes, structure and provenance; actual Fusion load/readback; actual Fusion micro-render evidence for alpha/blend/clipping boundaries; full real Fusion render compared with `D:\Downloads\20260812.png`; then optional independent cross-render evidence if useful. PSD bytes/semantic provenance remain authoritative for structure, and graph/load evidence never promotes a pixel claim. Photoshop evidence is optional/additional. Do not claim `clbl=false`.
+
+Known architecture debts remain visible but are not automatic blockers for the first host/pixel baseline: Evaluation IR/capability decisions do not yet drive backend selection before graph compilation, and asset materialization still needs an explicitly verified ICC/straight-premult/transparent-RGB contract. Use host/pixel evidence to decide whether either is causal. Before multiple backends, custom operations, verified bake paths, or broader PSD feature support are introduced, capability planning must be connected to lowering so strict mode cannot silently emit an unverified backend.
+
+Detailed remaining procedure: `.control/PARITY-004_TODO.md` and `docs/PARITY_004_HOST_PIXEL_GATE.md`.
 
 ### PARITY-005 — `clbl=false` and group interaction
 
-Use independent on/off fixtures and available renderer cross-checks to determine member backdrop and base mode/opacity. Verify isolated, Pass Through, nested and group-as-base/member cases. Reconstruct only with evidence; otherwise use explicit verified bake/reject. Photoshop evidence, if available, is optional/additional and never the sole semantic authority.
+Blocked until PARITY-004 host/pixel closure. After that gate, use independent on/off fixtures and available renderer cross-checks to determine member backdrop and base mode/opacity. Verify isolated, Pass Through, nested and group-as-base/member cases. Reconstruct only with evidence; otherwise use explicit verified bake/reject. Photoshop evidence, if available, is optional/additional and never the sole semantic authority.
 
 ### PARITY-006 — Real PSD convergence
 
-Partition reference differences by semantic region, chain, group, blend, opacity, alpha and color. Reduce each material issue to a fixture, repair the smallest correct boundary, rerun fixture then real PSD, and retain before/after evidence. No blind global grade, resize, blur or flatten.
+Blocked until the first PARITY-004 real Fusion/reference baseline exists. Partition reference differences by semantic region, chain, group, blend, opacity, alpha and color. Reduce each material issue to a fixture, repair the smallest correct boundary, rerun fixture then real PSD, and retain before/after evidence. No blind global grade, resize, blur or flatten.
 
 ### PARITY-007 — Independent closeout
 
@@ -127,11 +150,10 @@ A fresh clean-checkout verifier recomputes hashes, reruns offline/fixture/host/r
 
 ## Repository check
 
-Until PARITY-001 adds the host/reference command:
-
 ```powershell
 pwsh -NoProfile -File .\scripts\check.ps1
 ```
 
 This validates canonical state, unit tests and Python compilation. It never implies host/reference success.
+
 Task completion additionally requires publishing commits and using the remote completion guard after a fresh fetch/readback of `origin/main:.control/current.json`; network or remote mismatch is not PASS.
