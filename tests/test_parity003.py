@@ -106,6 +106,7 @@ class CapabilityAndFixtureTests(unittest.TestCase):
             "candidate_commit": "x",
             "proof_id": "p",
             "deterministic_fixtures": {"status": "PASS"},
+            "psd_provenance": {"status": "PASS", "source_sha256": "b" * 64},
             "resolve_fusion": {
                 "version": "21.0.3.7",
                 "render_artifact": {"path": "render.png", "sha256": "a" * 64},

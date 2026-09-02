@@ -60,6 +60,7 @@ def _unverified_blend(mode: str, fusion_id: str) -> CapabilityRecord:
             "alpha": "straight/premult boundary must be recorded",
             "proof_required": [
                 "deterministic_fixture_evidence",
+                "psd_semantic_provenance",
                 "fusion_render_artifact",
                 "reference_png_comparison",
             ],
@@ -147,6 +148,7 @@ def proof_fields_complete(evidence: Mapping[str, Any]) -> bool:
         "candidate_commit",
         "proof_id",
         "deterministic_fixtures",
+        "psd_provenance",
         "resolve_fusion",
         "reference_comparison",
         "metrics",
@@ -154,6 +156,7 @@ def proof_fields_complete(evidence: Mapping[str, Any]) -> bool:
     if any(not evidence.get(field) for field in required):
         return False
     fixtures = evidence.get("deterministic_fixtures")
+    provenance = evidence.get("psd_provenance")
     resolve = evidence.get("resolve_fusion")
     comparison = evidence.get("reference_comparison")
     metrics = evidence.get("metrics")
@@ -166,6 +169,9 @@ def proof_fields_complete(evidence: Mapping[str, Any]) -> bool:
     return (
         isinstance(fixtures, Mapping)
         and fixtures.get("status") == "PASS"
+        and isinstance(provenance, Mapping)
+        and provenance.get("status") == "PASS"
+        and provenance.get("source_sha256") not in (None, "", "not_run")
         and isinstance(resolve, Mapping)
         and resolve.get("version") not in (None, "", "not_run")
         and artifact_complete
