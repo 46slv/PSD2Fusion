@@ -1,0 +1,43 @@
+{
+  "schema_version": 1,
+  "task": "PARITY-002",
+  "status": "awaiting_verification",
+  "candidate_source_commit": "686bf73ecdeedb491f5ee4b9be058dc88eeec759",
+  "candidate_source_tree": "395a4a5f3873ba4c45b64e59b04d69335feeb4e1",
+  "branch": "codex/parity-002",
+  "source_sha256": "574d8a6511b2aabe744835d81ed76c8fc8ffd0c9c5678f3359e8eda10f9174db",
+  "structure_counts": {
+    "descendants": 136,
+    "groups": 34,
+    "clipping_chains": 23,
+    "clipped_members": 59
+  },
+  "plan_counts": {
+    "nodes": 136,
+    "decisions": 159,
+    "clipping_spans": 23,
+    "clipped_members": 59
+  },
+  "decision_status_counts": {
+    "verified_fusion_native": 159
+  },
+  "policy": "strict",
+  "commands": [
+    "python -m unittest discover -s tests -v",
+    "pwsh -NoProfile -File .\\scripts\\check.ps1",
+    "python scripts/parity/parity.py plan --psd <private> --output <safe>"
+  ],
+  "privacy": {
+    "private_inputs_committed": false,
+    "full_renders_committed": false
+  },
+  "unresolved_issues": [
+    "Fusion host capability remains unverified; strict planner rejects unsupported and clbl=false semantics."
+  ],
+  "verifier_reproduction": [
+    "checkout candidate commit e7526bf...",
+    "run check.ps1",
+    "run real plan command against read-only a.psd",
+    "verify source_sha256 and 136/34/23/59 counts"
+  ]
+}
