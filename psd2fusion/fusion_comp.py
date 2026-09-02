@@ -489,13 +489,52 @@ class _Compiler:
                 1.0,
                 "PSD clipping alpha (base=%s): %s"
                 % (layer.clipping_base_id or "unknown", layer.name)
-                + " [P4-01 fixed matte via Operator=In]",
+                + " [P4-01 fixed matte via Operator=In; P4-02 shared base matte]",
                 x,
                 y,
                 operator="In",
             )
         )
         return _Source(clip_name)
+
+    def _collect_clipping_members(
+        self,
+        items: Sequence[SemanticLayer],
+        base_index: int,
+        ordered_member_ids: Sequence[str],
+        *,
+        strict: bool = False,
+    ) -> Tuple[List[SemanticLayer], int]:
+        """Collect one contiguous clipping span in canonical PSD order.
+
+        The child list is the normalized PSD bottom-to-top sequence, while a
+        ``ClippingChain`` carries the semantic member order.  First collect
+        only the contiguous same-parent span, then map it back to the chain's
+        declared order.  This keeps the order deterministic without ever
+        using the progressively composited ClipStack as a matte.  Strict true
+        clipping chains reject malformed/incomplete spans instead of silently
+        dropping a member and claiming a complete local result.
+        """
+
+        member_ids = list(ordered_member_ids)
+        if strict and len(set(member_ids)) != len(member_ids):
+            raise ValueError("Clipping chain contains duplicate member IDs")
+        member_id_set = set(member_ids)
+        end = base_index + 1
+        contiguous: List[SemanticLayer] = []
+        while end < len(items) and items[end].id in member_id_set:
+            contiguous.append(items[end])
+            end += 1
+
+        by_id = {member.id: member for member in contiguous}
+        if strict:
+            missing = [member_id for member_id in member_ids if member_id not in by_id]
+            if missing:
+                raise ValueError(
+                    "Clipping chain members are not one contiguous same-parent span: %s"
+                    % ", ".join(missing)
+                )
+        return [by_id[member_id] for member_id in member_ids if member_id in by_id], end
 
     def clipping_subtree(
         self,
@@ -505,11 +544,18 @@ class _Compiler:
         depth: int,
         scope: str,
     ) -> _ItemResult:
-        """Evaluate a true/default clipping chain without consuming outer backdrop."""
+        """Evaluate a true/default chain with one fixed matte for every member.
+
+        ``current`` is allowed to advance through the local ClipStack, but
+        ``fixed_matte`` is captured once from the base and passed unchanged to
+        every Operator=In Merge.  The caller applies the completed local span
+        to the parent backdrop exactly once.
+        """
 
         current = base_result.output
         fixed_matte = base_result.matte
-        for member in members:
+        member_total = len(members)
+        for member_index, member in enumerate(members, 1):
             if not member.effective_visible:
                 continue
             member_result = self.item(member, current, depth, scope)
@@ -528,7 +574,9 @@ class _Compiler:
                     member.opacity,
                     "PSD clipping subtree member (base=%s): %s"
                     % (base.id, member.name)
-                    + " [P4-01 local Merge; ProcessAlpha=0 preserves base alpha]",
+                    + " [P4-01 local Merge; ProcessAlpha=0 preserves base alpha; "
+                    + "P4-02 shared matte member %d/%d]"
+                    % (member_index, member_total),
                     x,
                     y,
                     # Photoshop clipping keeps the base alpha as the chain
@@ -575,15 +623,13 @@ class _Compiler:
                 ordered_member_ids = (
                     list(chain.member_ids) if chain is not None else list(layer.clipping_members)
                 )
-                member_ids = set(ordered_member_ids)
-                j = i + 1
-                members: List[SemanticLayer] = []
-                while j < len(items) and items[j].id in member_ids:
-                    members.append(items[j])
-                    j += 1
+                members, j = self._collect_clipping_members(
+                    items,
+                    i,
+                    ordered_member_ids,
+                    strict=chain is not None and chain.blend_clipped_as_group,
+                )
                 if chain is not None and chain.blend_clipped_as_group:
-                    ordered = {member.id: member for member in members}
-                    members = [ordered[item_id] for item_id in ordered_member_ids if item_id in ordered]
                     subtree = self.clipping_subtree(
                         base_result, layer, members, depth, scope
                     )

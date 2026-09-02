@@ -41,6 +41,9 @@ Done when:
 
 ## P4-02 — Multiple clipped members share one base matte
 
+Status: COMPLETE (three-member fixture verifies the selected recipe; P4-03
+and later items remain not started)
+
 Goal: base + N clipped members.
 
 Required shape:
@@ -64,6 +67,17 @@ Base alpha --------+---- mask
 All members reuse the same base coverage. Member order follows PSD bottom-to-top order. Do not derive the mask from the progressively composited local result.
 
 Done when one base with 2+ members lowers deterministically and remains readable.
+
+Implementation evidence:
+
+- `scripts/parity/p4_02.py` emits a deterministic three-member graph and checks
+  shared base matte, per-member `Operator=In`, PSD bottom-to-top order, local
+  `ProcessAlpha=0` stacks, and one outer Merge.
+- `psd2fusion/fusion_comp.py` captures the base matte once for the local span,
+  reuses it for every member, and rejects an incomplete true chain instead of
+  silently dropping a non-contiguous member.
+- `tests/test_parity004_p402_graph.py` covers the graph shape and malformed-span
+  guard.
 
 ## P4-03 — Member blend and opacity placement
 
@@ -171,5 +185,5 @@ Pixel validation is feedback for the lowering recipe, not the design driver.
 
 ## Immediate next item
 
-P4-01 is complete. The next queued item is P4-02; do not start it in the
+P4-02 is complete. The next queued item is P4-03; do not start it in the
 current run.
