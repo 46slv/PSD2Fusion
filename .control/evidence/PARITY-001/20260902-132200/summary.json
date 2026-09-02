@@ -53,13 +53,25 @@
   "inputs_unchanged": true,
   "privacy": {"private_input_paths_committed": false, "safe_summary": true},
   "verifier_start": {
-    "source_candidate_commit": "45a94e232de35032e1c5c9202b174c63171bf1ef",
+    "reproduction_commit": "45a94e232de35032e1c5c9202b174c63171bf1ef",
+    "reproduction_tree": "ab3495ab29906f3c6fd88b53f62b7803930bd5f0",
+    "canonical_state_task_commit": "45a94e232de35032e1c5c9202b174c63171bf1ef",
+    "summary_candidate_commit": "45a94e232de35032e1c5c9202b174c63171bf1ef",
+    "summary_source_head": "45a94e232de35032e1c5c9202b174c63171bf1ef",
+    "candidate_linkage_verified": true,
     "state_commit": "3b33b29baf132c98cd0d6985a852ed1b6f6d3360",
     "prior_state_commit": "de83b8382ec8bb62c37e2736b56cfcc396207f82",
-    "current_metadata_head": "64df79671c7c9a54925f1fd4d80abac52a10ca11",
-    "final_head_recorded_at_closeout": "64df79671c7c9a54925f1fd4d80abac52a10ca11",
-    "fresh_verifier_test_commit": "45a94e232de35032e1c5c9202b174c63171bf1ef",
-    "note": "45a94e2 is the PARITY-001 source candidate; 3b33b29 is the state metadata parent; 64df796 is the current metadata head. A fresh verifier should test source candidate 45a94e2 while auditing final metadata at 64df796. Subsequent cleanup-only commit(s) do not change candidate code."
+    "metadata_commit_chain": [
+      {"commit": "3b33b29baf132c98cd0d6985a852ed1b6f6d3360", "role": "state/evidence linkage metadata"},
+      {"commit": "64df79671c7c9a54925f1fd4d80abac52a10ca11", "role": "evidence linkage metadata"},
+      {"commit": "20e4bd0df77bd2d1fe2c041f70bdf27471738f29", "role": "observed current branch metadata head"}
+    ],
+    "metadata_heads_observed": [
+      "3b33b29baf132c98cd0d6985a852ed1b6f6d3360",
+      "64df79671c7c9a54925f1fd4d80abac52a10ca11",
+      "20e4bd0df77bd2d1fe2c041f70bdf27471738f29"
+    ],
+    "note": "45a94e2 is the exact PARITY-001 source-candidate HEAD and reproduction_commit; reproduction_tree is its Git tree identity. The metadata_commit_chain records the observed linkage history through 20e4bd0, which was the current branch tip when this metadata was written. A fresh verifier must test 45a94e2/reproduction_tree while auditing the current branch tip. Future metadata-only commits must not alter the candidate code/tree; this summary cannot embed its own future commit hash."
   },
   "remaining_gaps": ["Stored composite fails closed on ICC profile mismatch and nonzero RGB delta", "Photoshop/Resolve host validation not run"]
 }
