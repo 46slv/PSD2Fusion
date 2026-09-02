@@ -288,6 +288,90 @@ def composite_layers(
     return result
 
 
+def composite_clipping_span(
+    backdrop: Sequence[float],
+    base: Sequence[float],
+    members: Iterable[tuple[Sequence[float], str, float]],
+    base_mode: str = "Normal",
+    base_opacity: float = 1.0,
+    *,
+    color_space: ColorSpaceSpec | str = "sRGB",
+    clamp: bool = True,
+    transparent_rgb: str = "canonical_zero",
+) -> RGBA:
+    """Composite one Photoshop ``clbl=true`` clipping span.
+
+    ``base`` establishes a fixed local coverage.  Members are evaluated in
+    that local domain, in the supplied bottom-to-top order, and can never
+    expand the span alpha or consume the caller's backdrop.  The completed
+    span is then composited into ``backdrop`` once using the base mode and
+    overall opacity.  This is the executable oracle for the grouped/default
+    clipping contract; ``clbl=false`` intentionally has no implementation
+    here.
+    """
+
+    if isinstance(color_space, str):
+        color_space = ColorSpaceSpec(color_space)
+    b = _rgba(backdrop, "backdrop", clamp)
+    base_rgba = _rgba(base, "base", clamp)
+    mode_members = list(members)
+    base_alpha = base_rgba[3]
+    # The local span starts with the base's evaluated content and coverage.
+    local = base_rgba
+    for index, (member_pixel, member_mode, member_opacity) in enumerate(mode_members):
+        member = _rgba(member_pixel, "member[%d]" % index, clamp)
+        opacity = _alpha(member_opacity, "member[%d].opacity" % index)
+        if base_alpha <= 0.0:
+            # A zero-coverage base is an absorbing matte.  Canonicalize RGB so
+            # hidden member colors cannot become a fringe after unpremultiply.
+            local = (0.0, 0.0, 0.0, 0.0)
+            continue
+        source_alpha = member[3] * opacity
+        if source_alpha <= 0.0:
+            continue
+        # Blend in the declared working space, then keep the fixed base alpha.
+        local_rgb = local[:3]
+        blend_rgb_value = blend_rgb(
+            local_rgb,
+            member[:3],
+            member_mode,
+            color_space=color_space,
+            clamp=clamp,
+        )
+        local_work = _to_working(local_rgb, color_space)
+        member_work = _to_working(member[:3], color_space)
+        blended_work = _to_working(blend_rgb_value, color_space)
+        mixed_source = tuple(
+            (1.0 - base_alpha) * member_work[channel]
+            + base_alpha * blended_work[channel]
+            for channel in range(3)
+        )
+        # Premultiplied source-over within the fixed matte.  Dividing by the
+        # unchanged base alpha preserves the local-alpha invariant.
+        out_work = tuple(
+            (source_alpha * mixed_source[channel]
+             + base_alpha * (1.0 - source_alpha) * local_work[channel])
+            / base_alpha
+            for channel in range(3)
+        )
+        if clamp:
+            out_work = tuple(max(0.0, min(1.0, value)) for value in out_work)
+        local_encoded = _from_working(out_work, color_space)
+        if clamp:
+            local_encoded = tuple(max(0.0, min(1.0, value)) for value in local_encoded)
+        local = (local_encoded[0], local_encoded[1], local_encoded[2], base_alpha)
+    # Base mode and overall opacity are applied only at the outer boundary.
+    return composite_pixel(
+        b,
+        local,
+        base_mode,
+        base_opacity,
+        color_space=color_space,
+        clamp=clamp,
+        transparent_rgb=transparent_rgb,
+    )
+
+
 def composite_isolated_group(
     backdrop: Sequence[float],
     layers: Iterable[tuple[Sequence[float], str, float]],
