@@ -1,0 +1,148 @@
+{
+  "schema_version": 1,
+  "task": "PARITY-004",
+  "items": ["P4-08"],
+  "status": "PASS",
+  "verification": "pending_fresh_luna",
+  "branch": "codex/parity-004",
+  "candidate_head": "2343e7f9f84dc911c06f42eb7fdfe78375ba1c11",
+  "scope": {
+    "purpose": "ordinary Resolve/Fusion load and readback sanity for the P4-07 real-a.psd composition",
+    "p4_09_pixel_reference": "NOT_RUN_BY_SCOPE",
+    "parity_005": "NOT_STARTED",
+    "photoshop": "NOT_RUN_BY_SCOPE",
+    "composition_render": "NOT_RUN; prohibited by the existing host evidence procedure",
+    "new_import_method": false,
+    "new_render_infrastructure": false,
+    "real_inputs_modified": false
+  },
+  "artifact": {
+    "reference_psd": {
+      "path": "D:\\Downloads\\a.psd",
+      "read_only": true,
+      "sha256": "574d8a6511b2aabe744835d81ed76c8fc8ffd0c9c5678f3359e8eda10f9174db"
+    },
+    "composition": {
+      "path": ".local/p4-07-real-a653395/PSD2Fusion.comp",
+      "size_bytes": 249254,
+      "sha256": "5e7c833858e4016f7f5554250992f90a4618377a261a612315226dd6b25fe2f6"
+    }
+  },
+  "host": {
+    "application": "DaVinci Resolve Studio",
+    "version": "21.0.3.7",
+    "project": "PSD2Fusion P4-08 20260902",
+    "fusion_page": "normal blank composition initialized",
+    "load_comp": {
+      "status": "PASS",
+      "output": "LOAD_PASS tools=363; READBACK_CALL=true; READBACK_VALUE=nil",
+      "media_out": "MediaOut1 connected"
+    },
+    "paste_current_comp": {
+      "status": "PASS",
+      "output": "PASTE_PASS before=0 added=363 after=363; EXISTING_TOOLS_PRESERVED=true; OUTPUT_SELECTED=MediaOut2"
+    },
+    "current_comp_readback": {
+      "status": "PASS",
+      "tools": 364,
+      "media_out": [
+        {"name": "MediaOut1", "connected": true},
+        {"name": "MediaOut2", "connected": true}
+      ],
+      "representative_clipin": "ClipInRIIII_0bed15e775 reg=Merge bg=LoaderRIIII_8e83942a64 fg=LoaderRIIII_0bed15e775 operator=In",
+      "representative_clipstack": "ClipStackRIIII_0bed15e775 reg=Merge bg=LoaderRIIII_8e83942a64 fg=ClipInRIIII_0bed15e775 process_alpha=0"
+    },
+    "flow": {
+      "status": "PASS",
+      "ordinary_fusion_flow": true,
+      "scale_to_fit_invoked": true,
+      "scale_100_invoked": true,
+      "output_visible_in_inspector": "MediaOut2",
+      "representative_chain_visual": "NOT_CAPTURED; nested ClipIn/ClipStack names were not exposed by the Flow accessibility search"
+    }
+  },
+  "graph": {
+    "tools": 363,
+    "counts": {
+      "Loader": 100,
+      "Merge": 193,
+      "GroupOperator": 34,
+      "Background": 35,
+      "MediaOut": 1
+    },
+    "clipping": {
+      "chains": 23,
+      "members": 59,
+      "clipin": 59,
+      "clipstack": 59,
+      "clipin_connections": 59,
+      "clipstack_connections": 59,
+      "clipin_operator_in": 59,
+      "clipstack_process_alpha_zero": 59,
+      "outer_clipping_merges": 23
+    },
+    "groups_with_children": 34,
+    "group_child_total": 355,
+    "loader_paths_resolved": 100,
+    "mediaout_connected": 1,
+    "unknown_tools": 0,
+    "invalid_tools": 0,
+    "merge_background_foreground_connected": 159,
+    "merge_connection_note": "159/193 includes ordinary one-input merges; all 59 clipping merges were complete"
+  },
+  "representative": {
+    "base_loader": "LoaderRIIII_8e83942a64",
+    "clipin": "ClipInRIIII_0bed15e775",
+    "clipstack": "ClipStackRIIII_0bed15e775",
+    "clipin_background": "LoaderRIIII_8e83942a64",
+    "clipin_foreground": "LoaderRIIII_0bed15e775",
+    "clipin_operator": "In",
+    "clipstack_background": "LoaderRIIII_8e83942a64",
+    "clipstack_foreground": "ClipInRIIII_0bed15e775",
+    "clipstack_process_alpha": 0
+  },
+  "reproducible_checks": {
+    "real_structural_validator": {
+      "status": "PASS",
+      "command": "python scripts/validate_clipping_subtrees.py D:\\Downloads\\a.psd .local\\p4-07-real-a653395\\PSD2Fusion.comp",
+      "chains": 23,
+      "clipped_members": 59,
+      "visible_clipped_members": 59,
+      "groups_semantic": 34,
+      "groups_graph": 34,
+      "failed_chains": []
+    },
+    "repository_check": {
+      "status": "PASS",
+      "command": "pwsh -NoProfile -File .\\scripts\\check.ps1",
+      "tests": 60,
+      "control_state": "PASS",
+      "python_compile": "PASS"
+    },
+    "host_probe": {
+      "script": ".local/p4_08_host_probe.lua",
+      "readback": ".local/p4_08-host-probe.txt",
+      "status": "PASS",
+      "resolve_endpoint": "Fusion localhost scripting endpoint"
+    },
+    "inspect_comp": {
+      "script": "scripts/resolve/inspect_comp.lua",
+      "readback": ".local/p4_08-inspect_comp.txt",
+      "status": "PASS"
+    },
+    "current_comp_probe": {
+      "script": ".local/p4_08_current_probe.lua",
+      "readback": ".local/p4_08-current-probe.txt",
+      "status": "PASS"
+    }
+  },
+  "claims": {
+    "ordinary_fusion_load": "PASS",
+    "ordinary_fusion_readback": "PASS",
+    "loader_resolution": "PASS",
+    "clipping_graph_connections": "PASS",
+    "flow_layout_read": "PASS",
+    "pixel_reference": false,
+    "parity_005_started": false
+  }
+}
