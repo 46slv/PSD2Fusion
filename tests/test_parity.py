@@ -3,7 +3,7 @@ import tempfile
 import unittest
 from pathlib import Path
 from unittest.mock import patch
-from PIL import Image
+from PIL import Image, ImageCms
 
 from scripts.parity.parity import compare_images, run_inspection
 
@@ -39,6 +39,7 @@ class ComparatorFalsePassTests(unittest.TestCase):
         p = self.root / "outlier.png"; im = Image.new("RGBA", (20, 20), (20, 40, 60, 255)); im.putpixel((10, 10), (255, 255, 255, 255)); im.save(p)
         ref = self.root / "outlier-ref.png"; Image.new("RGBA", (20, 20), (20, 40, 60, 255)).save(ref)
         got = compare_images(p, ref)
+        self.assertEqual("FAIL", got["status"])
         self.assertGreater(got["threshold_exceeding"]["count"], 0)
 
     def test_threshold_relaxation_cannot_pass_material_one_pixel_delta(self):
@@ -58,8 +59,12 @@ class ComparatorFalsePassTests(unittest.TestCase):
     def test_threshold_validation_and_profile_mismatch(self):
         self.assertEqual("invalid_threshold", compare_images(self.ref, self.ref, threshold=999)["hard_failure"])
         a = Image.new("RGBA", (4, 4), (20, 40, 60, 255)); b = a.copy()
-        a.info["icc_profile"], b.info["icc_profile"] = b"profile-a", b"profile-b"
-        self.assertEqual("profile_mismatch", compare_images(a, b)["hard_failure"])
+        srgb = ImageCms.ImageCmsProfile(ImageCms.createProfile("sRGB")).tobytes()
+        altered = srgb[:-1] + bytes([srgb[-1] ^ 1])
+        a.info["icc_profile"], b.info["icc_profile"] = srgb, altered
+        got = compare_images(a, b)
+        self.assertEqual("FAIL", got["status"])
+        self.assertEqual("profile_mismatch", got["hard_failure"])
 
     def test_premultiply_fringe_and_signed_artifact(self):
         ref = Image.new("RGBA", (2, 1), (0, 0, 0, 0)); ref.putpixel((0, 0), (200, 0, 0, 128))

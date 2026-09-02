@@ -9,7 +9,7 @@
   "branch": "codex/parity-001",
   "command_templates": [
     {"command": "pwsh -NoProfile -File .\\scripts\\check.ps1", "exit_code": 0},
-    {"command": "pwsh -NoProfile -File .\\scripts\\parity\\run.ps1 -Mode baseline -Psd <private-input> -Reference <private-input> -Output parity-output\\20260902-131741-baseline", "exit_code": 2}
+    {"command": "pwsh -NoProfile -File .\\scripts\\parity\\run.ps1 -Mode baseline -Psd <private-input> -Reference <private-input> -Output parity-output\\20260902-131741-baseline", "exit_code": 3}
   ],
   "environment": {
     "windows": "Windows-11-10.0.26200-SP0",
@@ -56,9 +56,10 @@
     "source_candidate_commit": "45a94e232de35032e1c5c9202b174c63171bf1ef",
     "state_commit": "3b33b29baf132c98cd0d6985a852ed1b6f6d3360",
     "prior_state_commit": "de83b8382ec8bb62c37e2736b56cfcc396207f82",
-    "final_head_recorded_at_closeout": "3b33b29baf132c98cd0d6985a852ed1b6f6d3360",
-    "fresh_verifier_test_commit": "3b33b29baf132c98cd0d6985a852ed1b6f6d3360",
-    "note": "45a94e2 is the PARITY-001 source candidate; 3b33b29 is the state/linkage commit. The cleanup-only commit carrying this summary does not alter candidate code; a fresh verifier should test candidate 45a94e2 with state linkage from 3b33b29."
+    "current_metadata_head": "64df79671c7c9a54925f1fd4d80abac52a10ca11",
+    "final_head_recorded_at_closeout": "64df79671c7c9a54925f1fd4d80abac52a10ca11",
+    "fresh_verifier_test_commit": "45a94e232de35032e1c5c9202b174c63171bf1ef",
+    "note": "45a94e2 is the PARITY-001 source candidate; 3b33b29 is the state metadata parent; 64df796 is the current metadata head. A fresh verifier should test source candidate 45a94e2 while auditing final metadata at 64df796. Subsequent cleanup-only commit(s) do not change candidate code."
   },
   "remaining_gaps": ["Stored composite fails closed on ICC profile mismatch and nonzero RGB delta", "Photoshop/Resolve host validation not run"]
 }
