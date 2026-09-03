@@ -215,6 +215,7 @@ def _orchestration_hint(latest: list[dict[str, Any]]) -> dict[str, Any]:
         "next_workload": "GroupOperator proxy/render-source split implementation after the published clipping-island candidate",
         "gate_order": ["P4-08", "P4-HOST-PIXEL", "P4-09", "localized_repair"],
         "blocked_until_parity004_closure": ["PARITY-005", "PARITY-006"],
+        "manager_packet_guard": "Every exact path belongs to exactly one of read_paths or write_paths; put only files intended to change in write_paths and use handoff_refs for immutable evidence.",
         "latest_evidence_count": len(latest),
         "source": "repo-local canonical state plus current user workload instruction",
     }

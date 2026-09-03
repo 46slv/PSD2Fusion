@@ -609,6 +609,9 @@ def _run_production(root: Path, harness_root: Path, args: argparse.Namespace) ->
                 _write_sol_escalation(evidence_root, run_id, reason=str(detail), record=record)
                 _atomic_json_write(cycle_path, record)
             break
+        if index == args.max_cycles:
+            stop_reason = "MAX_CYCLES"
+            stop_detail = detail or "bounded supervisor cycle budget exhausted"
         # Only the compact adapter/evidence files are read on the next pass;
         # no role result or transcript is copied into the next Task Packet.
         preflight = {"status": "PASS", "production_roles_launched": False, "probes": []}
