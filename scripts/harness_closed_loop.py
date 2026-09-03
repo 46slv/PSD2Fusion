@@ -36,6 +36,13 @@ _MANAGER_LOCATE_PATH_CONTRACT = (
     "and must exactly equal its sole path_scopes entry (for example query AGENTS.md with "
     "path_scopes [AGENTS.md]). Do not put a descriptive sentence in query; keep query non-empty."
 )
+_MANAGER_PLAN_PATH_CONTRACT = (
+    "Task Packet path contract is strict: every exact repository path may appear in exactly one "
+    "of read_paths, write_paths, or handoff_refs. If an immutable Runner evidence path is placed "
+    "in handoff_refs, omit that same path from read_paths; do not duplicate it. Keep write_paths "
+    "limited to the three declared implementation files. The generic validator rejects any "
+    "duplicate across these arrays."
+)
 
 
 class _PSD2FusionInvoker:
@@ -55,6 +62,9 @@ class _PSD2FusionInvoker:
         if role == "manager-locate":
             prompt = str(kwargs.get("prompt") or "")
             kwargs["prompt"] = f"{prompt}\n\n{_MANAGER_LOCATE_PATH_CONTRACT}"
+        elif role == "manager-plan":
+            prompt = str(kwargs.get("prompt") or "")
+            kwargs["prompt"] = f"{prompt}\n\n{_MANAGER_PLAN_PATH_CONTRACT}"
         elif role == "worker":
             prompt = str(kwargs.get("prompt") or "")
             kwargs["prompt"] = f"{prompt}\n\n{_WORKER_EVIDENCE_PATH_CONTRACT}"
