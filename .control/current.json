@@ -3,7 +3,7 @@
   "schema_version": 1,
   "program_id": "PSD2FUSION-COMPOSITING-PARITY",
   "status": "active",
-  "updated_date": "2026-09-02",
+  "updated_date": "2026-09-04",
   "baseline": {
     "repository": "46slv/PSD2Fusion",
     "default_branch": "main",
@@ -63,7 +63,7 @@
       ],
       "verification": "pending",
       "branch": "codex/parity-004",
-      "commit": "a65339563dce878f0e3ddf438f811d00c50109a5",
+      "commit": "96112d57ec52645a1d9797323d3551bf45538f27",
       "evidence": [
         ".control/evidence/PARITY-004/20260902-170000/summary.json",
         ".control/evidence/PARITY-004/20260902-174500/verifier.json",
@@ -79,7 +79,13 @@
         ".control/evidence/PARITY-004/20260902-p403-p407/summary.json",
         ".control/evidence/PARITY-004/20260902-p403-p407/verifier.json",
         ".control/evidence/PARITY-004/20260902-p408/summary.json",
-        ".control/evidence/PARITY-004/20260902-p408/verifier.json"
+        ".control/evidence/PARITY-004/20260902-p408/verifier.json",
+        ".control/evidence/PARITY-004/20260903-p4-png-contract/summary.json",
+        ".control/evidence/PARITY-004/20260903-p4-host-pixel-chbool/summary.json",
+        ".control/evidence/PARITY-004/20260903-group-operator-contract/decision.md",
+        ".control/evidence/PARITY-004/20260903-p408-96112d5/summary.json",
+        ".control/evidence/PARITY-004/20260903-saver-artifact-blocker/summary.json",
+        ".control/evidence/PARITY-004/20260903-sol-host-pixel-diagnostic/decision.json"
       ]
     },
     {
