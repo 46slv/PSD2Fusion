@@ -1,0 +1,148 @@
+{
+  "cached_input_tokens": 246272,
+  "ephemeral": true,
+  "exit_code": 0,
+  "input_tokens": 303206,
+  "isolation": {
+    "allowed_workspace_read": true,
+    "allowed_workspace_write": false,
+    "backend": "codex-split-filesystem-profile",
+    "canonical_external_read": "DENIED",
+    "codex_executable": "C:\\Users\\shiro\\AppData\\Local\\OpenAI\\Codex\\bin\\b99306303521e97e\\codex.exe",
+    "command_exit_code": 0,
+    "exact_write": "DENIED",
+    "forbidden_external_read": "DENIED",
+    "legacy_sandbox_mode_used": false,
+    "outside_write": "DENIED",
+    "platform": "win32",
+    "probe_mode": "codex-exec",
+    "profile_name": "ceh_manager_locate_2b55dae568ff",
+    "readonly_write": "DENIED",
+    "runtime_executable": "C:\\Users\\shiro\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\python\\python.exe",
+    "status": "PROVEN",
+    "stderr_bytes": 197,
+    "stderr_sha256": "f1204c0c4164d087b2bea14ee10512d62ebadf6dc71fe95a345c6fd14d5bfc7a",
+    "stdout_bytes": 2006,
+    "stdout_sha256": "005e1d1625764d830ec34000d98fdbf4c3ab3dbb8a937e52eac6a08d30f33636",
+    "wall_time_ms": 20468,
+    "workspace_access": "read",
+    "write_path_read": "PASS"
+  },
+  "isolation_profile": "ceh_manager_locate_2b55dae568ff",
+  "isolation_status": "PROVEN",
+  "model_visible_bytes": 87637,
+  "model_visible_file_count": 4,
+  "output_tokens": 7290,
+  "protocol_errors": [],
+  "result": {
+    "goal_item_id": "PARITY-004",
+    "requests": [
+      {
+        "kind": "EXACT_FILE",
+        "max_bytes": 5811,
+        "max_results": 1,
+        "path_scopes": [
+          "AGENTS.md"
+        ],
+        "query": "Read repository-specific instructions and protected PARITY-004 invariants.",
+        "reason": "Required execution constraints."
+      },
+      {
+        "kind": "EXACT_FILE",
+        "max_bytes": 8065,
+        "max_results": 1,
+        "path_scopes": [
+          ".control/PARITY-004_TODO.md"
+        ],
+        "query": "Read the bounded PARITY-004 procedure and current non-goals.",
+        "reason": "Confirm ordered gates and clipping invariants."
+      },
+      {
+        "kind": "EXACT_FILE",
+        "max_bytes": 6117,
+        "max_results": 1,
+        "path_scopes": [
+          "docs/PARITY_004_HOST_PIXEL_GATE.md"
+        ],
+        "query": "Read the host/pixel verification procedure and claim boundaries.",
+        "reason": "Preserve structural versus host/pixel evidence limits."
+      },
+      {
+        "kind": "EXACT_FILE",
+        "max_bytes": 3539,
+        "max_results": 1,
+        "path_scopes": [
+          ".control/evidence/PARITY-004/20260903-group-operator-contract/decision.md"
+        ],
+        "query": "Read the implementation-ready GroupOperator proxy/render-source contract.",
+        "reason": "Define the narrow task semantics."
+      },
+      {
+        "kind": "EXACT_FILE",
+        "max_bytes": 45874,
+        "max_results": 1,
+        "path_scopes": [
+          "psd2fusion/fusion_comp.py"
+        ],
+        "query": "Read the current GroupOperator and stream-attachment implementation.",
+        "reason": "Locate the implementation boundary."
+      },
+      {
+        "kind": "EXACT_FILE",
+        "max_bytes": 15139,
+        "max_results": 1,
+        "path_scopes": [
+          "scripts/parity/p4_05.py"
+        ],
+        "query": "Read the existing P4-05 group and nesting fixture.",
+        "reason": "Plan focused structural coverage."
+      },
+      {
+        "kind": "EXACT_FILE",
+        "max_bytes": 2002,
+        "max_results": 1,
+        "path_scopes": [
+          "tests/test_parity004_p405_graph.py"
+        ],
+        "query": "Read the existing P4-05 graph regression tests.",
+        "reason": "Extend focused regression assertions."
+      },
+      {
+        "kind": "EXACT_FILE",
+        "max_bytes": 844,
+        "max_results": 1,
+        "path_scopes": [
+          "scripts/check.ps1"
+        ],
+        "query": "Read the repository-supported offline validation command.",
+        "reason": "Use the prescribed verification entry point."
+      },
+      {
+        "kind": "EXACT_FILE",
+        "max_bytes": 886,
+        "max_results": 1,
+        "path_scopes": [
+          "tests/test_parity004_p407.py"
+        ],
+        "query": "Read the real-PSD representative-selection regression expectations.",
+        "reason": "Ensure the narrow group change preserves P4-07 coverage."
+      }
+    ],
+    "status": "DISCOVERY_REQUESTED",
+    "summary": "Selected PARITY-004 for the narrow GroupOperator proxy/render-source split. Discovery is limited to the governing contract, implementation and focused test/validation files; host_loaded and pixel_verified remain unresolved."
+  },
+  "role": "manager-locate",
+  "run_id": "p4-harness-1788428973-001-ac4c133b",
+  "schema": "codex-ephemeral-harness.role-evidence.v1",
+  "schema_version": 1,
+  "status": "DISCOVERY_REQUESTED",
+  "stderr_bytes": 197,
+  "stderr_sha256": "b08a3d37b40dc345de582333062f0dfc2bfb872f67f4116dc8fc11ffb7ebd490",
+  "stdout_bytes": 192415,
+  "stdout_sha256": "96637d0f42a712c37c267bcc11a25366e8443b21fe2d3a208f3982c7009f07dc",
+  "thread_id": "01a066ac-c966-7460-a5fd-b6f4faeaa241",
+  "timestamp": "2026-09-03T09:52:32.545475Z",
+  "transcripts_forwarded": false,
+  "uncached_input_tokens": 56934,
+  "wall_time_ms": 157719
+}

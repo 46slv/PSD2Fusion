@@ -1,0 +1,20 @@
+{
+  "adapter": "psd2fusion-parity-004",
+  "checkpoint": null,
+  "created_at": "2026-09-03T09:49:33.643775Z",
+  "discovery_round": 1,
+  "error": "exact discovery file is unavailable in repo map: Read repository-specific instructions and protected PARITY-004 invariants.",
+  "expansion_count": 0,
+  "patch_applied": false,
+  "phase": "DISCOVERY",
+  "plan_attempt": 0,
+  "recovered": false,
+  "repo_identity": "ee28cee08a380e2c",
+  "run_id": "p4-harness-1788428973-001-ac4c133b",
+  "schema": "codex-ephemeral-harness.cycle-state.v1",
+  "second_cycle": "NOT_RUN",
+  "status": "BLOCKED",
+  "transition_applied": false,
+  "updated_at": "2026-09-03T09:52:32.589482Z",
+  "worker_attempt": 0
+}

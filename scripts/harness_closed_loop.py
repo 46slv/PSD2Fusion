@@ -31,6 +31,11 @@ _WORKER_EVIDENCE_PATH_CONTRACT = (
     "exactly matching task.write_paths (for example psd2fusion/fusion_comp.py). Never emit an "
     "absolute path, Windows drive path, or isolated Temp workspace path."
 )
+_MANAGER_LOCATE_PATH_CONTRACT = (
+    "For every EXACT_FILE discovery request, query must be the complete repository-relative filename "
+    "and must exactly equal its sole path_scopes entry (for example query AGENTS.md with "
+    "path_scopes [AGENTS.md]). Do not put a descriptive sentence in query; keep query non-empty."
+)
 
 
 class _PSD2FusionInvoker:
@@ -46,7 +51,11 @@ class _PSD2FusionInvoker:
         self._delegate = delegate
 
     def invoke(self, **kwargs: Any) -> Any:
-        if kwargs.get("role") == "worker":
+        role = kwargs.get("role")
+        if role == "manager-locate":
+            prompt = str(kwargs.get("prompt") or "")
+            kwargs["prompt"] = f"{prompt}\n\n{_MANAGER_LOCATE_PATH_CONTRACT}"
+        elif role == "worker":
             prompt = str(kwargs.get("prompt") or "")
             kwargs["prompt"] = f"{prompt}\n\n{_WORKER_EVIDENCE_PATH_CONTRACT}"
         return self._delegate.invoke(**kwargs)
