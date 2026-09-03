@@ -83,6 +83,38 @@ class PSD2FusionAdapterTests(unittest.TestCase):
         self.assertEqual(before, (root / ".control" / "current.json").read_bytes())
         self.assertTrue((root / first["marker_relpath"]).is_file())
 
+    def test_latest_runner_feedback_is_bounded_and_points_to_current_artifact(self) -> None:
+        root = self._repo()
+        harness = root / ".control" / "evidence" / "PARITY-004" / "harness"
+        harness.mkdir(parents=True)
+        run_id = "p4-harness-test-001"
+        (harness / "current.json").write_text(
+            json.dumps({"run_id": run_id, "status": "TEST_FAILED", "phase": "RUNNER_TESTS"}),
+            encoding="utf-8",
+        )
+        (harness / run_id).mkdir()
+        (harness / run_id / "runner-tests.json").write_text(
+            json.dumps(
+                {
+                    "status": "FAIL",
+                    "failed": 1,
+                    "passed": 0,
+                    "results": [{"command": "python -m unittest", "status": "FAIL", "exit_code": 1}],
+                }
+            ),
+            encoding="utf-8",
+        )
+
+        value = PSD2FusionAdapter().load_goal_state(root)
+        feedback = value["state"]["latest_runner_feedback"]
+        self.assertEqual("FAIL", feedback["runner_status"])
+        self.assertEqual(
+            ".control/evidence/PARITY-004/harness/p4-harness-test-001/runner-tests.json",
+            feedback["runner_tests_path"],
+        )
+        self.assertEqual("FAIL", feedback["results"][0]["status"])
+        self.assertNotIn(str(root), json.dumps(feedback, ensure_ascii=False))
+
 
 if __name__ == "__main__":
     unittest.main()

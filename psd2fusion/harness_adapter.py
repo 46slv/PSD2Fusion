@@ -222,6 +222,71 @@ def _latest_evidence(repo: Path) -> list[dict[str, Any]]:
     return result
 
 
+def _latest_runner_feedback(repo: Path) -> dict[str, Any] | None:
+    """Project the current Runner result into the next PSD2Fusion cycle.
+
+    The generic harness owns Runner execution and keeps the full test artifact
+    under the run directory.  The adapter exposes only a bounded, non-
+    transcript summary so a fresh Manager/Worker can repair a localized
+    PSD2Fusion failure instead of treating an unchanged source tree as done.
+    """
+
+    current_path = repo / _HARNESS_EVIDENCE / "current.json"
+    if not current_path.is_file():
+        return None
+    try:
+        current = _read_json(current_path)
+    except ValueError:
+        return {
+            "status": "UNREADABLE",
+            "path": _HARNESS_EVIDENCE.joinpath("current.json").as_posix(),
+        }
+    if not isinstance(current, Mapping):
+        return {"status": "INVALID", "path": _HARNESS_EVIDENCE.joinpath("current.json").as_posix()}
+    run_id = current.get("run_id")
+    if not isinstance(run_id, str) or not re.fullmatch(r"[A-Za-z0-9][A-Za-z0-9._-]*", run_id):
+        return {"status": "NO_RUN", "phase": current.get("phase")}
+    relative = _HARNESS_EVIDENCE / run_id / "runner-tests.json"
+    record = _file_record(repo, relative)
+    feedback: dict[str, Any] = {
+        "run_id": run_id,
+        "cycle_status": current.get("status"),
+        "phase": current.get("phase"),
+        "runner_tests_path": relative.as_posix(),
+        "runner_tests": record,
+    }
+    path = repo / relative
+    if not path.is_file():
+        feedback["runner_status"] = "PENDING"
+        return feedback
+    try:
+        runner = _read_json(path)
+    except ValueError:
+        feedback["runner_status"] = "UNREADABLE"
+        return feedback
+    if not isinstance(runner, Mapping):
+        feedback["runner_status"] = "INVALID"
+        return feedback
+    feedback["runner_status"] = runner.get("status")
+    feedback["failed"] = runner.get("failed")
+    feedback["passed"] = runner.get("passed")
+    results: list[dict[str, Any]] = []
+    raw_results = runner.get("results")
+    if isinstance(raw_results, list):
+        for item in raw_results[:12]:
+            if not isinstance(item, Mapping):
+                continue
+            results.append(
+                {
+                    "command": item.get("command"),
+                    "status": item.get("status"),
+                    "exit_code": item.get("exit_code"),
+                }
+            )
+    feedback["results"] = results
+    return feedback
+
+
 def _active_task(canonical: Mapping[str, Any]) -> dict[str, Any] | None:
     active_id = canonical.get("active_task_id")
     tasks = canonical.get("tasks")
@@ -233,7 +298,9 @@ def _active_task(canonical: Mapping[str, Any]) -> dict[str, Any] | None:
     return None
 
 
-def _orchestration_hint(latest: list[dict[str, Any]]) -> dict[str, Any]:
+def _orchestration_hint(
+    latest: list[dict[str, Any]], runner_feedback: Mapping[str, Any] | None = None
+) -> dict[str, Any]:
     """A bounded sequence hint; it is not a substitute for host evidence."""
 
     return {
@@ -249,7 +316,7 @@ def _orchestration_hint(latest: list[dict[str, Any]]) -> dict[str, Any]:
         "next_workload": "GroupOperator proxy/render-source split implementation after the published clipping-island candidate",
         "gate_order": ["P4-08", "P4-HOST-PIXEL", "P4-09", "localized_repair"],
         "blocked_until_parity004_closure": ["PARITY-005", "PARITY-006"],
-        "manager_packet_guard": "Every exact path belongs to exactly one of read_paths or write_paths; put only files intended to change in write_paths and use handoff_refs for immutable evidence. Include .control/evidence/PARITY-004/20260903-group-operator-contract/decision.md as an immutable read path when implementing the GroupOperator split. Worker context_budget.max_files must cover all exact read/write/handoff files plus the generated WORKER.md, task.json, and context-manifest.json (at least that total). Worker evidence.path values are contract fields: emit only repository-relative POSIX paths exactly matching task.write_paths, never isolated-temp absolute paths or Windows drive paths. Use repository-supported unittest/check.ps1 commands rather than assuming pytest is installed.",
+        "manager_packet_guard": "Every exact path belongs to exactly one of read_paths or write_paths; put only files intended to change in write_paths and use handoff_refs for immutable evidence. Include .control/evidence/PARITY-004/20260903-group-operator-contract/decision.md as an immutable read path when implementing the GroupOperator split. If latest_runner_feedback.runner_status is FAIL, include its runner_tests_path as an immutable handoff/read path and plan a localized repair; do not return a no-op implementation while the declared Runner tests fail. Worker context_budget.max_files must cover all exact read/write/handoff files plus the generated WORKER.md, task.json, and context-manifest.json (at least that total). Worker evidence.path values are contract fields: emit only repository-relative POSIX paths exactly matching task.write_paths, never isolated-temp absolute paths or Windows drive paths. Use repository-supported unittest/check.ps1 commands rather than assuming pytest is installed.",
         "manager_locate_guard": "EXACT_FILE requests must use the complete repository-relative filename (for example AGENTS.md, not AGENTS); every query must be non-empty and every path scope must exist in the repo map.",
         "coordinator_selection": {
             "goal_item_id": "PARITY-004",
@@ -267,6 +334,7 @@ def _orchestration_hint(latest: list[dict[str, Any]]) -> dict[str, Any]:
             "minimum_worker_context_files": 10,
         },
         "latest_evidence_count": len(latest),
+        "latest_runner_feedback": dict(runner_feedback or {"status": "NONE"}),
         "source": "repo-local canonical state plus current user workload instruction",
     }
 
@@ -311,13 +379,14 @@ class PSD2FusionAdapter:
         goal_text = _parity004_section(_read_text(root / _GOAL))
         todo_text = _read_text(root / _TODO)
         latest = _latest_evidence(root)
+        runner_feedback = _latest_runner_feedback(root)
         active = _active_task(canonical_raw)
         validation = {
             "offline_check": _file_record(root, _CHECK),
             "remote_completion_guard": _file_record(root, _REMOTE_GUARD),
             "remote_completion_guard_python": _file_record(root, _REMOTE_GUARD_PY),
         }
-        orchestration = _orchestration_hint(latest)
+        orchestration = _orchestration_hint(latest, runner_feedback)
         goal = {
             "program_id": canonical_raw.get("program_id"),
             "active_task_id": canonical_raw.get("active_task_id"),
@@ -338,6 +407,7 @@ class PSD2FusionAdapter:
             "active_task": _safe_value(active, root) if active is not None else None,
             "todo": _scrub_string(todo_text, root),
             "latest_evidence": latest,
+            "latest_runner_feedback": runner_feedback,
             "validation": validation,
             "orchestration": orchestration,
         }
