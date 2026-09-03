@@ -1,0 +1,33 @@
+{
+  "schema": "psd2fusion-parity-004.remote-completion-guard.v1",
+  "evidence_id": "remote-guard-final-20260903-9d5950a",
+  "status": "PASS",
+  "inspection_only": true,
+  "checks": {
+    "remote_branch_exists": true,
+    "candidate_reachable": true,
+    "state_reachable": true,
+    "state_matches": true,
+    "remote_expectations": true
+  },
+  "remote": {
+    "main": "2c13cd8efef8061dccb17ba89a320664c5d1c206",
+    "branch": "9d5950a70a36a2e35705234baefa16df05e624a1",
+    "candidate_from_canonical_task": "a65339563dce878f0e3ddf438f811d00c50109a5",
+    "state_commit": "4d9ddb014e4343d9828869c346908c6243730e2d"
+  },
+  "canonical_state": {
+    "active_task_id": "PARITY-004",
+    "status": "in_progress",
+    "verification": "pending",
+    "mutation": "none"
+  },
+  "correlation": {
+    "devexec_task_id": "devexec-psd2fusion-p004-20260903",
+    "harness_run_id": "p4-harness-1788440083-001-92972569",
+    "supervisor_target": "knotfield-harness-supervisor",
+    "p4_08_evidence": ".control/evidence/PARITY-004/20260903-p408-96112d5/summary.json",
+    "host_blocker": ".control/evidence/PARITY-004/20260903-saver-artifact-blocker/summary.json"
+  },
+  "next": "P4-HOST-PIXEL remains blocked solely by missing Saver artifact; do not advance PARITY-004 state or start PARITY-005/006."
+}
