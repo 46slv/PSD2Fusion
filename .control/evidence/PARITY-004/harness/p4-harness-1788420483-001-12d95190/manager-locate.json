@@ -1,0 +1,114 @@
+{
+  "cached_input_tokens": 197376,
+  "ephemeral": true,
+  "exit_code": 0,
+  "input_tokens": 278245,
+  "isolation": {
+    "allowed_workspace_read": true,
+    "allowed_workspace_write": false,
+    "backend": "codex-split-filesystem-profile",
+    "canonical_external_read": "DENIED",
+    "codex_executable": "C:\\Users\\shiro\\AppData\\Local\\OpenAI\\Codex\\bin\\b99306303521e97e\\codex.exe",
+    "command_exit_code": 0,
+    "exact_write": "DENIED",
+    "forbidden_external_read": "DENIED",
+    "legacy_sandbox_mode_used": false,
+    "outside_write": "DENIED",
+    "platform": "win32",
+    "probe_mode": "codex-exec",
+    "profile_name": "ceh_manager_locate_a2f793dce048",
+    "readonly_write": "DENIED",
+    "runtime_executable": "C:\\Users\\shiro\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\python\\python.exe",
+    "status": "PROVEN",
+    "stderr_bytes": 197,
+    "stderr_sha256": "f6e3956269a795fa7e25b6184c316409ac5fd2eff8cde4a0caf5af980c1d3a81",
+    "stdout_bytes": 2049,
+    "stdout_sha256": "92ba26ac4a444f852687be1e84255f9bac358e0b9c2ca341c3cad9177eda455e",
+    "wall_time_ms": 20297,
+    "workspace_access": "read",
+    "write_path_read": "PASS"
+  },
+  "isolation_profile": "ceh_manager_locate_a2f793dce048",
+  "isolation_status": "PROVEN",
+  "model_visible_bytes": 132202,
+  "model_visible_file_count": 4,
+  "output_tokens": 7850,
+  "protocol_errors": [],
+  "result": {
+    "goal_item_id": "PARITY-004",
+    "requests": [
+      {
+        "kind": "EXACT_FILE",
+        "max_bytes": 9000,
+        "max_results": 1,
+        "path_scopes": [
+          ".control/PARITY-004_TODO.md"
+        ],
+        "query": ".control/PARITY-004_TODO.md",
+        "reason": "Confirm the ordered PARITY-004 scope and current clipping recipe."
+      },
+      {
+        "kind": "EXACT_FILE",
+        "max_bytes": 7000,
+        "max_results": 1,
+        "path_scopes": [
+          "docs/PARITY_004_HOST_PIXEL_GATE.md"
+        ],
+        "query": "docs/PARITY_004_HOST_PIXEL_GATE.md",
+        "reason": "Confirm host/pixel gate constraints before planning the focused task."
+      },
+      {
+        "kind": "EXACT_FILE",
+        "max_bytes": 10000,
+        "max_results": 1,
+        "path_scopes": [
+          ".control/evidence/PARITY-004/20260903-p4-host-pixel-chbool/summary.json"
+        ],
+        "query": ".control/evidence/PARITY-004/20260903-p4-host-pixel-chbool/summary.json",
+        "reason": "Read the latest bounded evidence and blocker classification."
+      },
+      {
+        "kind": "SYMBOL_SEARCH",
+        "max_bytes": 12000,
+        "max_results": 40,
+        "path_scopes": [
+          "psd2fusion/fusion_comp.py",
+          "tests/test_parity004_p405_graph.py",
+          "tests/test_parity004_p407.py",
+          "scripts/parity/p4_05.py"
+        ],
+        "query": "GroupOperator",
+        "reason": "Locate the implementation and focused structural coverage for the GroupOperator proxy/render-source split."
+      },
+      {
+        "kind": "CONTENT_SEARCH",
+        "max_bytes": 12000,
+        "max_results": 40,
+        "path_scopes": [
+          "psd2fusion/fusion_comp.py",
+          "scripts/resolve/PSD2Fusion.lua",
+          "scripts/parity/p4_05.py",
+          "tests/test_parity004_p405_graph.py"
+        ],
+        "query": "proxy|render_source|render-source|render source",
+        "reason": "Find existing proxy/render-source terminology and connection logic without requesting broad repository contents."
+      }
+    ],
+    "status": "DISCOVERY_REQUESTED",
+    "summary": "Selected active goal PARITY-004. Request bounded discovery for the next focused GroupOperator proxy/render-source split task; current host/pixel evidence remains blocked and PARITY-005/006 stay out of scope."
+  },
+  "role": "manager-locate",
+  "run_id": "p4-harness-1788420483-001-12d95190",
+  "schema": "codex-ephemeral-harness.role-evidence.v1",
+  "schema_version": 1,
+  "status": "DISCOVERY_REQUESTED",
+  "stderr_bytes": 197,
+  "stderr_sha256": "197496abd8cd6219fcdbd3f77e714e661447348a37be25a35d67fe0a54ec269a",
+  "stdout_bytes": 244201,
+  "stdout_sha256": "362a859d60f2c68500491563c860e831f22aad4d466a09114fa7c2b733d60a21",
+  "thread_id": "01a0662b-3aa6-70b1-ace3-996acfff18d9",
+  "timestamp": "2026-09-03T07:31:16.318178Z",
+  "transcripts_forwarded": false,
+  "uncached_input_tokens": 80869,
+  "wall_time_ms": 172172
+}

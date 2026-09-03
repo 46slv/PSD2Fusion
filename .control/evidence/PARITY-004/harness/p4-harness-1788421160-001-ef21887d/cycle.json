@@ -1,0 +1,125 @@
+{
+  "adapter": "psd2fusion-parity-004",
+  "checkpoint": {
+    "task": {
+      "run_id": "p4-harness-1788421160-001-ef21887d",
+      "schema": "codex-ephemeral-harness.task.v2",
+      "selected_by": "manager",
+      "task": {
+        "acceptance": [
+          "Implement the focused GroupOperator proxy/render-source split on the published PARITY-004 clipping-island candidate.",
+          "Keep proxy/control input and rendered child output as distinct, deterministic stream roles across ordinary, isolated, Pass Through, and nested group structures.",
+          "Preserve the existing clipping topology: fixed base matte reuse, one ClipIn Merge with Operator=In per member, local ClipStack Merge with ProcessAlpha=0, and one outer chain boundary.",
+          "Add structural regression coverage that detects proxy/render-source aliasing or inversion without claiming host or pixel verification."
+        ],
+        "completion_scope": "TRANCHE",
+        "constraints": [
+          "Work on the active codex/parity-004 candidate and preserve prior published commits; record the exact resulting HEAD.",
+          "Keep the implementation narrow to GroupOperator stream attachment/lowering and its focused structural tests.",
+          "Treat D:\\Downloads\\a.psd and D:\\Downloads\\20260812.png as read-only; never materialize or modify them.",
+          "Do not advance PARITY-004 state, claim host_loaded or pixel_verified, start PARITY-005/006, or perform a broad compiler/planner redesign."
+        ],
+        "context_budget": {
+          "max_discovery_rounds": 1,
+          "max_files": 5,
+          "max_handoff_files": 2,
+          "max_total_bytes": 120000
+        },
+        "evidence_required": [
+          "Exact candidate HEAD and changed-file list.",
+          "Focused structural test output and repository-check output.",
+          "Machine-readable or inspectable graph evidence showing distinct GroupOperator proxy and render-source attachments for direct and nested group cases.",
+          "Confirmation that real PSD/reference inputs were untouched and no host/pixel status was advanced."
+        ],
+        "goal_done_when": [
+          "The GroupOperator proxy/render-source split is implemented and covered by focused structural regression tests.",
+          "The published clipping candidate remains structurally intact and PARITY-004 remains active pending later Fusion micro-proof and P4-09 baseline."
+        ],
+        "goal_item_id": "PARITY-004",
+        "handoff_refs": [
+          {
+            "path": ".control/evidence/PARITY-004/20260903-p4-host-pixel/verifier.json",
+            "reason": "Fresh verification keeps PARITY-004 active and blocks pixel claims until the Loader/PNG contract is resolved.",
+            "sha256": "dca62f785e1114fa1fdfaf8185acaa79df6de40b72fccb9ed4cb8986b9b2f749"
+          },
+          {
+            "path": ".control/evidence/PARITY-004/20260902-p408/summary.json",
+            "reason": "Published P4-08 evidence establishes the current candidate's ordinary Fusion load/readback baseline.",
+            "sha256": "3ecb3bd67f8862fbb298f34e5c3f52a0cf8815c8cf08787ca9bdeb01d755aa28"
+          }
+        ],
+        "id": "PARITY-004-GROUPOPERATOR-PROXY-RENDER-SOURCE-SPLIT",
+        "non_goals": [
+          "Loader/PNG alpha or color-contract repair.",
+          "P4-HOST-PIXEL or P4-09 real-PSD rendering and comparison.",
+          "Blend-mode formula changes, clbl=false semantics, importer changes, or new rendering backends.",
+          "Changes to Resolve scripts, external inputs, or broad Evaluation IR/compiler architecture."
+        ],
+        "objective": "Implement and structurally prove the narrow GroupOperator proxy/render-source split required after the published clipping-island candidate, while preserving existing grouped/default clipping behavior.",
+        "read_paths": [
+          {
+            "path": ".control/PARITY-004_TODO.md",
+            "reason": "Read the ordered PARITY-004 scope, clipping recipe, and host/pixel boundaries."
+          },
+          {
+            "path": "scripts/parity/p4_05.py",
+            "reason": "Inspect the existing group/nesting structural audit and expected GroupOperator placement."
+          },
+          {
+            "path": "tests/test_parity004_p407.py",
+            "reason": "Review real-PSD structural regression expectations that must remain unchanged."
+          }
+        ],
+        "runner_acceptance": [
+          "Run the focused GroupOperator/group-nesting tests and the repository check from the repository root.",
+          "Verify the generated structural evidence contains separate proxy and render-source attachments and retains existing clipping invariants.",
+          "Verify no external PSD/reference files were changed and no state transition or pixel-verification claim was made."
+        ],
+        "test_env": {
+          "PYTHONIOENCODING": "utf-8",
+          "host": "No Resolve/Fusion host dependency for this structural tranche",
+          "reference_inputs": "D:\\Downloads\\a.psd and D:\\Downloads\\20260812.png are read-only",
+          "shell": "pwsh -NoProfile and repository-configured Python",
+          "working_directory": "repository root"
+        },
+        "tests": [
+          "python -m pytest tests/test_parity004_p405_graph.py tests/test_parity004_p407.py",
+          "pwsh -NoProfile -File .\\scripts\\check.ps1"
+        ],
+        "title": "Split GroupOperator proxy and render-source attachments",
+        "worker_acceptance": [
+          "Update psd2fusion/fusion_comp.py at the GroupOperator attachment boundary so proxy/control input and rendered child output are represented separately without changing ordinary group behavior.",
+          "Extend tests/test_parity004_p405_graph.py with direct, isolated, Pass Through, and nested-group assertions for the split and for preserved clipping-island topology.",
+          "Keep naming, ordering, and graph output deterministic; avoid unrelated formatting or refactoring.",
+          "Leave PARITY-004 in progress and hand off for Runner verification rather than marking the goal done."
+        ],
+        "write_paths": [
+          {
+            "path": "psd2fusion/fusion_comp.py",
+            "reason": "Implement the focused GroupOperator proxy/render-source stream split."
+          },
+          {
+            "path": "tests/test_parity004_p405_graph.py",
+            "reason": "Add focused structural regression coverage for GroupOperator roles and nesting."
+          }
+        ]
+      }
+    }
+  },
+  "created_at": "2026-09-03T07:39:20.907273Z",
+  "discovery_round": 1,
+  "error": "Worker slice has 9 files; budget allows 5",
+  "expansion_count": 0,
+  "patch_applied": false,
+  "phase": "WORKER",
+  "plan_attempt": 1,
+  "recovered": false,
+  "repo_identity": "ee28cee08a380e2c",
+  "run_id": "p4-harness-1788421160-001-ef21887d",
+  "schema": "codex-ephemeral-harness.cycle-state.v1",
+  "second_cycle": "NOT_RUN",
+  "status": "BLOCKED",
+  "transition_applied": false,
+  "updated_at": "2026-09-03T07:45:45.069681Z",
+  "worker_attempt": 1
+}

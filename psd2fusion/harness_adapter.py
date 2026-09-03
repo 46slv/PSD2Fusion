@@ -24,6 +24,7 @@ _CURRENT = Path(".control/current.json")
 _GOAL = Path(".control/CURRENT_GOAL.md")
 _TODO = Path(".control/PARITY-004_TODO.md")
 _EVIDENCE = Path(".control/evidence/PARITY-004")
+_GROUP_DECISION = _EVIDENCE / "20260903-group-operator-contract" / "decision.md"
 _HARNESS_EVIDENCE = _EVIDENCE / "harness"
 _CHECK = Path("scripts/check.ps1")
 _REMOTE_GUARD = Path("scripts/remote_completion_guard.ps1")
@@ -198,6 +199,26 @@ def _latest_evidence(repo: Path) -> list[dict[str, Any]]:
                 "data": data,
             }
         )
+    # The focused GroupOperator decision is durable Markdown rather than JSON.
+    # Include this one named authority explicitly; do not broaden the adapter
+    # into a recursive transcript/research reader.
+    decision_path = repo / _GROUP_DECISION
+    if decision_path.is_file():
+        try:
+            raw = decision_path.read_bytes()
+            result.append(
+                {
+                    "path": _GROUP_DECISION.as_posix(),
+                    "bytes": len(raw),
+                    "sha256": _sha256_bytes(raw),
+                    "data": {
+                        "kind": "SOL_DECISION",
+                        "text": _scrub_string(raw.decode("utf-8"), repo),
+                    },
+                }
+            )
+        except (OSError, UnicodeError):
+            pass
     return result
 
 
@@ -228,7 +249,7 @@ def _orchestration_hint(latest: list[dict[str, Any]]) -> dict[str, Any]:
         "next_workload": "GroupOperator proxy/render-source split implementation after the published clipping-island candidate",
         "gate_order": ["P4-08", "P4-HOST-PIXEL", "P4-09", "localized_repair"],
         "blocked_until_parity004_closure": ["PARITY-005", "PARITY-006"],
-        "manager_packet_guard": "Every exact path belongs to exactly one of read_paths or write_paths; put only files intended to change in write_paths and use handoff_refs for immutable evidence. Worker context_budget.max_files must cover all exact read/write/handoff files plus the generated WORKER.md, task.json, and context-manifest.json (at least that total). Worker evidence.path values must be repository-relative POSIX paths, never isolated-temp absolute paths. Use repository-supported unittest/check.ps1 commands rather than assuming pytest is installed.",
+        "manager_packet_guard": "Every exact path belongs to exactly one of read_paths or write_paths; put only files intended to change in write_paths and use handoff_refs for immutable evidence. Include .control/evidence/PARITY-004/20260903-group-operator-contract/decision.md as an immutable read path when implementing the GroupOperator split. Worker context_budget.max_files must cover all exact read/write/handoff files plus the generated WORKER.md, task.json, and context-manifest.json (at least that total). Worker evidence.path values must be repository-relative POSIX paths, never isolated-temp absolute paths. Use repository-supported unittest/check.ps1 commands rather than assuming pytest is installed.",
         "manager_locate_guard": "EXACT_FILE requests must use the complete repository-relative filename (for example AGENTS.md, not AGENTS); every query must be non-empty and every path scope must exist in the repo map.",
         "coordinator_selection": {
             "goal_item_id": "PARITY-004",
@@ -236,13 +257,14 @@ def _orchestration_hint(latest: list[dict[str, Any]]) -> dict[str, Any]:
             "immutable_read_paths": [
                 ".control/PARITY-004_TODO.md",
                 "docs/PARITY_004_HOST_PIXEL_GATE.md",
+                ".control/evidence/PARITY-004/20260903-group-operator-contract/decision.md",
             ],
             "implementation_write_paths": [
                 "psd2fusion/fusion_comp.py",
                 "scripts/parity/p4_05.py",
                 "tests/test_parity004_p405_graph.py",
             ],
-            "minimum_worker_context_files": 9,
+            "minimum_worker_context_files": 10,
         },
         "latest_evidence_count": len(latest),
         "source": "repo-local canonical state plus current user workload instruction",

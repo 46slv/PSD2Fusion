@@ -1,0 +1,56 @@
+{
+  "schema_version": 1,
+  "task": "PARITY-004",
+  "item": "P4-HOST-PIXEL",
+  "evidence_id": "mcp-fusion-readback-20260903",
+  "status": "BLOCKED",
+  "verification": "live_davinci_mcp_readback",
+  "host": {
+    "application": "DaVinci Resolve Studio",
+    "version": "21.0.3.7",
+    "current_page": "fusion",
+    "current_project_readback": "新規プロジェクト 1",
+    "bridge_surface": "signed localhost Resolve bridge",
+    "bridge_surface_version": "1.0",
+    "bridge_operations_used": [
+      "health",
+      "call(resolve.Fusion)",
+      "call(Fusion.LoadComp)",
+      "call(comp.FindTool)",
+      "call(comp.GetToolList)",
+      "call(comp.AddTool)",
+      "call(tool.SetInput)",
+      "call(comp.Render)",
+      "call(comp.IsRendering)"
+    ]
+  },
+  "fixture": {
+    "path": "D:\\Documents\\PSDFixtureForge-E2E-20260903\\fixtures\\fractional-alpha-opacity\\psd2fusion\\PSD2Fusion.comp",
+    "load": "PASS",
+    "tool_count_readback": 4,
+    "media_out": {
+      "name": "MediaOut1",
+      "connected": true
+    },
+    "composition_read_only": false,
+    "project_saved": false
+  },
+  "render_probe": {
+    "saver_added_in_memory": true,
+    "saver_input_connected": true,
+    "render_call": true,
+    "is_rendering_after_call": false,
+    "output": "C:\\Users\\shiro\\psd2fusion-mcp-p4-20260903-fractional-connected2.png",
+    "artifact_exists": false,
+    "pixel_comparison": "NOT_RUN"
+  },
+  "stop_condition": "MCP Render accepted/read back but no Saver artifact materialized; preserve host_loaded/readback evidence only and keep pixel_verified false.",
+  "scope": {
+    "p4_09": "NOT_RUN",
+    "repair_iterations": 0,
+    "parity_005": "NOT_STARTED",
+    "parity_006": "NOT_STARTED",
+    "real_inputs_modified": false,
+    "transcript_forwarded": false
+  }
+}

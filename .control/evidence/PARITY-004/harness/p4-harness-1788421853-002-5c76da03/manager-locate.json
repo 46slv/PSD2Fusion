@@ -1,0 +1,108 @@
+{
+  "cached_input_tokens": 115968,
+  "ephemeral": true,
+  "exit_code": 0,
+  "input_tokens": 187206,
+  "isolation": {
+    "allowed_workspace_read": true,
+    "allowed_workspace_write": false,
+    "backend": "codex-split-filesystem-profile",
+    "canonical_external_read": "DENIED",
+    "codex_executable": "C:\\Users\\shiro\\AppData\\Local\\OpenAI\\Codex\\bin\\b99306303521e97e\\codex.exe",
+    "command_exit_code": 0,
+    "exact_write": "DENIED",
+    "forbidden_external_read": "DENIED",
+    "legacy_sandbox_mode_used": false,
+    "outside_write": "DENIED",
+    "platform": "win32",
+    "probe_mode": "codex-exec",
+    "profile_name": "ceh_manager_locate_dd2e79015d56",
+    "readonly_write": "DENIED",
+    "runtime_executable": "C:\\Users\\shiro\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\python\\python.exe",
+    "status": "PROVEN",
+    "stderr_bytes": 197,
+    "stderr_sha256": "286b229d770440bed272214299812ad4c1f4b067e2e13294c2ed1f16952e367a",
+    "stdout_bytes": 2036,
+    "stdout_sha256": "e4b3db9e080714639104595cb91e073426350c45d3b1081b573a2adad086921a",
+    "wall_time_ms": 18312,
+    "workspace_access": "read",
+    "write_path_read": "PASS"
+  },
+  "isolation_profile": "ceh_manager_locate_dd2e79015d56",
+  "isolation_status": "PROVEN",
+  "model_visible_bytes": 95027,
+  "model_visible_file_count": 4,
+  "output_tokens": 5760,
+  "protocol_errors": [],
+  "result": {
+    "goal_item_id": "PARITY-004",
+    "requests": [
+      {
+        "kind": "EXACT_FILE",
+        "max_bytes": 6000,
+        "max_results": 1,
+        "path_scopes": [
+          "AGENTS.md"
+        ],
+        "query": "AGENTS",
+        "reason": "Apply repository-local instructions."
+      },
+      {
+        "kind": "EXACT_FILE",
+        "max_bytes": 9000,
+        "max_results": 1,
+        "path_scopes": [
+          ".control/PARITY-004_TODO.md"
+        ],
+        "query": "PARITY-004",
+        "reason": "Confirm the scoped task sequence and constraints."
+      },
+      {
+        "kind": "EXACT_FILE",
+        "max_bytes": 50000,
+        "max_results": 1,
+        "path_scopes": [
+          "psd2fusion/fusion_comp.py"
+        ],
+        "query": "GroupOperator",
+        "reason": "Inspect the GroupOperator proxy/render-source attachment boundary."
+      },
+      {
+        "kind": "EXACT_FILE",
+        "max_bytes": 3000,
+        "max_results": 1,
+        "path_scopes": [
+          "tests/test_parity004_p405_graph.py"
+        ],
+        "query": "GroupOperator",
+        "reason": "Inspect focused group/nesting structural regression coverage."
+      },
+      {
+        "kind": "EXACT_FILE",
+        "max_bytes": 16000,
+        "max_results": 1,
+        "path_scopes": [
+          "scripts/parity/p4_05.py"
+        ],
+        "query": "GroupOperator",
+        "reason": "Inspect the existing group/nesting audit and expected graph evidence."
+      }
+    ],
+    "status": "DISCOVERY_REQUESTED",
+    "summary": "Selected active goal PARITY-004. Request bounded discovery for the next narrow GroupOperator proxy/render-source split while preserving clipping topology and leaving host/pixel verification unresolved."
+  },
+  "role": "manager-locate",
+  "run_id": "p4-harness-1788421853-002-5c76da03",
+  "schema": "codex-ephemeral-harness.role-evidence.v1",
+  "schema_version": 1,
+  "status": "DISCOVERY_REQUESTED",
+  "stderr_bytes": 197,
+  "stderr_sha256": "23cc2820b0b406f0b941f13f831cd9f30080a1ebabc3a6c952fd30cdef3efcba",
+  "stdout_bytes": 204858,
+  "stdout_sha256": "985489291a6fc04d0c249700796ae2a7f0caffdae9afa3071853a2060401c0ff",
+  "thread_id": "01a06640-1bce-7e81-9398-0f67f1b1b962",
+  "timestamp": "2026-09-03T07:53:13.095243Z",
+  "transcripts_forwarded": false,
+  "uncached_input_tokens": 71238,
+  "wall_time_ms": 120594
+}

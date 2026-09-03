@@ -1,0 +1,170 @@
+{
+  "adapter": "psd2fusion-parity-004",
+  "canonical_state_mutation": "adapter marker only; .control/current.json unchanged",
+  "cycle_evidence_hash": "475b80aae99d811c461f8435ba4926a5ff5eef49d41a8b094e02bce6b74af293",
+  "decision": "NEXT_CYCLE_LOCALIZED",
+  "decision_detail": "bounded failure is eligible for a fresh Manager cycle",
+  "devexec_task_id": "devexec-psd2fusion-p004-20260903",
+  "evidence_relpath": ".control/evidence/PARITY-004/harness/p4-harness-1788420483-001-12d95190/cycle-evidence.json",
+  "fingerprint_count": 0,
+  "materialized_read_sets": {
+    "manager-locate": {
+      "files": [
+        ".harness/MANAGER_LOCATE.md",
+        ".harness/goal.json",
+        ".harness/state.json",
+        ".harness/repo-map.json",
+        ".harness/context-manifest.json"
+      ],
+      "source": "generic-bundle-contract"
+    },
+    "manager-plan": {
+      "files": [
+        ".harness/MANAGER_PLAN.md",
+        ".harness/goal.json",
+        ".harness/state.json",
+        ".harness/discovery.json",
+        ".harness/context-manifest.json"
+      ],
+      "source": "generic-bundle-contract"
+    },
+    "verifier": {
+      "files": [
+        ".harness/VERIFIER.md",
+        ".harness/verifier-bundle.json",
+        ".harness/context-manifest.json"
+      ],
+      "source": "generic-bundle-contract"
+    },
+    "worker": {
+      "files": [
+        ".harness/context-manifest.json",
+        ".harness/task.json"
+      ],
+      "source": "Task Packet exact read/handoff paths"
+    }
+  },
+  "metrics": {
+    "cached_input_tokens": 751872,
+    "input_tokens": 919595,
+    "model_visible_bytes": 269414,
+    "model_visible_file_count": 8,
+    "output_tokens": 24818,
+    "uncached_input_tokens": 167723,
+    "wall_time_ms": 530531
+  },
+  "patch": null,
+  "phase": "MANAGER_PLAN",
+  "preflight_context_firewall": {
+    "probes": [
+      {
+        "id": 1,
+        "name": "worker_allowed_read",
+        "status": "PASS"
+      },
+      {
+        "id": 2,
+        "name": "canonical_read_denied",
+        "status": "PASS"
+      },
+      {
+        "id": 3,
+        "name": "unrelated_sentinel_read_denied",
+        "status": "PASS"
+      },
+      {
+        "id": 4,
+        "name": "worker_exact_write",
+        "status": "PASS"
+      },
+      {
+        "id": 5,
+        "name": "worker_readonly_write_denied",
+        "status": "PASS"
+      },
+      {
+        "id": 6,
+        "name": "verifier_canonical_read_denied",
+        "status": "PASS"
+      }
+    ],
+    "production_roles_launched": false,
+    "status": "PASS"
+  },
+  "project_task": "PARITY-004",
+  "reasoning_effort": "max",
+  "repo_head_at_reload": "ref: refs/heads/codex/parity-004",
+  "role_model": "gpt-5.6-luna",
+  "roles": {
+    "manager-locate": {
+      "cached_input_tokens": 197376,
+      "ephemeral": true,
+      "external_read_denial": {
+        "canonical": "DENIED",
+        "forbidden": "DENIED",
+        "outside_write": "DENIED",
+        "readonly_write": "DENIED",
+        "status": "PROVEN"
+      },
+      "input_tokens": 278245,
+      "model": "gpt-5.6-luna",
+      "model_visible_bytes": 132202,
+      "model_visible_file_count": 4,
+      "output_tokens": 7850,
+      "present": true,
+      "reasoning_effort": "max",
+      "role": "manager-locate",
+      "thread_id": "01a0662b-3aa6-70b1-ace3-996acfff18d9",
+      "uncached_input_tokens": 80869,
+      "wall_time_ms": 172172
+    },
+    "manager-plan": {
+      "cached_input_tokens": 554496,
+      "ephemeral": true,
+      "external_read_denial": {
+        "canonical": "DENIED",
+        "forbidden": "DENIED",
+        "outside_write": "DENIED",
+        "readonly_write": "DENIED",
+        "status": "PROVEN"
+      },
+      "input_tokens": 641350,
+      "model": "gpt-5.6-luna",
+      "model_visible_bytes": 137212,
+      "model_visible_file_count": 4,
+      "output_tokens": 16968,
+      "present": true,
+      "reasoning_effort": "max",
+      "role": "manager-plan",
+      "thread_id": "01a0662e-2469-76f0-8b2d-0c591efde2a9",
+      "uncached_input_tokens": 86854,
+      "wall_time_ms": 358359
+    },
+    "verifier": {
+      "present": false
+    },
+    "worker": {
+      "present": false
+    }
+  },
+  "run_id": "p4-harness-1788420483-001-12d95190",
+  "schema": "psd2fusion-parity-004.supervisor-cycle.v1",
+  "sol_escalation": {
+    "reason": null,
+    "requested": false
+  },
+  "status": "BLOCKED",
+  "supervisor_target": "knotfield-harness-supervisor",
+  "task_packet": {
+    "bytes": 0,
+    "files": 0,
+    "present": false
+  },
+  "tests": null,
+  "verdict": {
+    "failure_fingerprint": null,
+    "item_complete": null,
+    "summary": "",
+    "verifier": null
+  }
+}

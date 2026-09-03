@@ -1,0 +1,178 @@
+{
+  "cached_input_tokens": 554496,
+  "ephemeral": true,
+  "exit_code": 0,
+  "input_tokens": 641350,
+  "isolation": {
+    "allowed_workspace_read": true,
+    "allowed_workspace_write": false,
+    "backend": "codex-split-filesystem-profile",
+    "canonical_external_read": "DENIED",
+    "codex_executable": "C:\\Users\\shiro\\AppData\\Local\\OpenAI\\Codex\\bin\\b99306303521e97e\\codex.exe",
+    "command_exit_code": 0,
+    "exact_write": "DENIED",
+    "forbidden_external_read": "DENIED",
+    "legacy_sandbox_mode_used": false,
+    "outside_write": "DENIED",
+    "platform": "win32",
+    "probe_mode": "codex-exec",
+    "profile_name": "ceh_manager_plan_969885fb99cc",
+    "readonly_write": "DENIED",
+    "runtime_executable": "C:\\Users\\shiro\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\python\\python.exe",
+    "status": "PROVEN",
+    "stderr_bytes": 197,
+    "stderr_sha256": "888b362186d75936ad82478b68c9298b0f644cb8772c9264b28165ad5e4094ba",
+    "stdout_bytes": 1898,
+    "stdout_sha256": "a008539bde69884a349be9c6d20b31fd7aa3475d33f65b6a7556783d3d438d8b",
+    "wall_time_ms": 18281,
+    "workspace_access": "read",
+    "write_path_read": "PASS"
+  },
+  "isolation_profile": "ceh_manager_plan_969885fb99cc",
+  "isolation_status": "PROVEN",
+  "model_visible_bytes": 137212,
+  "model_visible_file_count": 4,
+  "output_tokens": 16968,
+  "protocol_errors": [],
+  "result": {
+    "run_id": "p4-harness-1788420483-001-12d95190",
+    "schema": "codex-ephemeral-harness.task.v2",
+    "selected_by": "manager",
+    "task": {
+      "acceptance": [
+        "Implement the narrow GroupOperator proxy/render-source split and preserve the published grouped/default clipping candidate.",
+        "Keep proxy/input and rendered/source endpoints distinct through isolated, Pass Through, nested isolated, and adjacent group boundaries.",
+        "Add deterministic structural coverage for the split without changing established fixed-matte, ClipIn, ClipStack, or outer-Merge semantics.",
+        "Leave PARITY-004 in progress and submit the implementation for fresh verification; do not claim host or pixel parity from graph tests."
+      ],
+      "completion_scope": "TRANCHE",
+      "constraints": [
+        "Work on the existing codex/parity-004 branch and re-check the actual repository HEAD before editing; handoff commits are context only.",
+        "Modify only the declared implementation and focused P4-05 coverage paths.",
+        "Treat D:\\Downloads\\a.psd and D:\\Downloads\\20260812.png as read-only external inputs; never materialize or modify them.",
+        "Do not redesign the compiler/planner, add dependencies or backends, start PARITY-005/PARITY-006, implement clbl=false, or alter the clipping recipe without a localized defect.",
+        "Do not mark PARITY-004 done, advance active_task_id, or write a state transition.",
+        "Keep structural, host_loaded, and pixel_verified claims separate; the current host/pixel blocker remains unresolved."
+      ],
+      "context_budget": {
+        "max_discovery_rounds": 0,
+        "max_files": 5,
+        "max_handoff_files": 2,
+        "max_total_bytes": 120000
+      },
+      "evidence_required": [
+        "Fresh structural evidence must identify the proxy/input and render/source endpoints separately for isolated, Pass Through, nested isolated, and adjacent cases, with the candidate HEAD and artifact hashes.",
+        "Fresh Runner evidence must include the focused fixture and regression command results, changed-file scope, deterministic artifact paths/hashes, and invalid-tool/MediaOut checks.",
+        "If the nested-group Fusion micro proof is available, record the exact Resolve/Fusion version, load/render result, artifact hash, and RGBA/alpha metrics; graph text or readback alone is insufficient.",
+        "Evidence must explicitly preserve the unresolved P4-HOST-PIXEL and P4-09 status and confirm that real inputs were not modified."
+      ],
+      "goal_done_when": [
+        "The GroupOperator proxy/render-source split is implemented and structurally covered in the four P4-05 group-boundary cases.",
+        "A fresh verifier accepts this tranche, or reports an explicit blocker without promoting it to completion.",
+        "The next permitted work is nested-group actual-Fusion micro proof followed by clipping regression; PARITY-004 remains in_progress."
+      ],
+      "goal_item_id": "PARITY-004",
+      "handoff_refs": [
+        {
+          "path": ".control/evidence/PARITY-004/20260903-p4-host-pixel-chbool/summary.json",
+          "reason": "Latest bounded host/pixel and real-baseline evidence: alpha coverage was probed, RGB mode behavior remains unresolved, and the real render was paper-only; do not broaden this implementation into an unlocalized compositor rewrite.",
+          "sha256": "7855546c5278cb01d39b1f827997d02607e07549f020d49ee996ba3e5622f0be"
+        },
+        {
+          "path": ".control/evidence/PARITY-004/20260902-p408/summary.json",
+          "reason": "Ordinary Fusion load/readback baseline confirming the existing candidate has populated GroupOperators, resolved loaders, connected MediaOut, and no invalid tools; use it as the regression shape to preserve.",
+          "sha256": "3ecb3bd67f8862fbb298f34e5c3f52a0cf8815c8cf08787ca9bdeb01d755aa28"
+        }
+      ],
+      "id": "PARITY-004-GROUPOPERATOR-PROXY-RENDER-SOURCE-SPLIT",
+      "non_goals": [
+        "P4-HOST-PIXEL mode/alpha contract repair beyond the narrow group boundary.",
+        "P4-09 real PSD/reference convergence or any whole-image fitting.",
+        "PARITY-005 clbl=false semantics and PARITY-006 broad real-PSD convergence.",
+        "New PSD import mechanisms, Photoshop automation, broad capability/backend redesign, or unrelated PSD features."
+      ],
+      "objective": "Make the smallest GroupOperator lowering change needed to separate the wrapper's proxy/input stream from the group's rendered/source stream, so downstream composition receives the actual group render while existing group boundaries and the published clipping-island recipe remain intact.",
+      "read_paths": [
+        {
+          "path": ".control/PARITY-004_TODO.md",
+          "reason": "Read the ordered PARITY-004 contract, current clipping recipe, group scope, and prohibited expansion."
+        },
+        {
+          "path": "docs/PARITY_004_HOST_PIXEL_GATE.md",
+          "reason": "Read the host/pixel evidence boundary and stop conditions that the implementation and Runner must preserve."
+        },
+        {
+          "path": "psd2fusion/fusion_comp.py",
+          "reason": "Inspect the GroupOperator construction and stream attachment implementation identified by discovery."
+        },
+        {
+          "path": "scripts/parity/p4_05.py",
+          "reason": "Inspect the existing isolated, Pass Through, nested, and adjacent group fixture/report invariants."
+        },
+        {
+          "path": "tests/test_parity004_p405_graph.py",
+          "reason": "Inspect focused structural assertions for GroupOperator boundaries and deterministic graph wiring."
+        }
+      ],
+      "runner_acceptance": [
+        "Run every command listed in tests from the repository root and record exact results, counts, artifact paths, and hashes.",
+        "Verify the generated P4-05 graph has distinct proxy/input and render/source wiring in all four group cases, retains downstream stream attachment, and introduces no invalid or missing tools.",
+        "Run the clipping/regression suite and repository check; distinguish any pre-existing host/pixel failures from implementation regressions.",
+        "When Resolve is available, run the minimal nested-group actual-Fusion micro proof after structural checks and record host/version plus rendered artifact and quantitative metrics; report BLOCKED if unavailable.",
+        "Do not treat structural tests, host readback, or the existing paper-only real baseline as pixel parity, and do not advance PARITY-004 state."
+      ],
+      "test_env": {
+        "artifact_policy": "Generated comps, renders, and reports stay under ignored .local output and are not committed.",
+        "fusion_host": "DaVinci Resolve Studio 21.0.3.7 via the Fusion localhost scripting endpoint, Runner-owned and optional for structural execution",
+        "offline_check": "pwsh -NoProfile -File .\\scripts\\check.ps1",
+        "platform": "Windows",
+        "python": "Repository-supported Python interpreter",
+        "real_inputs": "D:\\Downloads\\a.psd and D:\\Downloads\\20260812.png are read-only and remain outside Worker context",
+        "shell": "PowerShell",
+        "working_directory": "repository root"
+      },
+      "tests": [
+        "python scripts/parity/p4_05.py .local/p4-05-groupoperator-proxy-render-source",
+        "python -m unittest tests.test_parity004_p405_graph -v",
+        "python -m unittest tests.test_parity004_p402_graph tests.test_clipping_subtree tests.test_parity004_p403_graph tests.test_parity004_p404_graph tests.test_parity004_p405_graph tests.test_parity004_p406_layout tests.test_parity004_p407 tests.test_parity004_p401_graph tests.test_parity004_clipping -v",
+        "pwsh -NoProfile -File .\\scripts\\check.ps1"
+      ],
+      "title": "Split GroupOperator proxy and render-source wiring",
+      "worker_acceptance": [
+        "At the GroupOperator lowering boundary, represent and wire the proxy/input stream and rendered/source stream as distinct endpoints, using each only at its intended wrapper or downstream boundary.",
+        "Preserve caller stream attachment and ensure downstream composition receives the rendered group source for isolated, Pass Through, nested isolated, and adjacent group cases.",
+        "Update the P4-05 fixture and focused test assertions to make the split explicit and to reject proxy/render-source cross-connections or nondeterministic wiring.",
+        "Preserve existing tool naming/layout conventions and the fixed shared-matte, Operator=In, ProcessAlpha=0, member-control, and single outer-boundary recipe.",
+        "Keep the change limited to the declared paths and leave state, evidence verdicts, external inputs, and unsupported semantics untouched."
+      ],
+      "write_paths": [
+        {
+          "path": "psd2fusion/fusion_comp.py",
+          "reason": "Implement the narrow GroupOperator proxy/render-source split at the existing lowering boundary."
+        },
+        {
+          "path": "scripts/parity/p4_05.py",
+          "reason": "Extend the focused group fixture/report to expose and validate the split."
+        },
+        {
+          "path": "tests/test_parity004_p405_graph.py",
+          "reason": "Add deterministic structural regression assertions for the four GroupOperator boundary cases."
+        }
+      ]
+    }
+  },
+  "role": "manager-plan",
+  "run_id": "p4-harness-1788420483-001-12d95190",
+  "schema": "codex-ephemeral-harness.role-evidence.v1",
+  "schema_version": 1,
+  "status": "COMPLETED",
+  "stderr_bytes": 197,
+  "stderr_sha256": "7eda639dbee046e0797ef4c30bfca95e4c61ecc519080e39c60fca205839af9d",
+  "stdout_bytes": 396567,
+  "stdout_sha256": "9ed11dc20121faa390bbe3649ec1060a8a20783a1c63455f3ef811e415d29241",
+  "thread_id": "01a0662e-2469-76f0-8b2d-0c591efde2a9",
+  "timestamp": "2026-09-03T07:37:33.414623Z",
+  "transcripts_forwarded": false,
+  "uncached_input_tokens": 86854,
+  "wall_time_ms": 358359
+}

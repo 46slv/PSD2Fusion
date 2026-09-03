@@ -1,0 +1,20 @@
+{
+  "adapter": "psd2fusion-parity-004",
+  "checkpoint": null,
+  "created_at": "2026-09-03T07:48:18.920926Z",
+  "discovery_round": 1,
+  "error": null,
+  "expansion_count": 0,
+  "patch_applied": false,
+  "phase": "DISCOVERY",
+  "plan_attempt": 0,
+  "recovered": false,
+  "repo_identity": "ee28cee08a380e2c",
+  "run_id": "p4-harness-1788421698-003-527d6135",
+  "schema": "codex-ephemeral-harness.cycle-state.v1",
+  "second_cycle": "NOT_RUN",
+  "status": "IN_PROGRESS",
+  "transition_applied": false,
+  "updated_at": "2026-09-03T07:51:08.996685Z",
+  "worker_attempt": 0
+}

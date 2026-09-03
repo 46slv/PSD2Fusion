@@ -1,0 +1,165 @@
+{
+  "budget": {
+    "max_total_bytes": 400000,
+    "max_total_results": 100
+  },
+  "repo_head": "a50370fe912aae80e0f6acbad5e33b0f2d0aeeca",
+  "requests": [
+    {
+      "index": 0,
+      "kind": "EXACT_FILE",
+      "max_bytes": 9000,
+      "max_results": 1,
+      "path_scopes": [
+        ".control/PARITY-004_TODO.md"
+      ],
+      "query": ".control/PARITY-004_TODO.md",
+      "reason": "Confirm the ordered PARITY-004 scope and current clipping recipe.",
+      "result_bytes": 8595,
+      "result_count": 1,
+      "truncated": false
+    },
+    {
+      "index": 1,
+      "kind": "EXACT_FILE",
+      "max_bytes": 7000,
+      "max_results": 1,
+      "path_scopes": [
+        "docs/PARITY_004_HOST_PIXEL_GATE.md"
+      ],
+      "query": "docs/PARITY_004_HOST_PIXEL_GATE.md",
+      "reason": "Confirm host/pixel gate constraints before planning the focused task.",
+      "result_bytes": 6554,
+      "result_count": 1,
+      "truncated": false
+    },
+    {
+      "index": 2,
+      "kind": "EXACT_FILE",
+      "max_bytes": 10000,
+      "max_results": 1,
+      "path_scopes": [
+        ".control/evidence/PARITY-004/20260903-p4-host-pixel-chbool/summary.json"
+      ],
+      "query": ".control/evidence/PARITY-004/20260903-p4-host-pixel-chbool/summary.json",
+      "reason": "Read the latest bounded evidence and blocker classification.",
+      "result_bytes": 0,
+      "result_count": 0,
+      "truncated": true
+    },
+    {
+      "index": 3,
+      "kind": "SYMBOL_SEARCH",
+      "max_bytes": 12000,
+      "max_results": 40,
+      "path_scopes": [
+        "psd2fusion/fusion_comp.py",
+        "tests/test_parity004_p405_graph.py",
+        "tests/test_parity004_p407.py",
+        "scripts/parity/p4_05.py"
+      ],
+      "query": "GroupOperator",
+      "reason": "Locate the implementation and focused structural coverage for the GroupOperator proxy/render-source split.",
+      "result_bytes": 1499,
+      "result_count": 5,
+      "truncated": false
+    },
+    {
+      "index": 4,
+      "kind": "CONTENT_SEARCH",
+      "max_bytes": 12000,
+      "max_results": 40,
+      "path_scopes": [
+        "psd2fusion/fusion_comp.py",
+        "scripts/resolve/PSD2Fusion.lua",
+        "scripts/parity/p4_05.py",
+        "tests/test_parity004_p405_graph.py"
+      ],
+      "query": "proxy|render_source|render-source|render source",
+      "reason": "Find existing proxy/render-source terminology and connection logic without requesting broad repository contents.",
+      "result_bytes": 0,
+      "result_count": 0,
+      "truncated": false
+    }
+  ],
+  "results": [
+    {
+      "binary": false,
+      "excerpt": "# PARITY-004 Fusion-first implementation TODO\r\n\r\nPurpose: finish grouped/default PSD clipping as a readable Fusion graph, then verify that the exact graph produces the required pixels in actual Fusion. Graph structure is a prerequisite, not pixel proof.\r\n\r\nDetailed remaining host/pixel procedure: `docs/PARITY_004_HOST_PIXEL_GATE.md`.\r\n\r\n## Working rule\r\n\r\nWork the remaining gates in order. Preserve the already-published P4-03 through P4-07 structural candidate unless host/pixel evidence identifies a concrete defect. Prefer ordinary Fusion Loader / Merge / mask connections and readable Flow structure. Do not add a new abstraction layer merely because a proof gate is pending.\r\n\r\nDo not start `PARITY-005`, `PARITY-006`, or a broad compiler/planner redesign before the first P4-09 baseline unless the current graph cannot load/render and the blocker is already localized to that architecture boundary.\r\n\r\n## Current recipe\r\n\r\nCanonical grouped/default `clbl=true` candidate:\r\n\r\n```text\r\nbase Loader\r\n  -> fixed base matte reused by every member\r\n  -> one ClipIn Merge (`Operator=In`) per member\r\n  -> local ClipStack Merge per member (`ProcessAlpha=0`)\r\n  -> one outer chain Merge with base blend/overall opacity\r\n```\r\n\r\nThe direct Effect Mask candidate was rejected for partial base alpha because ordinary source-over would expand coverage without an additional alpha-preserving stage.\r\n\r\n## P4-01 — Simplest 1:1 clipping recipe\r\n\r\nStatus: `STRUCTURAL_COMPLETE / HOST_PIXEL_PENDING`\r\n\r\nSelected candidate: explicit fixed-matte `Operator=In` lowering.\r\n\r\nStructural evidence proves one base + one member lowers with no outer backdrop inside the local clipping operation. Pixel truth remains subject to P4-HOST-PIXEL.\r\n\r\nEvidence: `scripts/parity/p4_01.py`, `tests/test_parity004_p401_graph.py` and committed P4-01 evidence.\r\n\r\n## P4-02 — Multiple clipped members share one base matte\r\n\r\nStatus: `STRUCTURAL_COMPLETE / HOST_PIXEL_PENDING`\r\n\r\nAll members reuse the exact same base coverage. Member order follows PSD bottom-to-top order. The progressively composited local result is never used as the next member matte.\r\n\r\nEvidence:\r\n\r\n- `scripts/parity/p4_02.py`;\r\n- `psd2fusion/fusion_comp.py` strict contiguous-span handling;\r\n- `tests/test_parity004_p402_graph.py`.\r\n\r\n## P4-03 — Member blend and opacity placement\r\n\r\nStatus: `STRUCTURAL_COMPLETE / HOST_PIXEL_PENDING`\r\n\r\nMember `ApplyMode` and `Blend` controls live on each local ClipStack Merge. The fixed ClipIn remains `Operator=In`, Normal, Blend 1. Structural fixtures cover Normal, Multiply, Linear Dodge, Overlay and 25/50/75/100% member opacity.\r\n\r\nEvidence: `scripts/parity/p4_03.py`, `tests/test_parity004_p403_graph.py`.\r\n\r\n## P4-04 — Base blend and opacity boundary\r\n\r\nStatus: `STRUCTURAL_COMPLETE / HOST_PIXEL_PENDING`\r\n\r\nThe completed local stack enters exactly one outer chain Merge. That Merge owns the base blend and overall opacity once.\r\n\r\nEvidence: `scripts/parity/p4_04.py`, `tests/test_parity004_p404_graph.py`.\r\n\r\n## P4-05 — Groups and nesting\r\n\r\nStatus: `STRUCTURAL_COMPLETE / HOST_PIXEL_PENDING`\r\n\r\nThe same clipping recipe is structurally covered inside isolated and Pass Through groups, nested isolated groups, and clipping spans adjacent to group boundaries. Existing GroupOperator stream attachment remains unchanged.\r\n\r\nEvidence: `scripts/parity/p4_05.py`, `tests/test_parity004_p405_graph.py`.\r\n\r\n## P4-06 — Fusion Flow layout\r\n\r\nStatus: `COMPLETE`\r\n\r\nClipping member Loaders use deterministic rows above the base; ClipIn/ClipStack pairs are clustered; the fixed matte connection is visible; one outer Merge exits the cluster; GroupOperator boundaries remain visually distinct.\r\n\r\nEvidence: `scripts/parity/p4_06.py`, `tests/test_parity004_p406_layout.py`.\r\n\r\n## P4-07 — Apply the recipe to the real PSD\r\n\r\nStatus: `STRUCTURAL_COMPLETE / HOST_PIXEL_PENDING`\r\n\r\nThe read-only `D:\\Downloads\\a.psd` currently expands to:\r\n\r\n- 23 default/true clipping chains;\r\n- 59 clipped members;\r\n- 34 groups;\r\n- 363 generated Fusion tools.\r\n\r\nAll chains pass structural fixed-matte, `Operator=In`, `ProcessAlpha=0`, member-control and one-outer-boundary checks. Representative chains span one-to-six members and nesting depths 2-4.\r\n\r\nEvidence: `scripts/parity/p4_07.py`, committed P4-07/P4-03-through-P4-07 evidence, with full outputs kept under ignored `.local/`.\r\n\r\n## P4-08 — Ordinary Fusion load/readback sanity\r\n\r\nStatus: `PENDING — NEXT`\r\n\r\nUse a new Resolve/Fusion launch and new project when practical; a known disposable test project is also acceptable.\r\n\r\nRequired checks:\r\n\r\n- `.comp` loads;\r\n- Loader paths resolve;\r\n- MediaOut receives the final stream;\r\n- representative GroupOperator and clipping connections survive;\r\n- `ApplyMode`, `Blend`, `Operator=In`, `ProcessAlpha=0`, and Loader `PostMultiply` survive readback/reload;\r\n- no missing/invalid tools are introduced;\r\n- record exact candidate commit and Resolve/Fusion version.\r\n\r\nP4-08 may establish `host_loaded`. It cannot establish `pixel_verified`.\r\n\r\n## P4-HOST-PIXEL — Minimum actual-Fusion pixel gate\r\n\r\nStatus: `PENDING — REQUIRED BEFORE REAL P4-09 INTERPRETATION`\r\n\r\nRender deterministic micro fixtures in actual Fusion before diagnosing the full real PSD. At minimum cover:\r\n\r\n- Loader straight/premult and `PostMultiply` boundary;\r\n- `Operator=In` with fractional base/member alpha;\r\n- `ProcessAlpha=0` fixed-alpha invariant;\r\n- Normal / Multiply / Linear Dodge / Overlay member modes;\r\n- 25/50/75/100% member opacity;\r\n- base opacity and at least one non-Normal base mode;\r\n- transparent / black / white / colored outer backdrops.\r\n\r\nUse the existing comparator. Record actual rendered artifact hashes and RGBA/alpha metrics. Graph text or host readback alone is not pixel evidence.\r\n\r\nFull procedure: `docs/PARITY_004_HOST_PIXEL_GATE.md`.\r\n\r\n## P4-09 — Real Fusion render / golden-reference baseline\r\n\r\nStatus: `PENDING`\r\n\r\nAfter P4-08 and a usable micro pixel gate, render the current real graph and compare it directly with `D:\\Downloads\\20260812.png`.\r\n\r\nThe first run is a diagnostic baseline, not a requirement to pass immediately. Classify material differences before editing compositor math. Possible categories include color/profile, alpha/premult edge, blend family, one clipping chain, isolated/Pass Through group scope, placement/canvas, asset materialization, or unsupported semantics.\r\n\r\nFor a material failure:\r\n\r\n1. reduce it to the smallest deterministic fixture;\r\n2. repair the smallest responsible boundary;\r\n3. rerun that focused fixture;\r\n4. rerun the real comparison;\r\n5. retain before/after metrics.\r\n\r\nDo not fit the reference by threshold relaxation, global grade, resize, blur, flatten, or whole-image correction.\r\n\r\n## Known architecture debt — observe, do not preemptively redesign\r\n\r\nTwo known debts remain visible:\r\n\r\n1. Evaluation IR / capability decisions currently do not drive backend selection before graph compilation;\r\n2. asset materialization still needs an explicitly verified ICC / straight-premult / transparent-RGB contract.\r\n\r\nDo not ignore these. Also do not perform a broad rewrite before the first host/pixel baseline merely because they exist. Use actual Fusion evidence to determine whether either is causal. Before adding multiple backends, custom operations, verified bake paths or broader PSD feature support, capability planning must be connected to lowering so strict mode cannot silently emit an unverified backend.\r\n\r\n## Out of scope until PARITY-004 closes\r\n\r\n- explicit `clbl=false` semantics (`PARITY-005`);\r\n- broad real-PSD convergence work before the first P4-09 baseline (`PARITY-006`);\r\n- new PSD importer mechanism;\r\n- Photoshop automation as a dependency;\r\n- blind reference fitting;\r\n- unrelated PSD feature expansion.\r\n\r\n## Immediate next action\r\n\r\nRun P4-08 on the published current candidate. If it loads, run the minimum actual-Fusion pixel gate. Then take the first P4-09 real baseline. Keep `PARITY-004` `in_progress` unti\n[TRUNCATED]",
+      "file_bytes": 8065,
+      "kind": "EXACT_FILE",
+      "line_end": 171,
+      "line_start": 1,
+      "path": ".control/PARITY-004_TODO.md",
+      "request_index": 0,
+      "sha256": "2e734a224d5517064f8ac9d79189b93504cb31fa6ab843fc1e2fda6d1d828470",
+      "truncated": true
+    },
+    {
+      "binary": false,
+      "excerpt": "# PARITY-004 host and pixel gate\r\n\r\nStatus: active execution contract for the remaining host/pixel portion of `PARITY-004`.\r\n\r\nThis document starts from the already-published structural candidate. Do not roll back P4-03 through P4-07 merely because host/pixel proof is still pending. Those items are structural evidence for the candidate graph; they are not pixel proof.\r\n\r\n## Current structural baseline\r\n\r\nThe current grouped/default clipping candidate is:\r\n\r\n```text\r\nbase Loader\r\n  -> fixed base matte reused by every member\r\n  -> one ClipIn Merge (`Operator=In`) per member\r\n  -> local ClipStack Merge per member (`ProcessAlpha=0`)\r\n  -> one outer chain Merge with base blend/overall opacity\r\n```\r\n\r\nThe real `a.psd` structural audit covers 23 clipping chains, 59 clipped members, 34 groups, and the current 422-tool generated graph (the 59 additional tools are the explicit RGB/alpha boundary nodes). Preserve this candidate until host/pixel evidence identifies a concrete defect.\n\r\n## Mandatory execution order\r\n\r\nRun the remaining work in this order:\r\n\r\n```text\r\nP4-08 ordinary Fusion load/readback\r\n-> P4-HOST-PIXEL micro fixtures\r\n-> P4-09 real PSD render/reference comparison\r\n-> smallest evidence-driven repair, if needed\r\n-> rerun micro fixture then real comparison\r\n```\r\n\r\nDo not start `PARITY-005`, `PARITY-006`, or a broad compiler/planner redesign before the first P4-09 baseline unless the current graph cannot load/render at all and the blocker is already localized to such a boundary.\r\n\r\n## P4-08 — ordinary Fusion load/readback\r\n\r\nUse a new Resolve/Fusion launch and a new project when practical. Reusing a known disposable test project is also acceptable. Treat the real PSD/reference as read-only.\r\n\r\nRequired checks:\r\n\r\n- generated `.comp` loads;\r\n- Loader paths resolve;\r\n- MediaOut receives the final stream;\r\n- expected tool count and representative GroupOperator/clipping connections survive load;\r\n- `ApplyMode`, `Blend`, `Operator=In`, `ProcessAlpha=0`, and Loader `PostMultiply` survive readback/reload;\r\n- no invalid/missing tools are introduced;\r\n- save/reload does not silently rewrite the semantic controls;\r\n- record exact Resolve/Fusion version and candidate commit.\r\n\r\nUseful product telemetry, when cheaply available:\r\n\r\n- load time;\r\n- first Viewer display time;\r\n- basic Flow interaction responsiveness;\r\n- save/reload success;\r\n- existing-comp paste/undo preservation.\r\n\r\nP4-08 earns `host_loaded` evidence only. It never earns `pixel_verified`.\r\n\r\n## P4-HOST-PIXEL — minimum Fusion pixel gate\r\n\r\nBefore rendering the full real PSD, render small deterministic RGBA fixtures in actual Fusion. Reuse the existing comparator and fixture semantics; do not create a second comparison standard.\r\n\r\nMinimum cases:\r\n\r\n### A. Loader alpha boundary\r\n\r\n- straight/premult expectation;\r\n- Loader `PostMultiply` behavior;\r\n- transparent and partially transparent pixels.\r\n\r\n### B. `Operator=In` coverage\r\n\r\n- base alpha: `0, .25, .5, .75, 1`;\r\n- member alpha: `0, .5, 1`;\r\n- verify clipped output cannot expand beyond base coverage.\r\n\r\n### C. `ProcessAlpha=0`\r\n\r\n- after each local member Merge, span alpha remains the fixed base coverage.\r\n\r\n### D. member controls\r\n\r\n- Normal;\r\n- Multiply;\r\n- Linear Dodge;\r\n- Overlay;\r\n- member opacity `.25, .5, .75, 1`.\r\n\r\n### E. outer boundary\r\n\r\n- base opacity `0, .5, 1`;\r\n- at least one non-Normal base mode;\r\n- transparent, black, white, and colored outer backdrops.\r\n\r\nFor every rendered fixture record candidate commit, host/version, project/color settings, render format, artifact path/hash, RGBA/alpha metrics, and whether the case passed. Graph text/readback is not a substitute for rendered pixels.\r\n\r\n## P4-09 — real PSD baseline\r\n\r\nAfter the micro pixel gate is usable, render the current real 422-tool graph from the same candidate family and compare it directly with the qualified `D:\\Downloads\\20260812.png` reference.\n\r\nThe first P4-09 run is a diagnostic baseline, not a requirement to pass immediately. Partition the difference before changing compositor math.\r\n\r\nClassify material differences into the smallest useful category, for example:\r\n\r\n- global/profile/working-space difference;\r\n- alpha/premultiply edge difference;\r\n- one blend mode family;\r\n- one clipping chain or coverage boundary;\r\n- isolated group only;\r\n- Pass Through group only;\r\n- placement/crop/canvas difference;\r\n- asset materialization difference;\r\n- unsupported PSD semantics.\r\n\r\nDo not fit the reference by changing thresholds, grading, resizing, blurring, flattening, or applying a whole-image correction.\r\n\r\n## Evidence-driven repair rule\r\n\r\nWhen a material failure is localized:\r\n\r\n1. reduce it to the smallest deterministic fixture;\r\n2. repair the smallest responsible boundary;\r\n3. rerun the focused micro fixture;\r\n4. rerun the real P4-09 comparison;\r\n5. retain before/after metrics.\r\n\r\nDo not redesign unrelated architecture around a failure that has not been localized.\r\n\r\n## Deferred architecture work\r\n\r\nTwo known design debts remain visible but are not automatic blockers for the first host/pixel baseline:\r\n\r\n1. `Evaluation IR` / capability decisions are currently produced after graph compilation and do not yet drive backend selection;\r\n2. asset materialization still needs an explicitly verified ICC/straight-premult/transparent-RGB contract.\r\n\r\nUse host/pixel evidence to decide whether either debt is causal. Before adding multiple backends, custom operations, verified bake paths, or broader PSD feature support, connect capability planning to lowering so strict mode cannot silently emit an unverified backend.\r\n\r\n## Stop conditions\r\n\r\nStop and report instead of advancing when:\r\n\r\n- P4-08 cannot load the current artifact and the blocker is not yet localized;\r\n- the micro pixel gate exposes an unresolved Loader/alpha/color contract;\r\n- the real baseline shows a material failure that has not yet been reduced to a fixture;\r\n- required host/reference evidence is unavailable.\r\n\r\n`PARITY-\n[TRUNCATED]",
+      "file_bytes": 6117,
+      "kind": "EXACT_FILE",
+      "line_end": 149,
+      "line_start": 1,
+      "path": "docs/PARITY_004_HOST_PIXEL_GATE.md",
+      "request_index": 1,
+      "sha256": "40ed360c970afffdce944a4434b71d1bb82d8fc97a70dec6ddac616339eebd17",
+      "truncated": true
+    },
+    {
+      "excerpt": "        \"%s = GroupOperator {\" % name,",
+      "kind": "SYMBOL_SEARCH",
+      "line_end": 344,
+      "line_start": 344,
+      "path": "psd2fusion/fusion_comp.py",
+      "request_index": 3,
+      "sha256": "5d2c39c80575325f38947b2ff15c1bdf0e2df314c6363110825639bd2013bcb3",
+      "truncated": false
+    },
+    {
+      "excerpt": "        # GroupOperator input. The wrapper is organizational; child Merge nodes",
+      "kind": "SYMBOL_SEARCH",
+      "line_end": 460,
+      "line_start": 460,
+      "path": "psd2fusion/fusion_comp.py",
+      "request_index": 3,
+      "sha256": "5d2c39c80575325f38947b2ff15c1bdf0e2df314c6363110825639bd2013bcb3",
+      "truncated": false
+    },
+    {
+      "excerpt": "                # The GroupOperator consumes the caller's stream through its",
+      "kind": "SYMBOL_SEARCH",
+      "line_end": 513,
+      "line_start": 513,
+      "path": "psd2fusion/fusion_comp.py",
+      "request_index": 3,
+      "sha256": "5d2c39c80575325f38947b2ff15c1bdf0e2df314c6363110825639bd2013bcb3",
+      "truncated": false
+    },
+    {
+      "excerpt": "where the local chain and its one outer Merge live relative to GroupOperator,",
+      "kind": "SYMBOL_SEARCH",
+      "line_end": 4,
+      "line_start": 4,
+      "path": "scripts/parity/p4_05.py",
+      "request_index": 3,
+      "sha256": "0b8ec3eaeb9bb1ab1a1ba5c3ceeb3c35fe67f98dd9050dcc63c8f4e9b2f9922b",
+      "truncated": false
+    },
+    {
+      "excerpt": "        groups = [tool for tool in tools if tool[\"type\"] == \"GroupOperator\"]",
+      "kind": "SYMBOL_SEARCH",
+      "line_end": 294,
+      "line_start": 294,
+      "path": "scripts/parity/p4_05.py",
+      "request_index": 3,
+      "sha256": "0b8ec3eaeb9bb1ab1a1ba5c3ceeb3c35fe67f98dd9050dcc63c8f4e9b2f9922b",
+      "truncated": false
+    }
+  ],
+  "schema": "codex-ephemeral-harness.discovery-packet.v2",
+  "skipped_large_files": 0,
+  "total_bytes": 16648,
+  "total_results": 7
+}

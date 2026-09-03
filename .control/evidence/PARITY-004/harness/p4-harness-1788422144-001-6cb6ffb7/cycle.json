@@ -1,0 +1,137 @@
+{
+  "adapter": "psd2fusion-parity-004",
+  "checkpoint": {
+    "task": {
+      "run_id": "p4-harness-1788422144-001-6cb6ffb7",
+      "schema": "codex-ephemeral-harness.task.v2",
+      "selected_by": "manager",
+      "task": {
+        "acceptance": [
+          "The narrow GroupOperator proxy/render-source split is implemented within the scoped files.",
+          "Existing grouped/default clipping topology and structural semantics remain preserved.",
+          "Runner can independently verify the focused structural regression without external PSD or reference-image materialization.",
+          "PARITY-004 remains in_progress pending the ordered Fusion host/pixel gates and fresh verification."
+        ],
+        "completion_scope": "TRANCHE",
+        "constraints": [
+          "Use commit a65339563dce878f0e3ddf438f811d00c50109a5 as the candidate baseline.",
+          "Change only the declared write paths.",
+          "Keep the fixed base matte, ClipIn Operator=In, local ClipStack ProcessAlpha=0, member controls, and single outer chain Merge semantics unchanged.",
+          "Cover absent/default true and explicit true clbl only; do not implement or claim clbl=false.",
+          "Do not materialize D:\\Downloads\\a.psd or D:\\Downloads\\20260812.png into worker context.",
+          "Do not perform broad compiler/planner redesign, importer changes, Photoshop automation, blind reference fitting, or unrelated PSD feature work.",
+          "Do not claim actual Fusion load, pixel verification, or P4-09 completion from structural evidence alone."
+        ],
+        "context_budget": {
+          "max_discovery_rounds": 0,
+          "max_files": 11,
+          "max_handoff_files": 1,
+          "max_total_bytes": 240000
+        },
+        "evidence_required": [
+          "A focused structural report covers direct, isolated, Pass Through, nested isolated, and adjacent group cases with distinct GroupOperator ownership and preserved clipping-island boundaries.",
+          "Runner records focused unittest and repository check results, exit status, candidate commit, and the final changed-path set.",
+          "The resulting evidence distinguishes structural verification from the still-pending P4-08, P4-HOST-PIXEL, and P4-09 gates.",
+          "Submission is awaiting_verification; no PARITY-004 state transition is asserted by the worker."
+        ],
+        "goal_done_when": [
+          "P4-08 records ordinary Fusion load/readback for the candidate, including representative GroupOperator and clipping connections and relevant control readback.",
+          "P4-HOST-PIXEL records actual Fusion micro-render hashes and RGBA/alpha metrics for the required alpha, blend, opacity, backdrop, and Loader boundaries.",
+          "P4-09 compares the real render against D:\\Downloads\\20260812.png and classifies any material difference before any localized repair.",
+          "A fresh verifier PASS authorizes PARITY-004 transition; until then PARITY-004 stays in_progress."
+        ],
+        "goal_item_id": "PARITY-004",
+        "handoff_refs": [
+          {
+            "path": ".control/evidence/PARITY-004/harness/p4-harness-1788421698-003-527d6135/discovery.json",
+            "reason": "Bounded discovery evidence for the GroupOperator split scope and focused P4-05/P4-07 structural coverage.",
+            "sha256": "b589200d1e5713704fc33a8c551a254af446cd208358991d0e6f8e3cf393cafc"
+          }
+        ],
+        "id": "devexec-psd2fusion-p004-20260903",
+        "non_goals": [
+          "Fusion/Resolve host execution or pixel parity validation in this tranche.",
+          "Closing PARITY-004 or advancing to PARITY-005/PARITY-006.",
+          "Changing explicit false clbl semantics.",
+          "Broad graph/compiler architecture redesign or new backend work."
+        ],
+        "objective": "Implement the narrow GroupOperator proxy/render-source split after the published clipping-island candidate, making group-boundary and render-source attachment explicit while preserving the existing grouped/default clbl=true clipping topology and leaving host/pixel verification to the ordered downstream gates.",
+        "read_paths": [
+          {
+            "path": ".control/PARITY-004_TODO.md",
+            "reason": "Immutable PARITY-004 contract, ordered gate sequence, clipping recipe, and scope constraints."
+          },
+          {
+            "path": "docs/PARITY_004_HOST_PIXEL_GATE.md",
+            "reason": "Immutable host/pixel procedure and evidence boundary that this structural tranche must preserve."
+          },
+          {
+            "path": "tests/test_parity004_p407.py",
+            "reason": "Read-only real-PSD structural regression expectations that must remain intact."
+          },
+          {
+            "path": "scripts/check.ps1",
+            "reason": "Repository-supported offline verification entrypoint."
+          }
+        ],
+        "runner_acceptance": [
+          "Run the commands declared in tests under the stated test environment and capture their output and exit statuses.",
+          "Confirm the P4-05 report and assertions cover direct, isolated, Pass Through, nested isolated, and adjacent cases, including distinct group ownership and clipping topology.",
+          "Confirm only the declared write paths changed and that no external PSD/reference inputs were materialized.",
+          "Record the candidate commit and leave host/pixel claims unresolved until their dedicated gates."
+        ],
+        "test_env": {
+          "PYTHONIOENCODING": "utf-8",
+          "base_commit": "a65339563dce878f0e3ddf438f811d00c50109a5",
+          "branch": "codex/parity-004",
+          "external_inputs": "D:\\Downloads\\a.psd and D:\\Downloads\\20260812.png remain read-only and are not materialized",
+          "python": "repository-supported Python runtime",
+          "resolve_fusion": "not required for this structural tranche",
+          "shell": "PowerShell",
+          "working_directory": "repository root"
+        },
+        "tests": [
+          "python -m unittest -v tests.test_parity004_p405_graph tests.test_parity004_p407",
+          "pwsh -NoProfile -File scripts/check.ps1"
+        ],
+        "title": "Implement GroupOperator proxy/render-source split",
+        "worker_acceptance": [
+          "Make the GroupOperator proxy and render-source references or attachments explicit at the existing group stream boundary, with the actual render source used for downstream stream wiring and the proxy retained for group-boundary semantics.",
+          "Preserve distinct ownership and correct stream attachment for direct, isolated, Pass Through, nested isolated, and adjacent group cases.",
+          "Update the focused P4-05 structural fixture and assertions to encode the split without changing the published clipping-island recipe.",
+          "Keep changes limited to the three declared implementation paths and submit the result for verification rather than marking the goal done."
+        ],
+        "write_paths": [
+          {
+            "path": "psd2fusion/fusion_comp.py",
+            "reason": "Implement the minimal GroupOperator proxy/render-source split at the existing stream-attachment boundary."
+          },
+          {
+            "path": "scripts/parity/p4_05.py",
+            "reason": "Extend the focused group/nesting structural fixture and audit for the split."
+          },
+          {
+            "path": "tests/test_parity004_p405_graph.py",
+            "reason": "Add focused structural assertions for GroupOperator ownership, proxy/render-source wiring, and clipping boundaries."
+          }
+        ]
+      }
+    }
+  },
+  "created_at": "2026-09-03T07:55:44.979700Z",
+  "discovery_round": 2,
+  "error": "duplicate role evidence conflicts with retained record: D:\\Documents\\PSD2Fusion\\.control\\evidence\\PARITY-004\\harness\\p4-harness-1788422144-001-6cb6ffb7\\manager-plan.json",
+  "expansion_count": 0,
+  "patch_applied": false,
+  "phase": "MANAGER_PLAN",
+  "plan_attempt": 2,
+  "recovered": true,
+  "repo_identity": "ee28cee08a380e2c",
+  "run_id": "p4-harness-1788422144-001-6cb6ffb7",
+  "schema": "codex-ephemeral-harness.cycle-state.v1",
+  "second_cycle": "NOT_RUN",
+  "status": "BLOCKED",
+  "transition_applied": false,
+  "updated_at": "2026-09-03T08:18:56.655143Z",
+  "worker_attempt": 0
+}

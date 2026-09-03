@@ -1,0 +1,98 @@
+{
+  "cached_input_tokens": 167680,
+  "ephemeral": true,
+  "exit_code": 0,
+  "input_tokens": 217321,
+  "isolation": {
+    "allowed_workspace_read": true,
+    "allowed_workspace_write": false,
+    "backend": "codex-split-filesystem-profile",
+    "canonical_external_read": "DENIED",
+    "codex_executable": "C:\\Users\\shiro\\AppData\\Local\\OpenAI\\Codex\\bin\\b99306303521e97e\\codex.exe",
+    "command_exit_code": 0,
+    "exact_write": "DENIED",
+    "forbidden_external_read": "DENIED",
+    "legacy_sandbox_mode_used": false,
+    "outside_write": "DENIED",
+    "platform": "win32",
+    "probe_mode": "codex-exec",
+    "profile_name": "ceh_manager_locate_8f083eee58ee",
+    "readonly_write": "DENIED",
+    "runtime_executable": "C:\\Users\\shiro\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\python\\python.exe",
+    "status": "PROVEN",
+    "stderr_bytes": 197,
+    "stderr_sha256": "001a78172ba7cbc573b2ce9f2798f934da19bf06d2082d63a42f23d2b1a96f17",
+    "stdout_bytes": 2044,
+    "stdout_sha256": "11a7e05cbc3fac432636ffba88920d2c2cdd29a41c9b062a17033146576d69f8",
+    "wall_time_ms": 17531,
+    "workspace_access": "read",
+    "write_path_read": "PASS"
+  },
+  "isolation_profile": "ceh_manager_locate_8f083eee58ee",
+  "isolation_status": "PROVEN",
+  "model_visible_bytes": 113909,
+  "model_visible_file_count": 4,
+  "output_tokens": 6387,
+  "protocol_errors": [],
+  "result": {
+    "goal_item_id": "PARITY-004",
+    "requests": [
+      {
+        "kind": "EXACT_FILE",
+        "max_bytes": 46000,
+        "max_results": 1,
+        "path_scopes": [
+          "psd2fusion/fusion_comp.py"
+        ],
+        "query": "",
+        "reason": "Inspect the existing GroupOperator construction and stream-attachment boundary."
+      },
+      {
+        "kind": "EXACT_FILE",
+        "max_bytes": 16000,
+        "max_results": 1,
+        "path_scopes": [
+          "scripts/parity/p4_05.py"
+        ],
+        "query": "",
+        "reason": "Inspect the focused isolated, Pass Through, nested, and adjacent group structural fixture."
+      },
+      {
+        "kind": "EXACT_FILE",
+        "max_bytes": 3000,
+        "max_results": 1,
+        "path_scopes": [
+          "tests/test_parity004_p405_graph.py"
+        ],
+        "query": "",
+        "reason": "Inspect focused GroupOperator and clipping-topology assertions to extend deterministically."
+      },
+      {
+        "kind": "EXACT_FILE",
+        "max_bytes": 1500,
+        "max_results": 1,
+        "path_scopes": [
+          "tests/test_parity004_p407.py"
+        ],
+        "query": "",
+        "reason": "Confirm the real-PSD structural regression expectations that must remain intact."
+      }
+    ],
+    "status": "DISCOVERY_REQUESTED",
+    "summary": "Selected active PARITY-004. The bounded next task is the narrow GroupOperator proxy/render-source split; preserve the published clipping topology, keep host/pixel claims unresolved, and re-check the actual repository HEAD before editing."
+  },
+  "role": "manager-locate",
+  "run_id": "p4-harness-1788421545-002-77992bf4",
+  "schema": "codex-ephemeral-harness.role-evidence.v1",
+  "schema_version": 1,
+  "status": "DISCOVERY_REQUESTED",
+  "stderr_bytes": 197,
+  "stderr_sha256": "a69525ac8e6d67c9aa45cfacd8ed53316ef88fc06409590e00392fb2b67fa1a7",
+  "stdout_bytes": 210651,
+  "stdout_sha256": "c8d1d1fe28592682d5c5e9fb24a06ac8ef58f2e4d3bfa78316e60c0d37b71cc9",
+  "thread_id": "01a0663b-6590-7440-b761-6f856b6db365",
+  "timestamp": "2026-09-03T07:48:18.854166Z",
+  "transcripts_forwarded": false,
+  "uncached_input_tokens": 49641,
+  "wall_time_ms": 135235
+}

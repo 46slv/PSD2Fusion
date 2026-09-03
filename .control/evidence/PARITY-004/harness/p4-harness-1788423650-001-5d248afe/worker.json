@@ -1,0 +1,79 @@
+{
+  "cached_input_tokens": 2574848,
+  "ephemeral": true,
+  "exit_code": 0,
+  "input_tokens": 2720041,
+  "isolation": {
+    "allowed_workspace_read": true,
+    "allowed_workspace_write": true,
+    "backend": "codex-split-filesystem-profile",
+    "canonical_external_read": "DENIED",
+    "codex_executable": "C:\\Users\\shiro\\AppData\\Local\\OpenAI\\Codex\\bin\\b99306303521e97e\\codex.exe",
+    "command_exit_code": 0,
+    "exact_write": "PASS",
+    "forbidden_external_read": "DENIED",
+    "legacy_sandbox_mode_used": false,
+    "outside_write": "DENIED",
+    "platform": "win32",
+    "probe_mode": "codex-exec",
+    "profile_name": "ceh_worker_afa3dd2998c8",
+    "readonly_write": "DENIED",
+    "runtime_executable": "C:\\Users\\shiro\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\python\\python.exe",
+    "status": "PROVEN",
+    "stderr_bytes": 197,
+    "stderr_sha256": "a2f5cad4a2d7aef3c476ee8ec2edde0c3f0d68e4cb0c670597245bde7238f892",
+    "stdout_bytes": 1904,
+    "stdout_sha256": "2a6c8bb0410e9049754cc8b71abc1f2ce97405296be80d6c3eab49ee10908e86",
+    "wall_time_ms": 23078,
+    "workspace_access": "write",
+    "write_path_read": "PASS"
+  },
+  "isolation_profile": "ceh_worker_afa3dd2998c8",
+  "isolation_status": "PROVEN",
+  "model_visible_bytes": 96159,
+  "model_visible_file_count": 11,
+  "output_tokens": 47390,
+  "protocol_errors": [],
+  "result": {
+    "canonical_patch_applied": false,
+    "evidence": [
+      {
+        "kind": "implementation",
+        "path": "C:\\Users\\shiro\\AppData\\Local\\Temp\\ceh-p4-harness-1788423650-001-5d248afe-worker-7i4v5p1e\\psd2fusion\\fusion_comp.py",
+        "summary": "Implemented explicit GroupOperator proxy/render-source boundaries and nested stream attachment handling."
+      },
+      {
+        "kind": "fixture",
+        "path": "C:\\Users\\shiro\\AppData\\Local\\Temp\\ceh-p4-harness-1788423650-001-5d248afe-worker-7i4v5p1e\\scripts\\parity\\p4_05.py",
+        "summary": "Added direct coverage and deterministic ownership/attachment reporting."
+      },
+      {
+        "kind": "tests",
+        "path": "C:\\Users\\shiro\\AppData\\Local\\Temp\\ceh-p4-harness-1788423650-001-5d248afe-worker-7i4v5p1e\\tests\\test_parity004_p405_graph.py",
+        "summary": "Added structural assertions for the split and ownership."
+      }
+    ],
+    "notes": [
+      "Only the three declared write paths changed.",
+      "Runner-owned tests and scripts/check.ps1 were not run, as required by the isolated Worker contract.",
+      "PARITY-004 host/pixel verification remains unresolved."
+    ],
+    "requested_context": [],
+    "status": "DONE",
+    "summary": "Implemented the bounded GroupOperator proxy/render-source split and P4-05 structural coverage."
+  },
+  "role": "worker",
+  "run_id": "p4-harness-1788423650-001-5d248afe",
+  "schema": "codex-ephemeral-harness.role-evidence.v1",
+  "schema_version": 1,
+  "status": "DONE",
+  "stderr_bytes": 197,
+  "stderr_sha256": "1725d9535f8f9669d5145809f60c8f1217160273c584414c6c3a9cf475d4e0d0",
+  "stdout_bytes": 366922,
+  "stdout_sha256": "1d8ebd308c0ff039c812587dad7ba15203d2c858ea88a566178734fa583788cc",
+  "thread_id": "01a06662-4bac-7c42-8b13-6f31152ebfe1",
+  "timestamp": "2026-09-03T08:45:14.285931Z",
+  "transcripts_forwarded": false,
+  "uncached_input_tokens": 145193,
+  "wall_time_ms": 1001312
+}

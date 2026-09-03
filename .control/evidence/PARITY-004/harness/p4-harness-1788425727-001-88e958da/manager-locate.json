@@ -1,0 +1,98 @@
+{
+  "cached_input_tokens": 166656,
+  "ephemeral": true,
+  "exit_code": 0,
+  "input_tokens": 213317,
+  "isolation": {
+    "allowed_workspace_read": true,
+    "allowed_workspace_write": false,
+    "backend": "codex-split-filesystem-profile",
+    "canonical_external_read": "DENIED",
+    "codex_executable": "C:\\Users\\shiro\\AppData\\Local\\OpenAI\\Codex\\bin\\b99306303521e97e\\codex.exe",
+    "command_exit_code": 0,
+    "exact_write": "DENIED",
+    "forbidden_external_read": "DENIED",
+    "legacy_sandbox_mode_used": false,
+    "outside_write": "DENIED",
+    "platform": "win32",
+    "probe_mode": "codex-exec",
+    "profile_name": "ceh_manager_locate_ae1c9a602712",
+    "readonly_write": "DENIED",
+    "runtime_executable": "C:\\Users\\shiro\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\python\\python.exe",
+    "status": "PROVEN",
+    "stderr_bytes": 197,
+    "stderr_sha256": "ca3dffce40136afd33780b3009640a8ad5e89a3a1839b4eac61fa7835561aac9",
+    "stdout_bytes": 2049,
+    "stdout_sha256": "191815f0f7677f003f61eb1e7b372abd2e184441f69b807584933c8698994462",
+    "wall_time_ms": 18640,
+    "workspace_access": "read",
+    "write_path_read": "PASS"
+  },
+  "isolation_profile": "ceh_manager_locate_ae1c9a602712",
+  "isolation_status": "PROVEN",
+  "model_visible_bytes": 88118,
+  "model_visible_file_count": 4,
+  "output_tokens": 4637,
+  "protocol_errors": [],
+  "result": {
+    "goal_item_id": "PARITY-004",
+    "requests": [
+      {
+        "kind": "EXACT_FILE",
+        "max_bytes": 46000,
+        "max_results": 1,
+        "path_scopes": [
+          "psd2fusion/fusion_comp.py"
+        ],
+        "query": "psd2fusion/fusion_comp.py",
+        "reason": "Inspect the existing GroupOperator construction and stream-attachment boundary."
+      },
+      {
+        "kind": "EXACT_FILE",
+        "max_bytes": 16000,
+        "max_results": 1,
+        "path_scopes": [
+          "scripts/parity/p4_05.py"
+        ],
+        "query": "scripts/parity/p4_05.py",
+        "reason": "Inspect the focused direct, isolated, Pass Through, nested, and adjacent-group structural fixture."
+      },
+      {
+        "kind": "EXACT_FILE",
+        "max_bytes": 3000,
+        "max_results": 1,
+        "path_scopes": [
+          "tests/test_parity004_p405_graph.py"
+        ],
+        "query": "tests/test_parity004_p405_graph.py",
+        "reason": "Inspect focused GroupOperator and clipping-topology assertions to extend deterministically."
+      },
+      {
+        "kind": "EXACT_FILE",
+        "max_bytes": 1500,
+        "max_results": 1,
+        "path_scopes": [
+          "tests/test_parity004_p407.py"
+        ],
+        "query": "tests/test_parity004_p407.py",
+        "reason": "Confirm real-PSD structural regression expectations that must remain intact."
+      }
+    ],
+    "status": "DISCOVERY_REQUESTED",
+    "summary": "Selected active PARITY-004. The bounded next task is the narrow GroupOperator proxy/render-source split; preserve the published clipping topology, keep host/pixel claims unresolved, and keep PARITY-005/006 out of scope."
+  },
+  "role": "manager-locate",
+  "run_id": "p4-harness-1788425727-001-88e958da",
+  "schema": "codex-ephemeral-harness.role-evidence.v1",
+  "schema_version": 1,
+  "status": "DISCOVERY_REQUESTED",
+  "stderr_bytes": 197,
+  "stderr_sha256": "17d0100f64372dee93ca9f959cdd2d8e7451d3d58fa68523116327457091b6e5",
+  "stdout_bytes": 139366,
+  "stdout_sha256": "743ab07e1d76b1c55706dca1400c571526361756ac9f8c21c7381d8ffb6d286b",
+  "thread_id": "01a0667b-3b0f-7123-8499-4d2c0b0dfcfa",
+  "timestamp": "2026-09-03T08:57:30.953142Z",
+  "transcripts_forwarded": false,
+  "uncached_input_tokens": 46661,
+  "wall_time_ms": 103844
+}
