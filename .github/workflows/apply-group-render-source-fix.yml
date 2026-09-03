@@ -1,0 +1,50 @@
+name: Apply GroupOperator render-source fix
+
+on:
+  push:
+    branches: [fix/parity-004-group-render-source-20260903]
+    paths:
+      - scripts/bootstrap_group_render_source_fix.py
+      - tests/test_parity004_group_render_source.py
+      - .github/workflows/apply-group-render-source-fix.yml
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  apply-and-prove:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: windows-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: fix/parity-004-group-render-source-20260903
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install package
+        shell: pwsh
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -e .
+      - name: Apply bounded GroupOperator fix
+        shell: pwsh
+        run: python scripts/bootstrap_group_render_source_fix.py
+      - name: Focused group regressions
+        shell: pwsh
+        run: python -m unittest tests.test_parity004_p405_graph tests.test_parity004_group_render_source -v
+      - name: Repository check
+        shell: pwsh
+        run: pwsh -NoProfile -File .\scripts\check.ps1
+      - name: Commit proven implementation
+        shell: pwsh
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add psd2fusion/fusion_comp.py
+          if (git diff --cached --quiet) { exit 0 }
+          git commit -m 'Use internal terminals as GroupOperator render sources'
+          git push origin HEAD:fix/parity-004-group-render-source-20260903
