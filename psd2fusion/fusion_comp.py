@@ -44,16 +44,26 @@ class _Source:
 
 @dataclass
 class _ItemResult:
+    # Actual render source consumed by parent/sibling tools.  For groups this
+    # is an internal terminal, never GroupOperator.MainOutput1.
     output: _Source
+    # The actual source to reuse as a clipping matte, with the same group
+    # boundary rule as output.
     matte: _Source
     # A pass-through group has already consumed the caller's stream.
     consumed_backdrop: bool = False
+    # Lowering-only metadata for a pass-through GroupOperator's input proxy.
+    # This is the first internal consumer of the caller's backdrop, not a
+    # render source exposed by the GroupOperator itself.
+    backdrop_consumer: Optional[_Source] = None
 
 
 @dataclass
 class _SequenceResult:
     output: _Source
     tools: List[str]
+    # Lowering-only metadata used to declare a pass-through input proxy.
+    backdrop_consumer: Optional[_Source] = None
 
 
 def _quote(value: object) -> str:
@@ -334,23 +344,23 @@ def _note(name: str, comment: str, x: float, y: float) -> str:
 def _group_operator(
     name: str,
     inner_tools: Sequence[str],
-    output: _Source,
+    proxy_output: _Source,
     comment: str,
     x: float,
     y: float,
-    input_target: Optional[str] = None,
+    input_target: Optional[_Source] = None,
 ) -> str:
     lines = [
         "%s = GroupOperator {" % name,
         "\tNameSet = true,",
         "\tInputs = ordered() {",
     ]
-    if input_target:
+    if input_target is not None and input_target.name:
         lines.extend(
             [
                 "\t\tMainInput1 = InstanceInput {",
-                "\t\t\tSourceOp = %s," % _quote(input_target),
-                "\t\t\tSource = \"Background\",",
+                "\t\t\tSourceOp = %s," % _quote(input_target.name),
+                "\t\t\tSource = %s," % _quote(input_target.port),
                 "\t\t},",
             ]
         )
@@ -359,8 +369,8 @@ def _group_operator(
         "\t},",
         "\tOutputs = {",
         "\t\tMainOutput1 = InstanceOutput {",
-        "\t\t\tSourceOp = %s," % _quote(output.name),
-        "\t\t\tSource = %s," % _quote(output.port),
+        "\t\t\tSourceOp = %s," % _quote(proxy_output.name),
+        "\t\t\tSource = %s," % _quote(proxy_output.port),
         "\t\t},",
         "\t},",
         "\tViewInfo = GroupInfo { Pos = { %.3f, %.3f } }," % (x, y),
@@ -399,7 +409,6 @@ class _Compiler:
         self.clip_count = 0
         self.blend_modes: set[str] = set()
         self._x = 0.0
-        self._external_input_target: Optional[str] = None
         self._root_background_name: Optional[str] = None
         # Per-member rows keep the fixed-matte path readable in Flow without
         # changing the deterministic PSD evaluation order.
@@ -455,10 +464,30 @@ class _Compiler:
         source = _Source(loader_name)
         return _ItemResult(source, source)
 
+    @staticmethod
+    def _group_result(
+        render_source: _Source,
+        consumed_backdrop: bool = False,
+        backdrop_consumer: Optional[_Source] = None,
+    ) -> _ItemResult:
+        """Return a group result using its internal terminal as the render edge.
+
+        ``GroupOperator.MainOutput1`` is serialized separately as an editable
+        Flow proxy.  It must never become the source returned to a parent
+        merge, sibling, MediaOut, or clipping matte.
+        """
+
+        return _ItemResult(
+            output=render_source,
+            matte=render_source,
+            consumed_backdrop=consumed_backdrop,
+            backdrop_consumer=backdrop_consumer,
+        )
+
     def group(self, layer: SemanticLayer, backdrop: _Source, depth: int, scope: str) -> _ItemResult:
         # Pass-through groups retain the parent's backdrop through an exposed
-        # GroupOperator input. The wrapper is organizational; child Merge nodes
-        # still evaluate against the caller's stream.
+        # GroupOperator input proxy. The wrapper is organizational; child Merge
+        # nodes still evaluate against the caller's actual stream.
         if layer.pass_through and layer.opacity < 0.999999:
             raise ValueError(
                 "Pass Through group opacity requires a verified host boundary"
@@ -469,18 +498,16 @@ class _Compiler:
             inner_scope = scope + "P"
             inner_tools: List[str] = []
             previous_tools = self._current_tools
-            previous_target = self._external_input_target
             self._current_tools = inner_tools
-            self._external_input_target = None
             nested = self.sequence(
                 layer.children,
-                _Source("", "Output"),
+                backdrop,
                 depth + 1,
                 inner_scope,
             )
-            input_target = self._external_input_target
             self._current_tools = previous_tools
-            self._external_input_target = previous_target
+            input_target = nested.backdrop_consumer
+            render_source = nested.output
             gx, gy = self.position(2, depth)
             if input_target is None:
                 # Empty pass-through groups are kept as a readable marker and
@@ -494,26 +521,27 @@ class _Compiler:
                         gy,
                     )
                 )
-                return _ItemResult(backdrop, backdrop, consumed_backdrop=True)
+                return self._group_result(backdrop, consumed_backdrop=True)
             self.group_count += 1
             self._current_tools.append(
                 _group_operator(
                     group_name,
                     inner_tools,
-                    nested.output,
+                    render_source,
                     "PSD Group: %s (pass-through)" % layer.name,
                     gx,
                     gy,
                     input_target=input_target,
                 )
             )
-            return _ItemResult(
-                _Source(group_name, "MainOutput1"),
-                _Source(group_name, "MainOutput1"),
-                # The GroupOperator consumes the caller's stream through its
-                # exposed MainInput1.  Adding a parent Normal merge would
-                # double-composite the pass-through result.
+            return self._group_result(
+                render_source,
+                # The actual internal sequence consumes the caller's stream;
+                # MainInput1 is retained as an editable proxy declaration.
+                # Adding a parent Normal merge would double-composite the
+                # pass-through result.
                 consumed_backdrop=True,
+                backdrop_consumer=input_target,
             )
 
         # Isolated group: build a self-contained transparent subtree, then let
@@ -537,19 +565,22 @@ class _Compiler:
         )
         nested = self.sequence(layer.children, _Source(inner_bg_name), depth + 1, inner_scope)
         self._current_tools = previous_tools
+        render_source = nested.output
         self.group_count += 1
         gx, gy = self.position(0, depth)
         self._current_tools.append(
             _group_operator(
                 group_name,
                 inner_tools,
-                nested.output,
+                render_source,
                 "PSD Group: %s (isolated)" % layer.name,
                 gx,
                 gy,
             )
         )
-        return _ItemResult(_Source(group_name, "MainOutput1"), _Source(group_name, "MainOutput1"))
+        # GroupOperator.MainOutput1 remains the editable Flow proxy. Parent
+        # render inputs must consume the internal terminal directly.
+        return self._group_result(render_source)
 
     def item(self, layer: SemanticLayer, backdrop: _Source, depth: int, scope: str) -> _ItemResult:
         if layer.is_group:
@@ -566,6 +597,7 @@ class _Compiler:
         comment_prefix: str = "PSD layer merge",
         opacity: Optional[float] = None,
         mode: Optional[str] = None,
+        backdrop_consumer: Optional[List[Optional[_Source]]] = None,
     ) -> _Source:
         # The local clipping island is sufficient for an opaque/root
         # backdrop. A fractional external backdrop plus a non-Normal base
@@ -581,6 +613,7 @@ class _Compiler:
                 scope,
                 opacity,
                 mode,
+                backdrop_consumer,
             )
         merge_name = self.name("Merge" + scope, layer.id)
         self.merge_count += 1
@@ -598,8 +631,8 @@ class _Compiler:
                     "Cannot lower unsupported/unverified blend mode without an "
                     "explicit capability decision: %s" % mode
                 )
-        if backdrop is not None and not backdrop.name:
-            self._external_input_target = merge_name
+        if backdrop_consumer is not None and backdrop_consumer[0] is None:
+            backdrop_consumer[0] = _Source(merge_name, "Background")
         comment = "%s: %s" % (comment_prefix, layer.name)
         if comment_prefix == "PSD clipping chain merge":
             comment += " [P4-01 outer boundary; P4-04 base blend/opacity once]"
@@ -626,6 +659,7 @@ class _Compiler:
         scope: str,
         opacity: Optional[float],
         mode: Optional[str],
+        backdrop_consumer: Optional[List[Optional[_Source]]] = None,
     ) -> _Source:
         """Lower one non-Normal clipping outer boundary in straight RGB.
 
@@ -654,6 +688,8 @@ class _Compiler:
             return self.name(role + scope, layer.id)
 
         backdrop_straight_name = emit_name("OuterBlendBackdropStraight")
+        if backdrop_consumer is not None and backdrop_consumer[0] is None:
+            backdrop_consumer[0] = _Source(backdrop_straight_name, "Input")
         x, y = self.position(row + 3.0, depth)
         self._current_tools.append(
             _alpha_divide(
@@ -814,8 +850,6 @@ class _Compiler:
         merge_name = self.name("Merge" + scope, layer.id)
         self.merge_count += 1
         x, y = self.position(row - 2.5, depth)
-        if not backdrop.name:
-            self._external_input_target = merge_name
         self._current_tools.append(
             _merge(
                 merge_name,
@@ -1112,6 +1146,10 @@ class _Compiler:
         scope: str,
     ) -> _SequenceResult:
         current = backdrop
+        # This metadata is consumed only when a pass-through group declares
+        # its InstanceInput proxy. Render consumers still use each sequence's
+        # actual internal terminal source.
+        backdrop_consumer: List[Optional[_Source]] = [None]
         i = 0
         while i < len(items):
             layer = items[i]
@@ -1122,16 +1160,26 @@ class _Compiler:
             # still emitted normally, with the parser warning preserved.
             if layer.clipping_base_id and not layer.clipping_members:
                 result = self.item(layer, current, depth, scope)
-                current = (
-                    result.output
-                    if result.consumed_backdrop
-                    else self.merge_item(current, result, layer, depth, scope)
-                )
+                if result.consumed_backdrop:
+                    if backdrop_consumer[0] is None:
+                        backdrop_consumer[0] = result.backdrop_consumer
+                    current = result.output
+                else:
+                    current = self.merge_item(
+                        current,
+                        result,
+                        layer,
+                        depth,
+                        scope,
+                        backdrop_consumer=backdrop_consumer,
+                    )
                 i += 1
                 continue
 
             base_result = self.item(layer, current, depth, scope)
             if base_result.consumed_backdrop:
+                if backdrop_consumer[0] is None:
+                    backdrop_consumer[0] = base_result.backdrop_consumer
                 current = base_result.output
                 i += 1
                 continue
@@ -1160,12 +1208,20 @@ class _Compiler:
                         comment_prefix="PSD clipping chain merge",
                         opacity=layer.opacity,
                         mode=layer.blend,
+                        backdrop_consumer=backdrop_consumer,
                     )
                 else:
                     # Explicit clbl=false is outside this Goal. Preserve the
                     # named FIRST_USABLE fallback instead of silently claiming
                     # group-scope semantics.
-                    current = self.merge_item(current, base_result, layer, depth, scope)
+                    current = self.merge_item(
+                        current,
+                        base_result,
+                        layer,
+                        depth,
+                        scope,
+                        backdrop_consumer=backdrop_consumer,
+                    )
                     for member in members:
                         if member.effective_visible:
                             member_result = self.item(member, current, depth, scope)
@@ -1181,12 +1237,20 @@ class _Compiler:
                                 comment_prefix="PSD clipped layer fallback (clbl=false)",
                                 opacity=member.opacity,
                                 mode=member.blend,
+                                backdrop_consumer=backdrop_consumer,
                             )
                 i = j
             else:
-                current = self.merge_item(current, base_result, layer, depth, scope)
+                current = self.merge_item(
+                    current,
+                    base_result,
+                    layer,
+                    depth,
+                    scope,
+                    backdrop_consumer=backdrop_consumer,
+                )
                 i += 1
-        return _SequenceResult(current, self._current_tools)
+        return _SequenceResult(current, self._current_tools, backdrop_consumer[0])
 
     def compile(self) -> Dict[str, str]:
         root_bg = self.name("Background", self.doc.source_sha256)

@@ -10,6 +10,7 @@ from __future__ import annotations
 import argparse
 import hashlib
 import json
+import re
 import sys
 from pathlib import Path
 from typing import Any, Dict, Iterable, List, Sequence, Tuple
@@ -24,7 +25,7 @@ from scripts.validate_clipping_subtrees import parse_tools
 
 
 SOURCE_HASH = "p405" + "0" * 60
-CASES = ("isolated", "pass_through", "nested_isolated", "adjacent")
+CASES = ("direct", "isolated", "pass_through", "nested_isolated", "adjacent")
 
 
 def _chain(base_id: str, member_ids: Sequence[str], label: str) -> Tuple[List[SemanticLayer], ClippingChain]:
@@ -68,6 +69,27 @@ def _group(group_id: str, name: str, children: Sequence[SemanticLayer], pass_thr
 
 def fixture_documents() -> Dict[str, SemanticDocument]:
     docs: Dict[str, SemanticDocument] = {}
+
+    direct_layers, direct_chain = _chain(
+        "p405dbase", ("p405dm001", "p405dm002"), "direct"
+    )
+    docs["direct"] = SemanticDocument(
+        source_path="p4-05-direct.psd",
+        source_sha256=SOURCE_HASH,
+        parser="fixture",
+        parser_version="1",
+        width=8,
+        height=8,
+        children=[
+            SemanticLayer(
+                id="p405dout",
+                name="P4-05 direct outer",
+                asset_path="assets/direct-outer.png",
+            ),
+            *direct_layers,
+        ],
+        clipping_chains=[direct_chain],
+    )
 
     isolated_layers, isolated_chain = _chain(
         "p405isobas", ("p405isom01", "p405isom02"), "isolated"
@@ -184,6 +206,303 @@ def _role(tools: Sequence[Dict[str, Any]], prefix: str, layer_id: str) -> List[D
     ]
 
 
+_FLOW_TOOL_RE = re.compile(
+    r"(?m)^[ \t]*([A-Za-z_][A-Za-z0-9_]*)\s*=\s*"
+    r"(Background|Loader|Merge|AlphaDivide|ChannelBoolean|"
+    r"BrightnessContrast|AlphaMultiply|MediaOut|GroupOperator|Note)\s*\{"
+)
+
+
+def _balanced_block_end(text: str, opening: int) -> int:
+    depth = 0
+    in_string = False
+    escaped = False
+    for index in range(opening, len(text)):
+        character = text[index]
+        if in_string:
+            if escaped:
+                escaped = False
+            elif character == "\\":
+                escaped = True
+            elif character == '"':
+                in_string = False
+            continue
+        if character == '"':
+            in_string = True
+        elif character == "{":
+            depth += 1
+        elif character == "}":
+            depth -= 1
+            if depth == 0:
+                return index + 1
+    return len(text)
+
+
+def _flow_tools(comp_path: Path) -> List[Dict[str, Any]]:
+    """Read every Flow tool, including tools nested inside GroupOperators.
+
+    The shared offline parser intentionally exposes a compact view and some
+    versions omit inputs belonging to a nested tool.  P4-05 needs the actual
+    source edges at group boundaries, so supplement that view from the comp
+    text while keeping its existing fields intact.
+    """
+
+    text = comp_path.read_text(encoding="utf-8")
+    tools: List[Dict[str, Any]] = []
+    for match in _FLOW_TOOL_RE.finditer(text):
+        opening = text.find("{", match.start(), match.end())
+        end = _balanced_block_end(text, opening)
+        block = text[match.start() : end]
+        tool: Dict[str, Any] = {
+            "name": match.group(1),
+            "type": match.group(2),
+            "start": match.start(),
+            "end": end,
+        }
+        for field, key in (
+            ("Background", "background"),
+            ("Foreground", "foreground"),
+            ("Input", "input"),
+            ("EffectMask", "effect_mask"),
+        ):
+            input_match = re.search(
+                r"(?m)^[ \t]*"
+                + re.escape(field)
+                + r"\s*=\s*Input\s*\{([^\r\n]*)",
+                block,
+            )
+            if input_match is not None:
+                source_match = re.search(
+                    r'SourceOp\s*=\s*"([^"]+)"', input_match.group(1)
+                )
+                if source_match is not None:
+                    tool[key] = source_match.group(1)
+        for field, key in (("Operator", "operator"), ("ApplyMode", "apply_mode")):
+            input_match = re.search(
+                r"(?m)^[ \t]*"
+                + re.escape(field)
+                + r"\s*=\s*Input\s*\{([^\r\n]*)",
+                block,
+            )
+            if input_match is not None:
+                value_match = re.search(
+                    r'Value\s*=\s*(FuID\s*\{\s*"[^"]+"\s*\}|[^,}]+)',
+                    input_match.group(1),
+                )
+                if value_match is not None:
+                    tool[key] = value_match.group(1).strip()
+        for field, key in (
+            ("Blend", "blend"),
+            ("ProcessAlpha", "process_alpha"),
+            ("ToAlpha", "to_alpha"),
+            ("ClipBlack", "clip_black"),
+            ("ClipWhite", "clip_white"),
+        ):
+            input_match = re.search(
+                r"(?m)^[ \t]*"
+                + re.escape(field)
+                + r"\s*=\s*Input\s*\{([^\r\n]*)",
+                block,
+            )
+            if input_match is not None:
+                value_match = re.search(
+                    r"Value\s*=\s*([^,}]+)", input_match.group(1)
+                )
+                if value_match is not None:
+                    tool[key] = value_match.group(1).strip()
+        comment_match = re.search(
+            r'(?m)^[ \t]*Comments\s*=\s*Input\s*\{\s*'
+            r'Value\s*=\s*"((?:\\.|[^"])*)"',
+            block,
+        )
+        if comment_match is not None:
+            tool["comments"] = comment_match.group(1)
+        tools.append(tool)
+    return tools
+
+
+def _all_tools(comp_path: Path) -> List[Dict[str, Any]]:
+    """Merge the shared parser view with complete nested Flow source edges."""
+
+    indexed: Dict[str, Dict[str, Any]] = {}
+    for tool in parse_tools(comp_path):
+        indexed[tool["name"]] = dict(tool)
+    for tool in _flow_tools(comp_path):
+        indexed.setdefault(tool["name"], {}).update(tool)
+    return sorted(indexed.values(), key=lambda tool: tool["start"])
+
+
+def _group_layers(items: Sequence[SemanticLayer]) -> Iterable[SemanticLayer]:
+    for layer in items:
+        if not layer.is_group:
+            continue
+        yield layer
+        for child in _group_layers(layer.children):
+            yield child
+
+
+def _balanced_group_block(text: str, group_name: str) -> str:
+    match = re.search(
+        r"(?m)^[ \t]*" + re.escape(group_name) + r"\s*=\s*GroupOperator\s*\{",
+        text,
+    )
+    if match is None:
+        return ""
+    opening = text.find("{", match.start(), match.end())
+    depth = 0
+    in_string = False
+    escaped = False
+    for index in range(opening, len(text)):
+        character = text[index]
+        if in_string:
+            if escaped:
+                escaped = False
+            elif character == "\\":
+                escaped = True
+            elif character == '"':
+                in_string = False
+            continue
+        if character == '"':
+            in_string = True
+        elif character == "{":
+            depth += 1
+        elif character == "}":
+            depth -= 1
+            if depth == 0:
+                return text[match.start() : index + 1]
+    return ""
+
+
+def _proxy_source(block: str, name: str, kind: str) -> Dict[str, str] | None:
+    match = re.search(
+        r"%s\s*=\s*%s\s*\{\s*"
+        r"SourceOp\s*=\s*\"([^\"]+)\"\s*,\s*"
+        r"Source\s*=\s*\"([^\"]+)\""
+        % (re.escape(name), re.escape(kind)),
+        block,
+    )
+    if match is None:
+        return None
+    return {"source_op": match.group(1), "source": match.group(2)}
+
+
+def _proxy_contracts(
+    comp_path: Path, groups: Sequence[Dict[str, Any]]
+) -> Dict[str, Dict[str, Any]]:
+    text = comp_path.read_text(encoding="utf-8")
+    contracts: Dict[str, Dict[str, Any]] = {}
+    for group in groups:
+        block = _balanced_group_block(text, group["name"])
+        proxy_input = _proxy_source(block, "MainInput1", "InstanceInput")
+        proxy_output = _proxy_source(block, "MainOutput1", "InstanceOutput")
+        contracts[group["name"]] = {
+            "input": proxy_input,
+            "output": proxy_output,
+        }
+    return contracts
+
+
+def _source_consumers(
+    tools: Sequence[Dict[str, Any]], source_name: str
+) -> List[Dict[str, str]]:
+    consumers: List[Dict[str, str]] = []
+    for tool in tools:
+        for input_name in ("background", "foreground", "input", "effect_mask"):
+            if tool.get(input_name) == source_name:
+                consumers.append(
+                    {
+                        "tool": tool["name"],
+                        "input": input_name,
+                        "source": source_name,
+                    }
+                )
+    return consumers
+
+
+def _group_parent_merges(
+    tools: Sequence[Dict[str, Any]], layer: SemanticLayer
+) -> List[Dict[str, Any]]:
+    suffix = "_" + layer.id[:10]
+    return [
+        tool
+        for tool in tools
+        if tool["type"] == "Merge"
+        and tool["name"].endswith(suffix)
+        and str(tool.get("comments", "")).strip().strip('"').startswith(
+            "PSD layer merge:"
+        )
+    ]
+
+
+def _group_proxy_shape(
+    comp_path: Path,
+    tools: Sequence[Dict[str, Any]],
+    groups: Sequence[Dict[str, Any]],
+    document: SemanticDocument,
+) -> List[Dict[str, Any]]:
+    contracts = _proxy_contracts(comp_path, groups)
+    layers = list(_group_layers(document.children))
+    shapes: List[Dict[str, Any]] = []
+    for group in groups:
+        layer = next(
+            (
+                candidate
+                for candidate in layers
+                if group["name"].endswith("_" + candidate.id[:10])
+            ),
+            None,
+        )
+        contract = contracts[group["name"]]
+        render_source = contract["output"]
+        parent_merges = _group_parent_merges(tools, layer) if layer is not None else []
+        if render_source is not None:
+            parent_merges = [
+                merge
+                for merge in parent_merges
+                if merge.get("foreground") == render_source["source_op"]
+            ]
+        parent_merge = parent_merges[0] if len(parent_merges) == 1 else None
+        render_consumers = _source_consumers(
+            tools,
+            render_source["source_op"] if render_source is not None else "",
+        )
+        # Some parser versions expose nested GroupOperator tools but omit the
+        # containing group's nested consumer list.  The unique parent Merge is
+        # still an inspectable runtime edge, so retain it as the consumer
+        # record only when it is proven to use the same internal terminal.
+        if (
+            not render_consumers
+            and parent_merge is not None
+            and render_source is not None
+            and parent_merge.get("foreground") == render_source["source_op"]
+        ):
+            render_consumers = [
+                {
+                    "tool": parent_merge["name"],
+                    "input": "foreground",
+                    "source": render_source["source_op"],
+                }
+            ]
+        shape = dict(group)
+        shape.update(
+            {
+                "layer_id": layer.id if layer is not None else None,
+                "proxy": contract,
+                "render_source": render_source,
+                "render_consumers": render_consumers,
+                "group_proxy_consumers": _source_consumers(tools, group["name"]),
+                "parent_merge": parent_merge,
+                "input_target": (
+                    contract["input"]["source_op"]
+                    if contract["input"] is not None
+                    else None
+                ),
+            }
+        )
+        shapes.append(shape)
+    return shapes
+
+
 def _chain_shape(tools: Sequence[Dict[str, Any]], base_id: str, member_ids: Sequence[str]) -> Dict[str, Any]:
     base_loaders = _role(tools, "Loader", base_id)
     outer_merges = [
@@ -288,20 +607,89 @@ def build(output: Path) -> Dict[str, Any]:
     for case, document in fixture_documents().items():
         comp_path = output / ("p4_05_%s.comp" % case)
         stats = compile_comp(document, str(comp_path))
-        tools = parse_tools(comp_path)
+        tools = _all_tools(comp_path)
         chain = document.clipping_chains[0]
         shape = _chain_shape(tools, chain.base_id, chain.member_ids)
         groups = [tool for tool in tools if tool["type"] == "GroupOperator"]
+        group_shapes = _group_proxy_shape(comp_path, tools, groups, document)
+        group_names = {group["name"] for group in groups}
+        render_input_names = ("background", "foreground", "input", "effect_mask")
+        ordinary_render_inputs_avoid_group_proxy = all(
+            tool.get(input_name) not in group_names
+            for tool in tools
+            for input_name in render_input_names
+        )
         outer = shape["outer"]
         containing_groups = [
             group
-            for group in groups
+            for group in group_shapes
             if outer is not None and group["start"] < outer["start"] < group["end"]
         ]
+        proxy_ports_exist = all(
+            group["proxy"]["output"] is not None for group in group_shapes
+        )
+        render_sources_are_internal = all(
+            group["render_source"] is not None
+            and group["render_source"]["source_op"] != group["name"]
+            for group in group_shapes
+        )
+        render_sources_are_attached = all(
+            group["render_consumers"] for group in group_shapes
+        )
+        render_inputs_do_not_consume_group_proxy = all(
+            not group["group_proxy_consumers"] for group in group_shapes
+        )
+        parent_render_inputs_use_internal_terminal = all(
+            (
+                group["parent_merge"] is not None
+                and group["parent_merge"]["foreground"]
+                == group["render_source"]["source_op"]
+            )
+            for group in group_shapes
+            if case != "pass_through"
+        )
+        pass_through_group = next(
+            (
+                group
+                for group in group_shapes
+                if group["proxy"]["input"] is not None
+            ),
+            None,
+        )
+        pass_through_proxy_targets_first_consumer = (
+            case != "pass_through"
+            or (
+                pass_through_group is not None
+                and outer is not None
+                and pass_through_group["proxy"]["input"]["source_op"]
+                == outer["name"]
+                and pass_through_group.get("input_target") == outer["name"]
+            )
+        )
+        pass_through_uses_actual_parent_backdrop = (
+            case != "pass_through"
+            or (
+                outer is not None
+                and bool(outer.get("background"))
+                and pass_through_group is not None
+                and outer["background"] != pass_through_group["name"]
+            )
+        )
+        direct_chain_stays_in_parent_stream = (
+            case != "direct"
+            or (len(groups) == 0 and len(containing_groups) == 0)
+        )
+        expected_group_count = {
+            "direct": 0,
+            "isolated": 1,
+            "pass_through": 1,
+            "nested_isolated": 2,
+            "adjacent": 2,
+        }[case]
         case_checks = {
             "clipping_recipe_inside_existing_stream": shape["pass"],
-            "expected_group_count": len(groups)
-            == (2 if case in ("nested_isolated", "adjacent") else 1),
+            "expected_group_count": len(groups) == expected_group_count,
+            "direct_chain_stays_in_parent_stream": direct_chain_stays_in_parent_stream,
             "isolated_chain_is_inside_group": case != "isolated"
             or len(containing_groups) == 1,
             "pass_through_chain_is_inside_group_and_consumes_input": case
@@ -319,13 +707,21 @@ def build(output: Path) -> Dict[str, Any]:
                 and outer is not None
                 and groups[0]["end"] < outer["start"] < groups[1]["start"]
             ),
+            "group_proxy_ports_exist": proxy_ports_exist,
+            "render_sources_are_internal_terminals": render_sources_are_internal,
+            "render_sources_are_attached": render_sources_are_attached,
+            "render_inputs_do_not_consume_group_proxy": render_inputs_do_not_consume_group_proxy,
+            "ordinary_render_inputs_avoid_group_proxy": ordinary_render_inputs_avoid_group_proxy,
+            "parent_render_inputs_use_internal_terminal": parent_render_inputs_use_internal_terminal,
+            "pass_through_proxy_targets_first_backdrop_consumer": pass_through_proxy_targets_first_consumer,
+            "pass_through_uses_actual_parent_backdrop": pass_through_uses_actual_parent_backdrop,
         }
         case_reports[case] = {
             "status": "PASS" if all(case_checks.values()) else "FAIL",
             "pass": all(case_checks.values()),
             "stats": stats,
             "checks": case_checks,
-            "groups": groups,
+            "groups": group_shapes,
             "containing_groups": [group["name"] for group in containing_groups],
             "chain": shape,
             "artifact": _artifact(comp_path),
@@ -337,6 +733,20 @@ def build(output: Path) -> Dict[str, Any]:
             case_report["checks"]["clipping_recipe_inside_existing_stream"]
             for case_report in case_reports.values()
         ),
+        "all_cases_keep_group_proxy_render_split": all(
+            case_report["checks"]["group_proxy_ports_exist"]
+            and case_report["checks"]["render_sources_are_internal_terminals"]
+            and case_report["checks"]["render_sources_are_attached"]
+            and case_report["checks"]["render_inputs_do_not_consume_group_proxy"]
+            and case_report["checks"]["ordinary_render_inputs_avoid_group_proxy"]
+            and case_report["checks"]["parent_render_inputs_use_internal_terminal"]
+            and case_report["checks"]["pass_through_proxy_targets_first_backdrop_consumer"]
+            and case_report["checks"]["pass_through_uses_actual_parent_backdrop"]
+            for case_report in case_reports.values()
+        ),
+        "direct_case_has_no_group_boundary": case_reports["direct"]["checks"][
+            "direct_chain_stays_in_parent_stream"
+        ],
     }
     report: Dict[str, Any] = {
         "schema_version": 1,
