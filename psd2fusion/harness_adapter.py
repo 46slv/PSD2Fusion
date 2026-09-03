@@ -88,7 +88,11 @@ def _scrub_string(value: str, repo: Path) -> str:
             result = re.sub(re.escape(variant), "<canonical-repo>", result, flags=re.IGNORECASE)
     if len(result) > _MAX_TEXT:
         result = result[:_MAX_TEXT] + "...[bounded]"
-    return result
+    # The generic PowerShell entrypoint may inherit a legacy cp932 stdout
+    # encoding.  Keep the projection lossless enough for evidence review while
+    # making every emitted byte representable there; the canonical markdown
+    # remains untouched on disk.
+    return result.encode("ascii", "backslashreplace").decode("ascii")
 
 
 def _safe_value(value: Any, repo: Path, *, depth: int = 0) -> Any:
