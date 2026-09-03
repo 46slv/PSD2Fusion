@@ -1,0 +1,240 @@
+{
+  "adapter": "psd2fusion-parity-004",
+  "canonical_state_mutation": "adapter marker only; .control/current.json unchanged",
+  "cycle_evidence_hash": "488cdf0bd2ff2f0f2437196688f5c2b3139b97465b63252dee56ac48b8e57260",
+  "decision": "NEXT_CYCLE_LOCALIZED",
+  "decision_detail": "bounded failure is eligible for a fresh Manager cycle",
+  "devexec_task_id": "devexec-psd2fusion-p004-20260903",
+  "evidence_relpath": ".control/evidence/PARITY-004/harness/p4-harness-1788433139-001-1f426efc/cycle-evidence.json",
+  "fingerprint_count": 0,
+  "materialized_read_sets": {
+    "manager-locate": {
+      "files": [
+        ".harness/MANAGER_LOCATE.md",
+        ".harness/goal.json",
+        ".harness/state.json",
+        ".harness/repo-map.json",
+        ".harness/context-manifest.json"
+      ],
+      "source": "generic-bundle-contract"
+    },
+    "manager-plan": {
+      "files": [
+        ".harness/MANAGER_PLAN.md",
+        ".harness/goal.json",
+        ".harness/state.json",
+        ".harness/discovery.json",
+        ".harness/context-manifest.json"
+      ],
+      "source": "generic-bundle-contract"
+    },
+    "verifier": {
+      "files": [
+        ".harness/VERIFIER.md",
+        ".harness/verifier-bundle.json",
+        ".harness/context-manifest.json"
+      ],
+      "source": "generic-bundle-contract"
+    },
+    "worker": {
+      "files": [
+        ".control/CURRENT_GOAL.md",
+        ".control/PARITY-004_TODO.md",
+        ".control/current.json",
+        ".control/evidence/PARITY-004/20260903-group-operator-contract/decision.md",
+        ".control/evidence/PARITY-004/harness/p4-harness-1788431988-001-45748e44/runner-tests.json",
+        ".harness/context-manifest.json",
+        ".harness/task.json",
+        "AGENTS.md",
+        "docs/PARITY_004_HOST_PIXEL_GATE.md",
+        "scripts/check.ps1"
+      ],
+      "source": "Task Packet exact read/handoff paths"
+    }
+  },
+  "metrics": {
+    "cached_input_tokens": 1697536,
+    "input_tokens": 1927329,
+    "model_visible_bytes": 337921,
+    "model_visible_file_count": 21,
+    "output_tokens": 47147,
+    "uncached_input_tokens": 229793,
+    "wall_time_ms": 969359
+  },
+  "patch": {
+    "changed_paths": [
+      "psd2fusion/fusion_comp.py",
+      "scripts/parity/p4_05.py",
+      "tests/test_parity004_p405_graph.py"
+    ],
+    "patch_bytes": 7746,
+    "patch_lines": 179,
+    "patch_sha256": "6b4087f2d47c8dd1b3fb3f62b9cc0f342ed08d7495d8394919af21cc0a14f9af"
+  },
+  "phase": "RUNNER_TESTS",
+  "preflight_context_firewall": {
+    "probes": [
+      {
+        "id": 1,
+        "name": "worker_allowed_read",
+        "status": "PASS"
+      },
+      {
+        "id": 2,
+        "name": "canonical_read_denied",
+        "status": "PASS"
+      },
+      {
+        "id": 3,
+        "name": "unrelated_sentinel_read_denied",
+        "status": "PASS"
+      },
+      {
+        "id": 4,
+        "name": "worker_exact_write",
+        "status": "PASS"
+      },
+      {
+        "id": 5,
+        "name": "worker_readonly_write_denied",
+        "status": "PASS"
+      },
+      {
+        "id": 6,
+        "name": "verifier_canonical_read_denied",
+        "status": "PASS"
+      }
+    ],
+    "production_roles_launched": false,
+    "status": "PASS"
+  },
+  "project_task": "PARITY-004",
+  "reasoning_effort": "max",
+  "repo_head_at_reload": "ref: refs/heads/codex/parity-004",
+  "role_model": "gpt-5.6-luna",
+  "roles": {
+    "manager-locate": {
+      "cached_input_tokens": 135168,
+      "ephemeral": true,
+      "external_read_denial": {
+        "canonical": "DENIED",
+        "forbidden": "DENIED",
+        "outside_write": "DENIED",
+        "readonly_write": "DENIED",
+        "status": "PROVEN"
+      },
+      "input_tokens": 182168,
+      "model": "gpt-5.6-luna",
+      "model_visible_bytes": 99658,
+      "model_visible_file_count": 4,
+      "output_tokens": 6304,
+      "present": true,
+      "reasoning_effort": "max",
+      "role": "manager-locate",
+      "thread_id": "01a066ec-4f37-7a01-aafc-580e34f6059d",
+      "uncached_input_tokens": 47000,
+      "wall_time_ms": 130969
+    },
+    "manager-plan": {
+      "cached_input_tokens": 416512,
+      "ephemeral": true,
+      "external_read_denial": {
+        "canonical": "DENIED",
+        "forbidden": "DENIED",
+        "outside_write": "DENIED",
+        "readonly_write": "DENIED",
+        "status": "PROVEN"
+      },
+      "input_tokens": 486794,
+      "model": "gpt-5.6-luna",
+      "model_visible_bytes": 106424,
+      "model_visible_file_count": 4,
+      "output_tokens": 14021,
+      "present": true,
+      "reasoning_effort": "max",
+      "role": "manager-plan",
+      "thread_id": "01a066ee-92f6-71c0-9496-f837be5794fd",
+      "uncached_input_tokens": 70282,
+      "wall_time_ms": 289125
+    },
+    "verifier": {
+      "present": false
+    },
+    "worker": {
+      "cached_input_tokens": 1145856,
+      "ephemeral": true,
+      "external_read_denial": {
+        "canonical": "DENIED",
+        "forbidden": "DENIED",
+        "outside_write": "DENIED",
+        "readonly_write": "DENIED",
+        "status": "PROVEN"
+      },
+      "input_tokens": 1258367,
+      "model": "gpt-5.6-luna",
+      "model_visible_bytes": 131839,
+      "model_visible_file_count": 13,
+      "output_tokens": 26822,
+      "present": true,
+      "reasoning_effort": "max",
+      "role": "worker",
+      "thread_id": "01a066f3-4df2-7690-ab5c-007a9efc4dcb",
+      "uncached_input_tokens": 112511,
+      "wall_time_ms": 549265
+    }
+  },
+  "run_id": "p4-harness-1788433139-001-1f426efc",
+  "schema": "psd2fusion-parity-004.supervisor-cycle.v1",
+  "sol_escalation": {
+    "reason": null,
+    "requested": false
+  },
+  "status": "TEST_FAILED",
+  "supervisor_target": "knotfield-harness-supervisor",
+  "task_packet": {
+    "bytes": 8184,
+    "files": 11,
+    "goal_item_id": "PARITY-004",
+    "present": true,
+    "sha256": "94fbfa8c97cdac0b29ec2a2e67d8c7d4671a8bc815a40a3c66e2bc56e1e0f7bc",
+    "task_id": "PARITY-004-GROUPOPERATOR-SPLIT"
+  },
+  "tests": {
+    "failed": 2,
+    "passed": 1,
+    "results": [
+      {
+        "command": "python -m unittest discover -s tests -p \"test_parity004_p405_graph.py\"",
+        "exit_code": 1,
+        "status": "FAIL",
+        "stderr_sha256": "04ded5f068675a43c8e99fdde2f30376c146dbe16033c1ff2eca0e28a35ef9e1",
+        "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "wall_time_ms": 968
+      },
+      {
+        "command": "python -m unittest discover -s tests -p \"test_parity004_p407.py\"",
+        "exit_code": 0,
+        "status": "PASS",
+        "stderr_sha256": "fb184ea57734512b1f088f9181209901b9cd46df3eb7eaa2500ea9e48dde20b5",
+        "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "wall_time_ms": 313
+      },
+      {
+        "command": "pwsh -NoProfile -File scripts/check.ps1",
+        "exit_code": 1,
+        "status": "FAIL",
+        "stderr_sha256": "82225a5e6554c21bdf9833965b4fac092de2b33d4a392aa057a68a585bd33a44",
+        "stdout_sha256": "f065d390014203861fb62197ac52165ce671dc899a0a6fed4f920e835200208c",
+        "wall_time_ms": 4828
+      }
+    ],
+    "status": "FAIL",
+    "wall_time_ms": 6109
+  },
+  "verdict": {
+    "failure_fingerprint": null,
+    "item_complete": null,
+    "summary": "",
+    "verifier": null
+  }
+}

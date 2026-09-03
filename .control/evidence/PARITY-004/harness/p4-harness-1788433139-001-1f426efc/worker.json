@@ -1,0 +1,77 @@
+{
+  "cached_input_tokens": 1145856,
+  "ephemeral": true,
+  "exit_code": 0,
+  "input_tokens": 1258367,
+  "isolation": {
+    "allowed_workspace_read": true,
+    "allowed_workspace_write": true,
+    "backend": "codex-split-filesystem-profile",
+    "canonical_external_read": "DENIED",
+    "codex_executable": "C:\\Users\\shiro\\AppData\\Local\\OpenAI\\Codex\\bin\\b99306303521e97e\\codex.exe",
+    "command_exit_code": 0,
+    "exact_write": "PASS",
+    "forbidden_external_read": "DENIED",
+    "legacy_sandbox_mode_used": false,
+    "outside_write": "DENIED",
+    "platform": "win32",
+    "probe_mode": "codex-exec",
+    "profile_name": "ceh_worker_7232b429b722",
+    "readonly_write": "DENIED",
+    "runtime_executable": "C:\\Users\\shiro\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\python\\python.exe",
+    "status": "PROVEN",
+    "stderr_bytes": 158,
+    "stderr_sha256": "901b0ef55eb56298c4bf8346aa831723d7f78b7bf9fc813ce6da4907e1497344",
+    "stdout_bytes": 2029,
+    "stdout_sha256": "544f59cf0be68ff479537d51f08fd2acfeec5d9a16ee0f9cf01c4a2c15956214",
+    "wall_time_ms": 19844,
+    "workspace_access": "write",
+    "write_path_read": "PASS"
+  },
+  "isolation_profile": "ceh_worker_7232b429b722",
+  "isolation_status": "PROVEN",
+  "model_visible_bytes": 131839,
+  "model_visible_file_count": 13,
+  "output_tokens": 26822,
+  "protocol_errors": [],
+  "result": {
+    "canonical_patch_applied": false,
+    "evidence": [
+      {
+        "kind": "implementation",
+        "path": "psd2fusion/fusion_comp.py",
+        "summary": "Implemented typed GroupOperator proxy input metadata and internal-terminal runtime wiring."
+      },
+      {
+        "kind": "fixture",
+        "path": "scripts/parity/p4_05.py",
+        "summary": "Updated group ownership inspection to validate internal render consumers and proxy targets."
+      },
+      {
+        "kind": "regression_test",
+        "path": "tests/test_parity004_p405_graph.py",
+        "summary": "Strengthened isolated and Pass Through proxy boundary assertions."
+      }
+    ],
+    "notes": [
+      "Runner-owned tests were not executed. No host_loaded or pixel_verified claim is made."
+    ],
+    "requested_context": [],
+    "status": "DONE",
+    "summary": "Completed the localized GroupOperator proxy/render-source split within the three authorized write paths."
+  },
+  "role": "worker",
+  "run_id": "p4-harness-1788433139-001-1f426efc",
+  "schema": "codex-ephemeral-harness.role-evidence.v1",
+  "schema_version": 1,
+  "status": "DONE",
+  "stderr_bytes": 472,
+  "stderr_sha256": "3c69e0bd1ed24efbb967e5f0e76dda8a0e9a183e59e1545ed736e1b94e5b34c8",
+  "stdout_bytes": 351516,
+  "stdout_sha256": "58aa55b0159b48299f86eab6777d4dcc9d1d168cd273eda9e1e210b243f56059",
+  "thread_id": "01a066f3-4df2-7690-ab5c-007a9efc4dcb",
+  "timestamp": "2026-09-03T11:16:05.523151Z",
+  "transcripts_forwarded": false,
+  "uncached_input_tokens": 112511,
+  "wall_time_ms": 549265
+}

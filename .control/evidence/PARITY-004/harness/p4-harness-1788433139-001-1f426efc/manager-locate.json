@@ -1,0 +1,148 @@
+{
+  "cached_input_tokens": 135168,
+  "ephemeral": true,
+  "exit_code": 0,
+  "input_tokens": 182168,
+  "isolation": {
+    "allowed_workspace_read": true,
+    "allowed_workspace_write": false,
+    "backend": "codex-split-filesystem-profile",
+    "canonical_external_read": "DENIED",
+    "codex_executable": "C:\\Users\\shiro\\AppData\\Local\\OpenAI\\Codex\\bin\\b99306303521e97e\\codex.exe",
+    "command_exit_code": 0,
+    "exact_write": "DENIED",
+    "forbidden_external_read": "DENIED",
+    "legacy_sandbox_mode_used": false,
+    "outside_write": "DENIED",
+    "platform": "win32",
+    "probe_mode": "codex-exec",
+    "profile_name": "ceh_manager_locate_731d35e336bb",
+    "readonly_write": "DENIED",
+    "runtime_executable": "C:\\Users\\shiro\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\python\\python.exe",
+    "status": "PROVEN",
+    "stderr_bytes": 158,
+    "stderr_sha256": "f3d1931f9b10a2113a26e8564fc554c9f0a865afe53088f36e4b74d28aa2648c",
+    "stdout_bytes": 2027,
+    "stdout_sha256": "13415d7a293400224d9462097502a03f3fe9aacda866973def62b7d291c99eba",
+    "wall_time_ms": 18063,
+    "workspace_access": "read",
+    "write_path_read": "PASS"
+  },
+  "isolation_profile": "ceh_manager_locate_731d35e336bb",
+  "isolation_status": "PROVEN",
+  "model_visible_bytes": 99658,
+  "model_visible_file_count": 4,
+  "output_tokens": 6304,
+  "protocol_errors": [],
+  "result": {
+    "goal_item_id": "PARITY-004",
+    "requests": [
+      {
+        "kind": "EXACT_FILE",
+        "max_bytes": 5811,
+        "max_results": 1,
+        "path_scopes": [
+          "AGENTS.md"
+        ],
+        "query": "AGENTS.md",
+        "reason": "Read repository-specific instructions."
+      },
+      {
+        "kind": "EXACT_FILE",
+        "max_bytes": 9885,
+        "max_results": 1,
+        "path_scopes": [
+          ".control/CURRENT_GOAL.md"
+        ],
+        "query": ".control/CURRENT_GOAL.md",
+        "reason": "Read the authoritative task contract."
+      },
+      {
+        "kind": "EXACT_FILE",
+        "max_bytes": 8065,
+        "max_results": 1,
+        "path_scopes": [
+          ".control/PARITY-004_TODO.md"
+        ],
+        "query": ".control/PARITY-004_TODO.md",
+        "reason": "Read the PARITY-004 procedure and scope."
+      },
+      {
+        "kind": "EXACT_FILE",
+        "max_bytes": 6117,
+        "max_results": 1,
+        "path_scopes": [
+          "docs/PARITY_004_HOST_PIXEL_GATE.md"
+        ],
+        "query": "docs/PARITY_004_HOST_PIXEL_GATE.md",
+        "reason": "Read the required host/pixel gate guidance."
+      },
+      {
+        "kind": "EXACT_FILE",
+        "max_bytes": 3539,
+        "max_results": 1,
+        "path_scopes": [
+          ".control/evidence/PARITY-004/20260903-group-operator-contract/decision.md"
+        ],
+        "query": ".control/evidence/PARITY-004/20260903-group-operator-contract/decision.md",
+        "reason": "Read the immutable GroupOperator lowering decision."
+      },
+      {
+        "kind": "EXACT_FILE",
+        "max_bytes": 49280,
+        "max_results": 1,
+        "path_scopes": [
+          "psd2fusion/fusion_comp.py"
+        ],
+        "query": "psd2fusion/fusion_comp.py",
+        "reason": "Inspect the declared implementation path."
+      },
+      {
+        "kind": "EXACT_FILE",
+        "max_bytes": 24551,
+        "max_results": 1,
+        "path_scopes": [
+          "scripts/parity/p4_05.py"
+        ],
+        "query": "scripts/parity/p4_05.py",
+        "reason": "Inspect the focused parity fixture."
+      },
+      {
+        "kind": "EXACT_FILE",
+        "max_bytes": 3877,
+        "max_results": 1,
+        "path_scopes": [
+          "tests/test_parity004_p405_graph.py"
+        ],
+        "query": "tests/test_parity004_p405_graph.py",
+        "reason": "Inspect the focused regression tests."
+      },
+      {
+        "kind": "EXACT_FILE",
+        "max_bytes": 844,
+        "max_results": 1,
+        "path_scopes": [
+          "scripts/check.ps1"
+        ],
+        "query": "scripts/check.ps1",
+        "reason": "Identify the repository-supported verification command."
+      }
+    ],
+    "status": "DISCOVERY_REQUESTED",
+    "summary": "PARITY-004 is in progress; the next single task is the GroupOperator proxy/render-source split. Discovery is limited to governing instructions, immutable task guidance, the three declared implementation paths, and the repository check script."
+  },
+  "role": "manager-locate",
+  "run_id": "p4-harness-1788433139-001-1f426efc",
+  "schema": "codex-ephemeral-harness.role-evidence.v1",
+  "schema_version": 1,
+  "status": "DISCOVERY_REQUESTED",
+  "stderr_bytes": 158,
+  "stderr_sha256": "3756967899c1bc471c888f643098a66537fb7674730b0fe13e75d8e23a477c7c",
+  "stdout_bytes": 153084,
+  "stdout_sha256": "a6aabe947e03e4042c594e30ca0b5e1a3de3ccc436ad37b70ec24c7dde0f1fab",
+  "thread_id": "01a066ec-4f37-7a01-aafc-580e34f6059d",
+  "timestamp": "2026-09-03T11:01:28.791878Z",
+  "transcripts_forwarded": false,
+  "uncached_input_tokens": 47000,
+  "wall_time_ms": 130969
+}
