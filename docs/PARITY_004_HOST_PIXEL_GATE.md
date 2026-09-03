@@ -150,11 +150,14 @@ Use host/pixel evidence to decide whether either debt is causal. Before adding m
 
 ## Stop conditions
 
-Stop and report instead of advancing when:
+Stop and report instead of advancing only when:
 
-- P4-08 cannot load the current artifact and the blocker is not yet localized;
-- the micro pixel gate exposes an unresolved Loader/alpha/color contract;
-- the real baseline shows a material failure that has not yet been reduced to a fixture;
-- required host/reference evidence is unavailable.
+- actual Fusion artifacts cannot be acquired through multiple reasonable routes;
+- actual Fusion internal-boundary evidence plus P4-09 still leaves multiple implementation hypotheses unresolved by the Orchestrator;
+- credentials, additional authority, or a destructive human action is required;
+- the deterministic execution path fails closed;
+- PARITY-004 reaches verified closure.
+
+Photoshop absence is not a stop condition. Ordinary test, fixture, or localized implementation failures require a changed diagnostic or localized repair rather than stopping.
 
 `PARITY-004` remains `in_progress` until the required host/pixel evidence is complete and fresh verification permits the canonical state transition.

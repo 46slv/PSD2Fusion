@@ -95,7 +95,7 @@ Evidence: `scripts/parity/p4_07.py`, committed P4-07/P4-03-through-P4-07 evidenc
 
 ## P4-08 — Ordinary Fusion load/readback sanity
 
-Status: `PENDING — NEXT`
+Status: `PASS — HOST_LOADED`
 
 Use a new Resolve/Fusion launch and new project when practical; a known disposable test project is also acceptable.
 
@@ -111,9 +111,11 @@ Required checks:
 
 P4-08 may establish `host_loaded`. It cannot establish `pixel_verified`.
 
+Current evidence: `.control/evidence/PARITY-004/20260903-p408-96112d5/summary.json` records successful ordinary load/readback for candidate `96112d5`. Do not rerun P4-08 unless a later implementation changes the candidate graph materially.
+
 ## P4-HOST-PIXEL — Minimum actual-Fusion pixel gate
 
-Status: `PENDING — REQUIRED BEFORE REAL P4-09 INTERPRETATION`
+Status: `IN_PROGRESS — FUSION-ONLY BOUNDED DIAGNOSTIC NEXT`
 
 Render deterministic micro fixtures in actual Fusion before diagnosing the full real PSD. At minimum cover:
 
@@ -126,6 +128,8 @@ Render deterministic micro fixtures in actual Fusion before diagnosing the full 
 - transparent / black / white / colored outer backdrops.
 
 Use the existing comparator. Record actual rendered artifact hashes and RGBA/alpha metrics. Graph text or host readback alone is not pixel evidence.
+
+The physical artifact route is established by `.control/evidence/PARITY-004/20260904-fusion-artifact-acquisition/summary.json`. Photoshop is not used and is not a prerequisite. The next bounded diagnostic compares actual Fusion boundaries for Normal, Multiply, Linear Dodge and Overlay across identical ungrouped and isolated-GroupOperator inputs. A formula oracle is diagnostic only.
 
 Full procedure: `docs/PARITY_004_HOST_PIXEL_GATE.md`.
 
@@ -167,4 +171,4 @@ Do not ignore these. Also do not perform a broad rewrite before the first host/p
 
 ## Immediate next action
 
-Run P4-08 on the published current candidate. If it loads, run the minimum actual-Fusion pixel gate. Then take the first P4-09 real baseline. Keep `PARITY-004` `in_progress` until required host/pixel evidence is complete and a fresh verifier permits state transition.
+Prepare the deterministic Fusion-only boundary fixture offline. When DaVinci/Fusion use resumes, materialize the ungrouped and isolated-GroupOperator boundaries, then take the first P4-09 real baseline if the graph is stable. Keep `PARITY-004` `in_progress` until required host/pixel evidence is complete and a fresh verifier permits state transition.
