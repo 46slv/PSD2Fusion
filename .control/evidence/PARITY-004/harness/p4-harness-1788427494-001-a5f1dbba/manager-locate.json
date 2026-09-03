@@ -1,0 +1,148 @@
+{
+  "cached_input_tokens": 210688,
+  "ephemeral": true,
+  "exit_code": 0,
+  "input_tokens": 273196,
+  "isolation": {
+    "allowed_workspace_read": true,
+    "allowed_workspace_write": false,
+    "backend": "codex-split-filesystem-profile",
+    "canonical_external_read": "DENIED",
+    "codex_executable": "C:\\Users\\shiro\\AppData\\Local\\OpenAI\\Codex\\bin\\b99306303521e97e\\codex.exe",
+    "command_exit_code": 0,
+    "exact_write": "DENIED",
+    "forbidden_external_read": "DENIED",
+    "legacy_sandbox_mode_used": false,
+    "outside_write": "DENIED",
+    "platform": "win32",
+    "probe_mode": "codex-exec",
+    "profile_name": "ceh_manager_locate_af6160f40004",
+    "readonly_write": "DENIED",
+    "runtime_executable": "C:\\Users\\shiro\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\python\\python.exe",
+    "status": "PROVEN",
+    "stderr_bytes": 197,
+    "stderr_sha256": "701c3e8afa77d90b9c0bdfdbd1f14659904f578ea7a4c078af2644f8aefbe41f",
+    "stdout_bytes": 2027,
+    "stdout_sha256": "13d53ea931918324eb493ead5bcecdb0050fd7846779d922e9a7ed3c0fb23bfa",
+    "wall_time_ms": 16047,
+    "workspace_access": "read",
+    "write_path_read": "PASS"
+  },
+  "isolation_profile": "ceh_manager_locate_af6160f40004",
+  "isolation_status": "PROVEN",
+  "model_visible_bytes": 87578,
+  "model_visible_file_count": 4,
+  "output_tokens": 7548,
+  "protocol_errors": [],
+  "result": {
+    "goal_item_id": "PARITY-004",
+    "requests": [
+      {
+        "kind": "EXACT_FILE",
+        "max_bytes": 5811,
+        "max_results": 1,
+        "path_scopes": [
+          "AGENTS.md"
+        ],
+        "query": "AGENTS.md",
+        "reason": "Repository-specific instructions."
+      },
+      {
+        "kind": "EXACT_FILE",
+        "max_bytes": 8065,
+        "max_results": 1,
+        "path_scopes": [
+          ".control/PARITY-004_TODO.md"
+        ],
+        "query": ".control/PARITY-004_TODO.md",
+        "reason": "PARITY-004 scope and ordered gate constraints."
+      },
+      {
+        "kind": "EXACT_FILE",
+        "max_bytes": 6117,
+        "max_results": 1,
+        "path_scopes": [
+          "docs/PARITY_004_HOST_PIXEL_GATE.md"
+        ],
+        "query": "docs/PARITY_004_HOST_PIXEL_GATE.md",
+        "reason": "Required host/pixel verification procedure."
+      },
+      {
+        "kind": "EXACT_FILE",
+        "max_bytes": 3539,
+        "max_results": 1,
+        "path_scopes": [
+          ".control/evidence/PARITY-004/20260903-group-operator-contract/decision.md"
+        ],
+        "query": ".control/evidence/PARITY-004/20260903-group-operator-contract/decision.md",
+        "reason": "Implementation-ready GroupOperator semantic contract."
+      },
+      {
+        "kind": "EXACT_FILE",
+        "max_bytes": 45874,
+        "max_results": 1,
+        "path_scopes": [
+          "psd2fusion/fusion_comp.py"
+        ],
+        "query": "psd2fusion/fusion_comp.py",
+        "reason": "Primary GroupOperator lowering and stream-attachment implementation."
+      },
+      {
+        "kind": "EXACT_FILE",
+        "max_bytes": 15139,
+        "max_results": 1,
+        "path_scopes": [
+          "scripts/parity/p4_05.py"
+        ],
+        "query": "scripts/parity/p4_05.py",
+        "reason": "Focused deterministic group/nesting fixture."
+      },
+      {
+        "kind": "EXACT_FILE",
+        "max_bytes": 2002,
+        "max_results": 1,
+        "path_scopes": [
+          "tests/test_parity004_p405_graph.py"
+        ],
+        "query": "tests/test_parity004_p405_graph.py",
+        "reason": "Focused structural regression tests."
+      },
+      {
+        "kind": "EXACT_FILE",
+        "max_bytes": 844,
+        "max_results": 1,
+        "path_scopes": [
+          "scripts/check.ps1"
+        ],
+        "query": "scripts/check.ps1",
+        "reason": "Repository-supported validation command."
+      },
+      {
+        "kind": "EXACT_FILE",
+        "max_bytes": 886,
+        "max_results": 1,
+        "path_scopes": [
+          "tests/test_parity004_p407.py"
+        ],
+        "query": "tests/test_parity004_p407.py",
+        "reason": "Existing clipping regression coverage to preserve."
+      }
+    ],
+    "status": "DISCOVERY_REQUESTED",
+    "summary": "PARITY-004 is active and the next bounded task is the GroupOperator proxy/render-source split. Discover only the listed instructions, contracts, implementation, focused fixtures/tests, and validation command; preserve clipping semantics and keep host/pixel claims pending."
+  },
+  "role": "manager-locate",
+  "run_id": "p4-harness-1788427494-001-a5f1dbba",
+  "schema": "codex-ephemeral-harness.role-evidence.v1",
+  "schema_version": 1,
+  "status": "DISCOVERY_REQUESTED",
+  "stderr_bytes": 366,
+  "stderr_sha256": "c692dd5d1da9973c63bf3b8b328659d2c5edc2cd0e90744f21a1871f81f67d6f",
+  "stdout_bytes": 193306,
+  "stdout_sha256": "06963182c38ce16462809412abe47a44222e6c6baf7fd6b3920d42756814f7c5",
+  "thread_id": "01a06696-2685-7922-a58d-9c4579513150",
+  "timestamp": "2026-09-03T09:27:50.626272Z",
+  "transcripts_forwarded": false,
+  "uncached_input_tokens": 62508,
+  "wall_time_ms": 159281
+}

@@ -1,0 +1,12 @@
+{
+  "component": "codex-ephemeral-harness",
+  "details": [
+    "evidence[0].path is not an exact repository path"
+  ],
+  "kind": "WORKER_EVIDENCE_PATH_CONTRACT",
+  "project_failure": false,
+  "recovery": "instruct fresh Worker results to use repository-relative POSIX evidence paths; do not modify generic core",
+  "run_id": "p4-harness-1788427494-001-a5f1dbba",
+  "schema": "psd2fusion-parity-004.harness-defect.v1",
+  "status": "OBSERVED"
+}

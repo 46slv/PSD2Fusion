@@ -1,0 +1,80 @@
+{
+  "cached_input_tokens": 1225216,
+  "ephemeral": true,
+  "exit_code": 0,
+  "input_tokens": 1337253,
+  "isolation": {
+    "allowed_workspace_read": true,
+    "allowed_workspace_write": true,
+    "backend": "codex-split-filesystem-profile",
+    "canonical_external_read": "DENIED",
+    "codex_executable": "C:\\Users\\shiro\\AppData\\Local\\OpenAI\\Codex\\bin\\b99306303521e97e\\codex.exe",
+    "command_exit_code": 0,
+    "exact_write": "PASS",
+    "forbidden_external_read": "DENIED",
+    "legacy_sandbox_mode_used": false,
+    "outside_write": "DENIED",
+    "platform": "win32",
+    "probe_mode": "codex-exec",
+    "profile_name": "ceh_worker_a22f749857e7",
+    "readonly_write": "DENIED",
+    "runtime_executable": "C:\\Users\\shiro\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\python\\python.exe",
+    "status": "PROVEN",
+    "stderr_bytes": 197,
+    "stderr_sha256": "5c4dad07dafa7747993d233ff72eeccfd72b87806a534072146706899a429885",
+    "stdout_bytes": 1904,
+    "stdout_sha256": "7f8bace2d8e8e3b8f3aee241a4bbb7ebfb52c029337e4916f07197eb85f72c3b",
+    "wall_time_ms": 18094,
+    "workspace_access": "write",
+    "write_path_read": "PASS"
+  },
+  "isolation_profile": "ceh_worker_a22f749857e7",
+  "isolation_status": "PROVEN",
+  "model_visible_bytes": 105851,
+  "model_visible_file_count": 13,
+  "output_tokens": 32716,
+  "protocol_errors": [],
+  "result": {
+    "canonical_patch_applied": false,
+    "evidence": [
+      {
+        "kind": "implementation",
+        "path": "C:\\Users\\shiro\\AppData\\Local\\Temp\\ceh-p4-harness-1788427494-001-a5f1dbba-worker-4jq35m_u\\psd2fusion\\fusion_comp.py",
+        "summary": "Implemented GroupOperator proxy/render-source separation and actual pass-through backdrop threading."
+      },
+      {
+        "kind": "fixture",
+        "path": "C:\\Users\\shiro\\AppData\\Local\\Temp\\ceh-p4-harness-1788427494-001-a5f1dbba-worker-4jq35m_u\\scripts\\parity\\p4_05.py",
+        "summary": "Added direct coverage and deterministic group boundary ownership/attachment checks."
+      },
+      {
+        "kind": "tests",
+        "path": "C:\\Users\\shiro\\AppData\\Local\\Temp\\ceh-p4-harness-1788427494-001-a5f1dbba-worker-4jq35m_u\\tests\\test_parity004_p405_graph.py",
+        "summary": "Added regression assertions for proxy-only group outputs and pass-through attachment."
+      }
+    ],
+    "notes": [
+      "Only the three declared write paths changed.",
+      "git diff --check passed.",
+      "Declared tests and scripts/check.ps1 were not run because verification is Runner-owned.",
+      "No host_loaded or pixel_verified claim was made."
+    ],
+    "requested_context": [],
+    "status": "DONE",
+    "summary": "Implemented the exact isolated Worker task within the permitted write paths."
+  },
+  "role": "worker",
+  "run_id": "p4-harness-1788427494-001-a5f1dbba",
+  "schema": "codex-ephemeral-harness.role-evidence.v1",
+  "schema_version": 1,
+  "status": "DONE",
+  "stderr_bytes": 578,
+  "stderr_sha256": "9ecaacaf654f521214d104a1137d0fdd9516a71ec11ea397e49778d74cfdef92",
+  "stdout_bytes": 237061,
+  "stdout_sha256": "822c17d0697aac4aea2ecc048c727e28244811bff7717b1eead75fecc1d1c270",
+  "thread_id": "01a0669d-1fb7-7f91-bb5c-cf5af6f19961",
+  "timestamp": "2026-09-03T09:44:09.155660Z",
+  "transcripts_forwarded": false,
+  "uncached_input_tokens": 112037,
+  "wall_time_ms": 680782
+}

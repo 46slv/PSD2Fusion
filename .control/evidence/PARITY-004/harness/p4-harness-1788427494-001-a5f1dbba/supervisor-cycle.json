@@ -1,0 +1,212 @@
+{
+  "adapter": "psd2fusion-parity-004",
+  "canonical_state_mutation": "adapter marker only; .control/current.json unchanged",
+  "cycle_evidence_hash": "f6093f2b7d200564a04109f5d96ce7e01aeb19a626db7186aa1ad0bca2353c3e",
+  "decision": "NEXT_CYCLE_LOCALIZED",
+  "decision_detail": "bounded failure is eligible for a fresh Manager cycle",
+  "devexec_task_id": "devexec-psd2fusion-p004-20260903",
+  "evidence_relpath": ".control/evidence/PARITY-004/harness/p4-harness-1788427494-001-a5f1dbba/cycle-evidence.json",
+  "fingerprint_count": 0,
+  "harness_defect": {
+    "component": "codex-ephemeral-harness",
+    "details": [
+      "evidence[0].path is not an exact repository path"
+    ],
+    "kind": "WORKER_EVIDENCE_PATH_CONTRACT",
+    "project_failure": false,
+    "recovery": "instruct fresh Worker results to use repository-relative POSIX evidence paths; do not modify generic core",
+    "run_id": "p4-harness-1788427494-001-a5f1dbba",
+    "schema": "psd2fusion-parity-004.harness-defect.v1",
+    "status": "OBSERVED"
+  },
+  "materialized_read_sets": {
+    "manager-locate": {
+      "files": [
+        ".harness/MANAGER_LOCATE.md",
+        ".harness/goal.json",
+        ".harness/state.json",
+        ".harness/repo-map.json",
+        ".harness/context-manifest.json"
+      ],
+      "source": "generic-bundle-contract"
+    },
+    "manager-plan": {
+      "files": [
+        ".harness/MANAGER_PLAN.md",
+        ".harness/goal.json",
+        ".harness/state.json",
+        ".harness/discovery.json",
+        ".harness/context-manifest.json"
+      ],
+      "source": "generic-bundle-contract"
+    },
+    "verifier": {
+      "files": [
+        ".harness/VERIFIER.md",
+        ".harness/verifier-bundle.json",
+        ".harness/context-manifest.json"
+      ],
+      "source": "generic-bundle-contract"
+    },
+    "worker": {
+      "files": [
+        ".control/PARITY-004_TODO.md",
+        ".control/evidence/PARITY-004/20260903-group-operator-contract/decision.md",
+        ".control/evidence/PARITY-004/harness/p4-harness-1788423650-001-5d248afe/discovery.json",
+        ".control/evidence/PARITY-004/harness/p4-harness-1788423650-001-5d248afe/manager-locate.json",
+        ".harness/context-manifest.json",
+        ".harness/task.json",
+        "AGENTS.md",
+        "docs/PARITY_004_HOST_PIXEL_GATE.md",
+        "scripts/check.ps1",
+        "tests/test_parity004_p407.py"
+      ],
+      "source": "Task Packet exact read/handoff paths"
+    }
+  },
+  "metrics": {
+    "cached_input_tokens": 1742336,
+    "input_tokens": 1986931,
+    "model_visible_bytes": 284968,
+    "model_visible_file_count": 21,
+    "output_tokens": 53032,
+    "uncached_input_tokens": 244595,
+    "wall_time_ms": 1100766
+  },
+  "patch": null,
+  "phase": "WORKER",
+  "preflight_context_firewall": {
+    "probes": [
+      {
+        "id": 1,
+        "name": "worker_allowed_read",
+        "status": "PASS"
+      },
+      {
+        "id": 2,
+        "name": "canonical_read_denied",
+        "status": "PASS"
+      },
+      {
+        "id": 3,
+        "name": "unrelated_sentinel_read_denied",
+        "status": "PASS"
+      },
+      {
+        "id": 4,
+        "name": "worker_exact_write",
+        "status": "PASS"
+      },
+      {
+        "id": 5,
+        "name": "worker_readonly_write_denied",
+        "status": "PASS"
+      },
+      {
+        "id": 6,
+        "name": "verifier_canonical_read_denied",
+        "status": "PASS"
+      }
+    ],
+    "production_roles_launched": false,
+    "status": "PASS"
+  },
+  "project_task": "PARITY-004",
+  "reasoning_effort": "max",
+  "repo_head_at_reload": "ref: refs/heads/codex/parity-004",
+  "role_model": "gpt-5.6-luna",
+  "roles": {
+    "manager-locate": {
+      "cached_input_tokens": 210688,
+      "ephemeral": true,
+      "external_read_denial": {
+        "canonical": "DENIED",
+        "forbidden": "DENIED",
+        "outside_write": "DENIED",
+        "readonly_write": "DENIED",
+        "status": "PROVEN"
+      },
+      "input_tokens": 273196,
+      "model": "gpt-5.6-luna",
+      "model_visible_bytes": 87578,
+      "model_visible_file_count": 4,
+      "output_tokens": 7548,
+      "present": true,
+      "reasoning_effort": "max",
+      "role": "manager-locate",
+      "thread_id": "01a06696-2685-7922-a58d-9c4579513150",
+      "uncached_input_tokens": 62508,
+      "wall_time_ms": 159281
+    },
+    "manager-plan": {
+      "cached_input_tokens": 306432,
+      "ephemeral": true,
+      "external_read_denial": {
+        "canonical": "DENIED",
+        "forbidden": "DENIED",
+        "outside_write": "DENIED",
+        "readonly_write": "DENIED",
+        "status": "PROVEN"
+      },
+      "input_tokens": 376482,
+      "model": "gpt-5.6-luna",
+      "model_visible_bytes": 91539,
+      "model_visible_file_count": 4,
+      "output_tokens": 12768,
+      "present": true,
+      "reasoning_effort": "max",
+      "role": "manager-plan",
+      "thread_id": "01a06698-dade-7c81-b375-4b65a00d8ea6",
+      "uncached_input_tokens": 70050,
+      "wall_time_ms": 260703
+    },
+    "verifier": {
+      "present": false
+    },
+    "worker": {
+      "cached_input_tokens": 1225216,
+      "ephemeral": true,
+      "external_read_denial": {
+        "canonical": "DENIED",
+        "forbidden": "DENIED",
+        "outside_write": "DENIED",
+        "readonly_write": "DENIED",
+        "status": "PROVEN"
+      },
+      "input_tokens": 1337253,
+      "model": "gpt-5.6-luna",
+      "model_visible_bytes": 105851,
+      "model_visible_file_count": 13,
+      "output_tokens": 32716,
+      "present": true,
+      "reasoning_effort": "max",
+      "role": "worker",
+      "thread_id": "01a0669d-1fb7-7f91-bb5c-cf5af6f19961",
+      "uncached_input_tokens": 112037,
+      "wall_time_ms": 680782
+    }
+  },
+  "run_id": "p4-harness-1788427494-001-a5f1dbba",
+  "schema": "psd2fusion-parity-004.supervisor-cycle.v1",
+  "sol_escalation": {
+    "reason": null,
+    "requested": false
+  },
+  "status": "BLOCKED",
+  "supervisor_target": "knotfield-harness-supervisor",
+  "task_packet": {
+    "bytes": 7237,
+    "files": 11,
+    "goal_item_id": "PARITY-004",
+    "present": true,
+    "sha256": "dc81136649f1e1f7049f4921de5eb7b0215e7b9c87b6a84ccd7793e85e0783f0",
+    "task_id": "PARITY-004-GROUPOPERATOR-SPLIT"
+  },
+  "tests": null,
+  "verdict": {
+    "failure_fingerprint": null,
+    "item_complete": null,
+    "summary": "",
+    "verifier": null
+  }
+}

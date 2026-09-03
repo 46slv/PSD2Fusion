@@ -26,6 +26,30 @@ from typing import Any
 
 ROLE_ORDER = ("manager-locate", "manager-plan", "worker", "verifier")
 SAFE_ID = re.compile(r"^[A-Za-z0-9][A-Za-z0-9._-]*$")
+_WORKER_EVIDENCE_PATH_CONTRACT = (
+    "Worker result evidence paths are contract fields: emit only repository-relative POSIX paths "
+    "exactly matching task.write_paths (for example psd2fusion/fusion_comp.py). Never emit an "
+    "absolute path, Windows drive path, or isolated Temp workspace path."
+)
+
+
+class _PSD2FusionInvoker:
+    """Project-only prompt guard around the generic invoker.
+
+    The generic harness remains responsible for isolation, invocation,
+    validation, patching, and evidence.  This wrapper supplies one workload
+    contract that a Worker omitted in an observed production run; it does not
+    rewrite role results or relax the generic validator.
+    """
+
+    def __init__(self, delegate: Any) -> None:
+        self._delegate = delegate
+
+    def invoke(self, **kwargs: Any) -> Any:
+        if kwargs.get("role") == "worker":
+            prompt = str(kwargs.get("prompt") or "")
+            kwargs["prompt"] = f"{prompt}\n\n{_WORKER_EVIDENCE_PATH_CONTRACT}"
+        return self._delegate.invoke(**kwargs)
 
 
 def _load_harness(harness_root: Path) -> dict[str, Any]:
@@ -612,11 +636,11 @@ def _run_production(root: Path, harness_root: Path, args: argparse.Namespace) ->
             else f"p4-harness-{int(time.time())}-{index:03d}-{uuid.uuid4().hex[:8]}"
         )
         resume_run_id = None
-        invoker = harness["CodexExecInvoker"](
+        invoker = _PSD2FusionInvoker(harness["CodexExecInvoker"](
             codex_command=command,
             base_env=base_env,
             evidence_store=harness["DurableRoleEvidenceStore"](evidence_root),
-        )
+        ))
         harness_defect: dict[str, Any] | None = None
         try:
             result = harness["run_production_cycle"](
