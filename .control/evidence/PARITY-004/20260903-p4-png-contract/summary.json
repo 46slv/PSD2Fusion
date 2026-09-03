@@ -1,0 +1,130 @@
+{
+  "schema_version": 1,
+  "task": "PARITY-004",
+  "items": ["P4-HOST-PIXEL", "PNG_RGBA_CONTRACT", "STATIC_LOADER_DIALECT"],
+  "status": "BLOCKED",
+  "verification": "worker_probe_complete_micro_gate_fail",
+  "branch": "codex/parity-004",
+  "candidate_commit": "f70114dc1c35ecc691cacc6be9e07d4490c0a87a",
+  "scope": {
+    "p4_09": "NOT_RUN",
+    "parity_005": "NOT_STARTED",
+    "parity_006": "NOT_STARTED",
+    "clipping_recipe_changed": false,
+    "real_inputs_modified": false
+  },
+  "host": {
+    "application": "DaVinci Resolve Studio",
+    "version": "21.0.3.7",
+    "project": "PSD2Fusion P4-08 20260902",
+    "script_endpoint": "Fusion localhost scripting endpoint"
+  },
+  "documentation": {
+    "postmultiply": "https://documents.blackmagicdesign.com/UserManuals/Fusion9_Tool_Reference.pdf?_v=1501601400000",
+    "image_api": "https://documents.blackmagicdesign.com/UserManuals/Fusion_Fuse_SDK.pdf?_v=1657782010000"
+  },
+  "png_rgba_probe": {
+    "fixture": {
+      "path": ".local/p4-loader-probe-20260903/loader-probe-unprofiled.png",
+      "sha256": "397e4781972cfe887f8a09d184ec1d6fef3a488b5ca92b7411e9466308309cc0",
+      "dimensions": [5, 1],
+      "profile": "unprofiled",
+      "rgba8": [[230, 51, 26, 0], [230, 51, 26, 64], [230, 51, 26, 128], [230, 51, 26, 191], [230, 51, 26, 255]]
+    },
+    "direct_loader_readback": {
+      "get_value": "PASS",
+      "image_dimensions": [5, 1],
+      "image_depth": 5,
+      "external_proxy_get_pixel": "UNAVAILABLE",
+      "interpretation": "The external Resolve Image proxy exposes the image object and dimensions but not GetPixel. Saver PreDivide=0 identity and the documented PostMultiply operation provide the independent numeric observation."
+    },
+    "matrix": [
+      {
+        "loader_postmultiply": 0,
+        "saver_predivide": 0,
+        "artifact": ".local/p4-png-contract-20260903/postoff-predoff0000.png",
+        "sha256": "9acb7c4e4b3f14afff201cd0af8adafdd0a34c5f9643b0e754f9148ffe49f712",
+        "rgba8": [[230, 51, 26, 0], [230, 51, 26, 64], [230, 51, 26, 128], [230, 51, 26, 191], [230, 51, 26, 255]],
+        "result": "identity; Fusion image is straight C,A"
+      },
+      {
+        "loader_postmultiply": 0,
+        "saver_predivide": 1,
+        "artifact": ".local/p4-png-contract-20260903/postoff-predon0000.png",
+        "sha256": "1a59ffcda388e1fc7fca441da7a53e4512bbd8954b7604801ee7243a5c3ac6cd",
+        "rgba8": [[0, 0, 0, 0], [255, 203, 103, 64], [255, 101, 51, 128], [255, 68, 34, 191], [230, 51, 26, 255]],
+        "result": "Saver divides straight C by A, clips and quantizes; this explains the previous RGB/alpha result"
+      },
+      {
+        "loader_postmultiply": 1,
+        "saver_predivide": 0,
+        "artifact": ".local/p4-png-contract-20260903/poston-predoff0000.png",
+        "sha256": "65652fd53f98f9d2cb5d57e960182a54823d13f8d16983fb5e339e52612e1bb6",
+        "rgba8": [[0, 0, 0, 0], [58, 13, 7, 64], [115, 26, 13, 128], [172, 38, 19, 191], [230, 51, 26, 255]],
+        "result": "Loader produces premultiplied C*A,A"
+      },
+      {
+        "loader_postmultiply": 1,
+        "saver_predivide": 1,
+        "artifact": ".local/p4-png-contract-20260903/poston-predon0000.png",
+        "sha256": "19c8386f93aa4131baf5e60cb21bf2649558f1dd1d2d8aaf1c3890da7bfc2c76",
+        "rgba8": [[0, 0, 0, 0], [231, 51, 27, 64], [229, 51, 25, 128], [229, 50, 25, 191], [230, 51, 26, 255]],
+        "result": "straight PNG round-trip within multiply/divide/8-bit rounding; A=0 RGB is canonical zero"
+      }
+    ],
+    "contract": {
+      "decode_postmultiply_0": "PNG straight C,A -> Fusion C,A",
+      "decode_postmultiply_1": "PNG straight C,A -> Fusion C*A,A",
+      "save_predivide_0": "Fusion Cmem,A -> PNG Cmem,A",
+      "save_predivide_1": "Fusion Cmem,A -> PNG clamp(Cmem/A),A with A=0 RGB canonicalized to zero",
+      "normal_compositing_path": "Loader PostMultiply=1 -> premultiplied Fusion processing -> Saver PreDivide=1"
+    }
+  },
+  "static_loader_probe": {
+    "factorial": [
+      {"start_frame_minus_one": false, "length_zero": true, "loader_image": false, "render": false},
+      {"start_frame_minus_one": false, "length_zero": false, "loader_image": false, "render": false},
+      {"start_frame_minus_one": true, "length_zero": true, "loader_image": false, "render": false},
+      {"start_frame_minus_one": true, "length_zero": false, "loader_image": true, "render": true}
+    ],
+    "cause": "The compiler emitted a zero-length clip and omitted Fusion's still-frame StartFrame=-1 declaration. This is independent of PostMultiply and Saver PreDivide.",
+    "fix": "Replace Length = 0 with StartFrame = -1 in the Loader Clip declaration.",
+    "fixed_artifact": ".local/p4-static-contract-20260903/compiler-fixed-output0000.png",
+    "fixed_artifact_sha256": "65652fd53f98f9d2cb5d57e960182a54823d13f8d16983fb5e339e52612e1bb6",
+    "fixed_direct_loader_dimensions": [5, 1]
+  },
+  "p4_host_pixel_rerun": {
+    "local_summary": ".local/p4-host-pixel-fixed-20260903/summary.json",
+    "fixture_dimensions": "variable width x 4 repeated rows",
+    "loader_postmultiply": 1,
+    "saver_predivide": 1,
+    "candidate_count": 13,
+    "render_count": 13,
+    "raw_rgba_pass_count": 1,
+    "alpha_max_error_all_cases": 0,
+    "results": [
+      ["alpha-matrix", "FAIL", 173, "32596fa2e76ac05f49a49df54b394a31e0b527ffc0f1f12ba82afa51b91c4c2e"],
+      ["member-mode-normal", "FAIL", 22, "5e19da170a0cae02baeebe6af0ff844b02ff42f71193638a1e615b432f962874"],
+      ["member-mode-multiply", "FAIL", 20, "92c6f9f1d5e2f3d8d6d80083ee13276739a34ddcbfe1e7dfbbfd84b74df28fc8"],
+      ["member-mode-linear-dodge", "FAIL", 7, "31a58a468379a2353e64f3a2137c3bdf38511031da79c02922954c01544e05d5"],
+      ["member-mode-overlay", "FAIL", 15, "414122337ae477f669665fd0aaf73c9201e99a03639b1e1f4be37e4fde769078"],
+      ["member-opacity-025", "FAIL", 11, "9afd9492263cbccfd132a4ccd4d6f74ace12c7e6d767ce102023b6b96190490a"],
+      ["member-opacity-050", "FAIL", 22, "5e19da170a0cae02baeebe6af0ff844b02ff42f71193638a1e615b432f962874"],
+      ["member-opacity-075", "FAIL", 32, "077f6395fdbe54ed91d92392b4466150332026c47bee70a1bfd234e7247f6f15"],
+      ["member-opacity-100", "FAIL", 43, "65aa8e9c728c6a6ea4f4594b80301f906bf078b77710ec9c4cfbbc7ab406fa6c"],
+      ["base-opacity-000", "PASS", 0, "96d5e41022204e58d5a7496eeca46f0db08ef4442007e3e9efe71ae2be4736ff"],
+      ["base-opacity-050", "FAIL", 11, "78e776f7ce88f729188172ba03d62148b60900937d0602d6dc256fe9c84faad3"],
+      ["base-opacity-100", "FAIL", 22, "5e19da170a0cae02baeebe6af0ff844b02ff42f71193638a1e615b432f962874"],
+      ["outer-backdrops-base-multiply", "FAIL", 152, "bba693925bbb776d4938159ebbedd499c69ba1b7db2ae158b5b980ee2838ca3f"]
+    ],
+    "localized_boundary": "Loader and Saver alpha handling are no longer the blocker. Base alpha is preserved exactly, but RGB diverges when a clipped member contributes through Operator=In and the ProcessAlpha=0 local Merge. Transparent RGB is also intentionally lost at A=0 on the premultiplied path.",
+    "next_action": "Stop before changing the clipping recipe. Independently determine the Fusion Merge RGB math/color-space contract for premultiplied Operator=In input, then rerun this focused fixture."
+  },
+  "checks": {
+    "focused_unittest": "PASS (2 tests)",
+    "offline_check": "PASS (60 tests)",
+    "host_pixel_verified": false,
+    "real_baseline": false,
+    "photoshop_pixel_parity": false
+  }
+}
