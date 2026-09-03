@@ -115,6 +115,49 @@ class PSD2FusionAdapterTests(unittest.TestCase):
         self.assertEqual("FAIL", feedback["results"][0]["status"])
         self.assertNotIn(str(root), json.dumps(feedback, ensure_ascii=False))
 
+    def test_latest_runner_feedback_falls_back_from_unfinished_current_run(self) -> None:
+        root = self._repo()
+        harness = root / ".control" / "evidence" / "PARITY-004" / "harness"
+        harness.mkdir(parents=True)
+        current_run = "p4-harness-current-pending"
+        prior_run = "p4-harness-prior-complete"
+        (harness / "current.json").write_text(
+            json.dumps(
+                {
+                    "run_id": current_run,
+                    "status": "HARNESS_EXCEPTION",
+                    "phase": "ROLE_PROCESS",
+                }
+            ),
+            encoding="utf-8",
+        )
+        (harness / prior_run).mkdir()
+        (harness / prior_run / "runner-tests.json").write_text(
+            json.dumps(
+                {
+                    "status": "FAIL",
+                    "failed": 2,
+                    "passed": 1,
+                    "results": [
+                        {"command": "python -m unittest", "status": "FAIL", "exit_code": 1}
+                    ],
+                }
+            ),
+            encoding="utf-8",
+        )
+
+        value = PSD2FusionAdapter().load_goal_state(root)
+        feedback = value["state"]["latest_runner_feedback"]
+        self.assertEqual(prior_run, feedback["run_id"])
+        self.assertEqual(current_run, feedback["current_run_id"])
+        self.assertEqual("HARNESS_EXCEPTION", feedback["cycle_status"])
+        self.assertEqual("FAIL", feedback["runner_status"])
+        self.assertEqual(
+            ".control/evidence/PARITY-004/harness/p4-harness-prior-complete/runner-tests.json",
+            feedback["runner_tests_path"],
+        )
+        self.assertNotIn(str(root), json.dumps(feedback, ensure_ascii=False))
+
 
 if __name__ == "__main__":
     unittest.main()

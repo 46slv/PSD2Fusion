@@ -243,13 +243,42 @@ def _latest_runner_feedback(repo: Path) -> dict[str, Any] | None:
         }
     if not isinstance(current, Mapping):
         return {"status": "INVALID", "path": _HARNESS_EVIDENCE.joinpath("current.json").as_posix()}
-    run_id = current.get("run_id")
-    if not isinstance(run_id, str) or not re.fullmatch(r"[A-Za-z0-9][A-Za-z0-9._-]*", run_id):
+    current_run_id = current.get("run_id")
+    if not isinstance(current_run_id, str) or not re.fullmatch(
+        r"[A-Za-z0-9][A-Za-z0-9._-]*", current_run_id
+    ):
         return {"status": "NO_RUN", "phase": current.get("phase")}
-    relative = _HARNESS_EVIDENCE / run_id / "runner-tests.json"
+
+    # A Harness role-process failure can advance ``current.json`` to a new
+    # unfinished run before Runner writes its artifact.  Do not hide the last
+    # completed Runner verdict from the next fresh Manager in that case.  The
+    # fallback is deliberately limited to bounded repo-local runner-tests.json
+    # files; it never reads role transcripts or arbitrary prior evidence.
+    evidence_root = repo / _HARNESS_EVIDENCE
+    candidate_paths: list[Path] = [
+        evidence_root / current_run_id / "runner-tests.json"
+    ]
+    if evidence_root.is_dir():
+        prior = [
+            path
+            for path in evidence_root.glob("*/runner-tests.json")
+            if path.is_file()
+            and path != candidate_paths[0]
+            and re.fullmatch(r"[A-Za-z0-9][A-Za-z0-9._-]*", path.parent.name)
+        ]
+        prior.sort(key=lambda item: (item.stat().st_mtime_ns, item.as_posix()), reverse=True)
+        candidate_paths.extend(prior[:16])
+
+    relative = candidate_paths[0]
+    for candidate in candidate_paths:
+        if candidate.is_file():
+            relative = candidate.relative_to(repo)
+            break
+    source_run_id = relative.parts[-2] if len(relative.parts) >= 2 else current_run_id
     record = _file_record(repo, relative)
     feedback: dict[str, Any] = {
-        "run_id": run_id,
+        "run_id": source_run_id,
+        "current_run_id": current_run_id,
         "cycle_status": current.get("status"),
         "phase": current.get("phase"),
         "runner_tests_path": relative.as_posix(),
