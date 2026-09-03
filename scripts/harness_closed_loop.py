@@ -568,7 +568,12 @@ def _run_production(root: Path, harness_root: Path, args: argparse.Namespace) ->
     cycles: list[dict[str, Any]] = []
     stop_reason = "MAX_CYCLES"
     stop_detail: str | None = None
-    resume_run_id = _existing_in_progress_run(evidence_root)
+    # Recovery is opt-in.  A generic cycle journal can contain a completed
+    # first-attempt role plus an unfinished later phase; blindly resuming can
+    # collide with the harness' attempt store.  Normal closed-loop progress
+    # therefore starts a fresh cycle, while an operator may explicitly choose
+    # ``--resume-in-progress`` after inspecting the retained journal.
+    resume_run_id = _existing_in_progress_run(evidence_root) if args.resume_in_progress else None
     for index in range(1, args.max_cycles + 1):
         run_id = (
             resume_run_id
@@ -706,6 +711,7 @@ def parser() -> argparse.ArgumentParser:
     root.add_argument("--max-discovery-rounds", type=int, default=2)
     root.add_argument("--max-retries", type=int, default=1)
     root.add_argument("--max-cycles", type=int, default=8)
+    root.add_argument("--resume-in-progress", action="store_true")
     root.add_argument("--model", default="gpt-5.6-luna")
     root.add_argument("--reasoning-effort", default="max")
     root.add_argument("--codex-executable")
