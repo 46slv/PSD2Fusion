@@ -83,6 +83,32 @@ class PSD2FusionAdapterTests(unittest.TestCase):
         self.assertEqual(before, (root / ".control" / "current.json").read_bytes())
         self.assertTrue((root / first["marker_relpath"]).is_file())
 
+    def test_reconcile_verified_result_keeps_root_for_summary_scrubbing(self) -> None:
+        root = self._repo()
+        adapter = PSD2FusionAdapter()
+        transition = adapter.reconcile_verified_result(
+            root,
+            goal_state={"state": {"orchestration": {"next_workload": "P4-08"}}},
+            task_packet={
+                "run_id": "run-001",
+                "task": {
+                    "id": "P4-HARNESS-001",
+                    "goal_item_id": "PARITY-004",
+                    "completion_scope": "TRANCHE",
+                },
+            },
+            patch={"patch_sha256": "a" * 64, "changed_paths": []},
+            runner_tests={"status": "PASS"},
+            verifier_result={
+                "verdict": "PASS",
+                "summary": f"verified at {root}",
+            },
+            evidence={"transcript": "must not be used"},
+        )
+        self.assertEqual("RECORDED", transition["status"])
+        self.assertNotIn(str(root), json.dumps(transition, ensure_ascii=False))
+        self.assertEqual("P4-08", transition["next_workload"])
+
     def test_latest_runner_feedback_is_bounded_and_points_to_current_artifact(self) -> None:
         root = self._repo()
         harness = root / ".control" / "evidence" / "PARITY-004" / "harness"

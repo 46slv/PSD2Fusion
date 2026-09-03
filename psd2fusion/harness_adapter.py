@@ -475,7 +475,12 @@ class PSD2FusionAdapter:
         verifier_result: Mapping[str, Any],
         evidence: Mapping[str, Any],
     ) -> Mapping[str, Any]:
-        del repo, evidence
+        # Keep the canonical root only for bounded path scrubbing below.  The
+        # previous ``del repo`` was a local adapter bug: it made the successful
+        # Runner/Verifier gate fail during reconciliation with
+        # ``UnboundLocalError`` after all role evidence had been persisted.
+        del evidence
+        repo_root = Path(repo).resolve()
         task = task_packet.get("task", task_packet)
         if not isinstance(task, Mapping):
             raise ValueError("Task Packet task must be an object")
@@ -496,7 +501,7 @@ class PSD2FusionAdapter:
             "goal_item_id": goal_item_id,
             "completion_scope": task.get("completion_scope"),
             "verifier_verdict": verifier_result.get("verdict"),
-            "verifier_summary": _scrub_string(str(verifier_result.get("summary", "")), Path(repo).resolve())[:2_000],
+            "verifier_summary": _scrub_string(str(verifier_result.get("summary", "")), repo_root)[:2_000],
             "runner_status": runner_tests.get("status"),
             "patch_sha256": patch.get("patch_sha256"),
             "changed_paths": changed_paths,
