@@ -108,6 +108,37 @@ def _read_cycle_evidence(result: Mapping[str, Any], evidence_root: Path, run_id:
     return value if isinstance(value, Mapping) else None
 
 
+def _existing_in_progress_run(evidence_root: Path) -> str | None:
+    """Return the generic journal's current unfinished run for safe recovery."""
+
+    path = evidence_root / "current.json"
+    if not path.is_file():
+        return None
+    try:
+        value = _read_json(path)
+    except (OSError, UnicodeError, json.JSONDecodeError):
+        return None
+    run_id = value.get("run_id") if isinstance(value, Mapping) else None
+    status = value.get("status") if isinstance(value, Mapping) else None
+    if isinstance(run_id, str) and SAFE_ID.fullmatch(run_id) and status == "IN_PROGRESS":
+        if (evidence_root / run_id / "cycle.json").is_file():
+            return run_id
+    return None
+
+
+def _scrub_exception(value: Any, repo: Path) -> str:
+    text = str(value)
+    variants = {
+        str(repo),
+        str(repo).replace("\\", "/"),
+        str(repo).replace("/", "\\"),
+    }
+    for variant in sorted(variants, key=len, reverse=True):
+        if variant:
+            text = re.sub(re.escape(variant), "<canonical-repo>", text, flags=re.IGNORECASE)
+    return text[:4_000]
+
+
 def _materialized_read_sets(task: Mapping[str, Any] | None) -> dict[str, Any]:
     task_value = task.get("task", task) if isinstance(task, Mapping) else {}
     if not isinstance(task_value, Mapping):
@@ -358,8 +389,8 @@ def _stop_decision(
     fingerprints: Mapping[str, int],
 ) -> tuple[bool, str, str | None]:
     status = str(result.get("status") or "UNKNOWN")
-    if status == "ISOLATION_FAILED":
-        return True, "HARNESS_FAIL_CLOSED", "generic Context Firewall proof did not remain PROVEN"
+    if status in {"ISOLATION_FAILED", "HARNESS_EXCEPTION"}:
+        return True, "HARNESS_FAIL_CLOSED", "generic Context Firewall/role process failed; recovery is required"
     if status in {"SOURCE_DRIFT", "RECOVERY_REQUIRED", "BLOCKED_CONTEXT_BUDGET"}:
         return True, status, str(result.get("error") or "cycle stopped by generic harness")
     current_path = repo / ".control" / "current.json"
@@ -537,27 +568,56 @@ def _run_production(root: Path, harness_root: Path, args: argparse.Namespace) ->
     cycles: list[dict[str, Any]] = []
     stop_reason = "MAX_CYCLES"
     stop_detail: str | None = None
+    resume_run_id = _existing_in_progress_run(evidence_root)
     for index in range(1, args.max_cycles + 1):
-        run_id = f"p4-harness-{int(time.time())}-{index:03d}-{uuid.uuid4().hex[:8]}"
+        run_id = (
+            resume_run_id
+            if index == 1 and resume_run_id is not None
+            else f"p4-harness-{int(time.time())}-{index:03d}-{uuid.uuid4().hex[:8]}"
+        )
+        resume_run_id = None
         invoker = harness["CodexExecInvoker"](
             codex_command=command,
             base_env=base_env,
             evidence_store=harness["DurableRoleEvidenceStore"](evidence_root),
         )
-        result = harness["run_production_cycle"](
-            root,
-            adapter,
-            invoker=invoker,
-            options=harness["CycleOptions"](
-                evidence_root=evidence_root,
-                run_id=run_id,
-                mode="production",
-                timeout_seconds=args.timeout,
-                max_discovery_rounds=args.max_discovery_rounds,
-                max_retries=args.max_retries,
-                base_env=base_env,
-            ),
-        )
+        harness_defect: dict[str, Any] | None = None
+        try:
+            result = harness["run_production_cycle"](
+                root,
+                adapter,
+                invoker=invoker,
+                options=harness["CycleOptions"](
+                    evidence_root=evidence_root,
+                    run_id=run_id,
+                    mode="production",
+                    timeout_seconds=args.timeout,
+                    max_discovery_rounds=args.max_discovery_rounds,
+                    max_retries=args.max_retries,
+                    base_env=base_env,
+                ),
+            )
+        except Exception as exc:
+            # Current CEH releases let a subprocess TimeoutExpired escape the
+            # one-cycle wrapper. Preserve that defect separately and stop
+            # closed; the unfinished CEH journal is recoverable by run_id.
+            result = {
+                "status": "HARNESS_EXCEPTION",
+                "phase": "ROLE_PROCESS",
+                "error_type": type(exc).__name__,
+                "error": _scrub_exception(exc, root),
+            }
+            harness_defect = {
+                "schema": "psd2fusion-parity-004.harness-defect.v1",
+                "run_id": run_id,
+                "component": "codex-ephemeral-harness",
+                "status": "OBSERVED",
+                "error_type": type(exc).__name__,
+                "error": _scrub_exception(exc, root),
+                "project_failure": False,
+                "recovery": "re-run the same run_id only after operator review; no blind duplicate role launch",
+            }
+            _atomic_json_write(evidence_root / run_id / "harness-defect.json", harness_defect)
         record = _build_cycle_record(
             repo=root,
             evidence_root=evidence_root,
@@ -567,6 +627,8 @@ def _run_production(root: Path, harness_root: Path, args: argparse.Namespace) ->
             supervisor_target=supervisor_target,
             preflight=preflight,
         )
+        if harness_defect is not None:
+            record["harness_defect"] = harness_defect
         fingerprint = _failure_fingerprint(record)
         if fingerprint:
             fingerprints[fingerprint] = fingerprints.get(fingerprint, 0) + 1
