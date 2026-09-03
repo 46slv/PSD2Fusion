@@ -5,7 +5,7 @@
   "status": "BLOCKED",
   "verification": "host_stage_probe_complete_micro_gate_fail_real_baseline_classified",
   "branch": "codex/parity-004",
-  "candidate_commit": "521baa5",
+  "candidate_commit": "521baa51fd8286de043d6d156a14b7f5f91d9e87",
   "scope": {
     "p4_08": "PASS (previously evidenced; current graph readback retained)",
     "p4_09": "diagnostic baseline run and classified",
