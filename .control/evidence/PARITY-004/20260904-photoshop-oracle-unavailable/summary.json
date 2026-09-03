@@ -1,0 +1,34 @@
+{
+  "schema": "psd2fusion-parity-004.photoshop-oracle-unavailable.v1",
+  "observed_at": "2026-09-04T00:54:30+09:00",
+  "task": "PARITY-004",
+  "gate": "P4-HOST-PIXEL-PHASE-2",
+  "status": "BLOCKED",
+  "candidate_commit": "96112d57ec52645a1d9797323d3551bf45538f27",
+  "classification": "PHOTOSHOP_ACTUAL_ORACLE_UNAVAILABLE_BY_USER_BOUNDARY",
+  "input_evidence": [
+    ".control/evidence/PARITY-004/20260903-sol-host-pixel-diagnostic/decision.json",
+    ".control/evidence/PARITY-004/20260904-fusion-artifact-acquisition/summary.json"
+  ],
+  "actual_observed_result": {
+    "user_direction": "Do not use Photoshop; treat it as unavailable.",
+    "oracle_artifact": null,
+    "expected_rgba_samples": null,
+    "attempt": "aborted before any oracle artifact was created",
+    "application_process": "stopped",
+    "tracked_files_changed_by_attempt": false,
+    "real_psd_or_reference_modified": false
+  },
+  "stop_condition": "The requested bounded Fusion diagnostic requires both a materialized Fusion artifact and a valid Photoshop actual oracle. The Fusion artifact route is recovered, but the Photoshop oracle is unavailable and may not be used.",
+  "claims": {
+    "fusion_artifact_route": true,
+    "photoshop_actual_oracle": false,
+    "bounded_fusion_diagnostic_permitted": false,
+    "pixel_verified": false,
+    "p4_09_permitted": false,
+    "parity_004_complete": false,
+    "parity_005_started": false,
+    "parity_006_started": false
+  },
+  "next_action": "Remain fail-closed at PARITY-004 until the user provides an allowed non-Photoshop actual oracle contract or explicitly re-authorizes Photoshop oracle acquisition."
+}

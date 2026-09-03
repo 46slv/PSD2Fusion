@@ -1,0 +1,59 @@
+{
+  "schema": "psd2fusion-parity-004.fusion-artifact-acquisition.v1",
+  "observed_at": "2026-09-04T00:49:35.3617338+09:00",
+  "task": "PARITY-004",
+  "gate": "P4-HOST-PIXEL-PHASE-1",
+  "status": "PASS",
+  "candidate_commit": "96112d57ec52645a1d9797323d3551bf45538f27",
+  "orchestrator_head": "a44f7d5d12a75f78ce24317794e3f2a12cb4443b",
+  "model_role": {
+    "orchestrator": "gpt-5.6-sol / persistent evidence interpretation",
+    "worker": "fresh gpt-5.6-luna max / bounded fixture-only probe",
+    "runner": "deterministic PowerShell plus fuscript.exe",
+    "transcript_forwarded": false
+  },
+  "input_evidence": [
+    ".control/evidence/PARITY-004/20260903-saver-artifact-blocker/summary.json",
+    ".control/evidence/PARITY-004/20260903-sol-host-pixel-diagnostic/decision.json"
+  ],
+  "host": {
+    "application": "DaVinci Resolve Studio",
+    "version": "21.0.3.7",
+    "fusion_endpoint": "Fusion localhost scripting endpoint",
+    "launch": "fresh Resolve process",
+    "project": "PSD2Fusion P4-08 20260902",
+    "composition_route": "existing disposable current composition"
+  },
+  "attempts": [
+    {
+      "route": "external Fusion NewComp plus targeted Saver render",
+      "command": "fuscript.exe -l lua p4_artifact_route_probe_20260904.lua <targeted.png> <fallback.png>",
+      "result": "comp:Render targeted and whole-range forms both returned false; no artifact",
+      "artifact": null,
+      "classification": "headless NewComp/current-host-state route unavailable; not a compositor failure"
+    },
+    {
+      "route": "load known disposable Resolve project, paste native Background into current composition, add Saver, render frame 0",
+      "command": "fuscript.exe -l Lua -x <Fusion localhost init> .local/p4_paste_background_render.lua <background.comp> <render.png>",
+      "result": "render call returned true and physical artifact appeared; undo restored the original tool count",
+      "artifact": ".local/p4-artifact-acquisition-20260904/current-comp-route-2/render0000.png",
+      "format": "PNG RGBA",
+      "dimensions": [4, 4],
+      "bytes": 83,
+      "sha256": "aa9f2497e1343b38dcf5811410f1c6eff38d3c76d5905b95b308a83eaad5bba5",
+      "rgba_samples": [[51, 102, 153, 255]],
+      "classification": "reproducible actual-Fusion artifact acquisition path"
+    }
+  ],
+  "classification": "HOST_ARTIFACT_ROUTE_RECOVERED",
+  "hypothesis": "The prior missing artifact is dependent on composition/project execution state or the external NewComp route, because the same host and Saver can materialize a PNG from a loaded current composition.",
+  "confidence": "high for artifact-path recovery; no compositor inference",
+  "claims": {
+    "physical_fusion_artifact": true,
+    "pixel_verified": false,
+    "photoshop_oracle": false,
+    "compositor_changed": false,
+    "harness_changed": false
+  },
+  "next_action": "Create a frozen tiny Photoshop actual oracle, then run the bounded ungrouped/grouped Fusion diagnostic through the recovered current-composition render route."
+}
