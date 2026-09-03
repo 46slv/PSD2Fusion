@@ -1,0 +1,145 @@
+{
+  "schema_version": 1,
+  "task": "PARITY-004",
+  "item": "P4-HOST-PIXEL",
+  "status": "BLOCKED",
+  "verification": "host_stage_probe_complete_micro_gate_fail_real_baseline_classified",
+  "branch": "codex/parity-004",
+  "candidate_commit": "521baa5",
+  "scope": {
+    "p4_08": "PASS (previously evidenced; current graph readback retained)",
+    "p4_09": "diagnostic baseline run and classified",
+    "repair_iterations": 1,
+    "parity_005": "NOT_STARTED",
+    "parity_006": "NOT_STARTED",
+    "real_inputs_modified": false,
+    "full_resolution_renders_committed": false
+  },
+  "host": {
+    "application": "DaVinci Resolve Studio",
+    "version": "21.0.3.7",
+    "script_endpoint": "Fusion localhost scripting endpoint",
+    "render_format": "PNG RGBA; Loader PostMultiply=1; Saver PreDivide=1",
+    "stage_probe_script": ".local/p4_channel_boolean_stage_probe.lua",
+    "stage_probe_runner": ".local/run_p4_channel_boolean_stage_probe_13.ps1",
+    "fixture_render_runner": ".local/run_p4_host_pixel_chbool.ps1"
+  },
+  "boundary_probe": {
+    "sample": {
+      "base_rgb_8bit": [59, 145, 232],
+      "base_alpha": 0.5,
+      "member_rgb_8bit": [232, 48, 18],
+      "member_alpha": 0.75,
+      "member_opacity": 0.5,
+      "outer_rgb_8bit": [20, 79, 171]
+    },
+    "operator_in": {
+      "output_rgba8": [231, 47, 18, 96],
+      "alpha_model": "A_b * A_m",
+      "rgb_model": "member RGB; internal premultiplied RGB is C_m * A_b * A_m",
+      "artifact_root": ".local/p4-stage-probe-13-20260903"
+    },
+    "clipstack_without_boundary": {
+      "process_alpha": 0,
+      "output_rgba8": [135, 137, 195, 128],
+      "normal_rgb_model": "C_b * (1 - q * A_b * A_m) + C_m * q * A_m",
+      "artifact_root": ".local/p4-stage-probe-13-20260903"
+    },
+    "channel_boolean_boundary": {
+      "operation": 0,
+      "to_red": 5,
+      "to_green": 6,
+      "to_blue": 7,
+      "to_alpha": 3,
+      "background": "ClipIn output",
+      "foreground": "original member output",
+      "output_rgba8": [116, 24, 9, 191],
+      "interpretation": "ClipIn premultiplied RGB is retained while member alpha replaces the intersection alpha",
+      "artifact_root": ".local/p4-channel-boolean-exact-20260903"
+    },
+    "clipstack_with_boundary": {
+      "process_alpha": 0,
+      "output_rgba8": [125, 109, 151, 128],
+      "psd_local_expected_rgba8": [124, 109, 152, 128],
+      "interpretation": "Base coverage is fixed and the remaining one-LSB differences are quantization; the former base-alpha attenuation is removed for Normal",
+      "artifact_root": ".local/p4-channel-boolean-stage-13-20260903"
+    }
+  },
+  "micro_gate": {
+    "manifest": ".local/p4-host-pixel-chbool-20260903/manifest.json",
+    "summary": ".local/p4-host-pixel-chbool-20260903/summary.json",
+    "candidate_count": 13,
+    "render_count": 13,
+    "raw_rgba_pass_count": 3,
+    "alpha_max_error_all_cases": 0,
+    "results": [
+      {"id": "alpha-matrix", "status": "FAIL", "rgb_max": 2, "rgb_mean": 0.8666666666666667, "rgb_p99": 2.0, "alpha_max": 0, "render_sha256": "e3526f610dd62bd9cb088c824a651c8d832a62345ea29a761b21bdd722457b65"},
+      {"id": "member-mode-normal", "status": "FAIL", "rgb_max": 1, "rgb_mean": 1.0, "rgb_p99": 1.0, "alpha_max": 0, "render_sha256": "aff8747a04076be7ad9d504faa30e2092b29ce8dbb5a22bd6c5914f0aaeb732a"},
+      {"id": "member-mode-multiply", "status": "FAIL", "rgb_max": 5, "rgb_mean": 5.0, "rgb_p99": 5.0, "alpha_max": 0, "render_sha256": "e2126551e81567d6dcbac09a3823f2a73b8eaf72220c704137a433680e9a8c27"},
+      {"id": "member-mode-linear-dodge", "status": "FAIL", "rgb_max": 8, "rgb_mean": 8.0, "rgb_p99": 8.0, "alpha_max": 0, "render_sha256": "04dda5d6672809989cd6c02ab2241870246e86d6755f6aa894deaef24d0b3a16"},
+      {"id": "member-mode-overlay", "status": "FAIL", "rgb_max": 37, "rgb_mean": 37.0, "rgb_p99": 37.0, "alpha_max": 0, "render_sha256": "defaf307fb169c4ebde12b3be4f50df4176b494379415fbdd0c07a64b64ff59c"},
+      {"id": "member-opacity-025", "status": "PASS", "rgb_max": 0, "rgb_mean": 0.0, "rgb_p99": 0.0, "alpha_max": 0, "render_sha256": "b8d877cdeb3cbea54a03e272a35bb0d64873b44ffa436cc64f24c8c3a3d63527"},
+      {"id": "member-opacity-050", "status": "FAIL", "rgb_max": 1, "rgb_mean": 1.0, "rgb_p99": 1.0, "alpha_max": 0, "render_sha256": "aff8747a04076be7ad9d504faa30e2092b29ce8dbb5a22bd6c5914f0aaeb732a"},
+      {"id": "member-opacity-075", "status": "FAIL", "rgb_max": 1, "rgb_mean": 1.0, "rgb_p99": 1.0, "alpha_max": 0, "render_sha256": "f64b132a7b7823f6d5bbea10b37327384d70114ff81de50bd94b4626c7b7aef6"},
+      {"id": "member-opacity-100", "status": "FAIL", "rgb_max": 1, "rgb_mean": 1.0, "rgb_p99": 1.0, "alpha_max": 0, "render_sha256": "62a66d6541dff7af1eea72d381d952a77b828e9e25563c922bfd840db37f67c7"},
+      {"id": "base-opacity-000", "status": "PASS", "rgb_max": 0, "rgb_mean": 0.0, "rgb_p99": 0.0, "alpha_max": 0, "render_sha256": "96d5e41022204e58d5a7496eeca46f0db08ef4442007e3e9efe71ae2be4736ff"},
+      {"id": "base-opacity-050", "status": "PASS", "rgb_max": 0, "rgb_mean": 0.0, "rgb_p99": 0.0, "alpha_max": 0, "render_sha256": "91ea4869d900ae2a02093d32c1a466900031595b0048c39bad6651d951e85d0a"},
+      {"id": "base-opacity-100", "status": "FAIL", "rgb_max": 1, "rgb_mean": 1.0, "rgb_p99": 1.0, "alpha_max": 0, "render_sha256": "aff8747a04076be7ad9d504faa30e2092b29ce8dbb5a22bd6c5914f0aaeb732a"},
+      {"id": "outer-backdrops-base-multiply", "status": "FAIL", "rgb_max": 152, "rgb_mean": 38.25, "rgb_p99": 152.0, "alpha_max": 0, "render_sha256": "6515303d52668985db06b648dd0c5f5b033bacb683fa3b49fed03eb4200cd55a"}
+    ],
+    "remaining_model_boundary": "Normal and opacity/base-opacity cases are within quantization after the alpha repair; Multiply, Linear Dodge and Overlay remain materially different under the same premultiplied RGB input, so no single mode-independent PSD lowering is proven.",
+    "transparent_rgb_note": "The outer transparent pixel is [0,0,0,96] versus the straight-reference [124,109,152,96]; premultiplied Loader/Saver canonicalizes RGB at A=0 and this is a separate transparent-RGB policy difference."
+  },
+  "p4_09_baseline": {
+    "composition": ".local/p4-09-real-chbool-20260903/PSD2Fusion.comp",
+    "composition_sha256": "3a76e013cb2380f44af71a025d774b1b97dc81d3f5be38d4294042c18b368385",
+    "composition_bytes": 308810,
+    "graph": {"tools": 422, "loaders": 100, "groups": 34, "channel_boolean": 59, "chains": 23, "clipped_members": 59},
+    "structural_audit": {"report": ".local/p4-09-real-chbool-audit-20260903/report.json", "status": "PASS"},
+    "render": {
+      "artifact": ".local/p4-09-real-chbool-20260903/PSD2Fusion.comp.host0000.png",
+      "sha256": "b1835271ec3df66f13c7cad8e377e9a83d7eb8c1bb36ed592dd023e7cc8b00c6",
+      "dimensions": [2304, 1296],
+      "unique_rgba_count": 1,
+      "only_rgba": [255, 255, 255, 255],
+      "pixel_count": 2985984,
+      "matching_first_loader_asset": "assets/layer-fbfee716070a3122.png"
+    },
+    "qualification": {
+      "report": ".local/p4-09-real-chbool-20260903/qualification.json",
+      "inspection_status": "PASS",
+      "canvas_status": "exact_canvas",
+      "status": "FAIL (stored-composite ICC mismatch; reference remains unchanged)",
+      "psd_sha256": "574d8a6511b2aabe744835d81ed76c8fc8ffd0c9c5678f3359e8eda10f9174db",
+      "reference_sha256": "91ff8daef941b3d9052497190fdc8aa6f4d56ba524c8d912cf011b6818535f54"
+    },
+    "comparison": {
+      "report": ".local/p4-09-real-chbool-20260903/comparison.json",
+      "status": "FAIL",
+      "candidate_dimensions": [2304, 1296],
+      "reference_dimensions": [2304, 1296],
+      "alpha_max_error": 0,
+      "rgb_max_error": 255,
+      "rgb_mean_error": 144.6640310195902,
+      "rgb_p99_error": 255.0,
+      "threshold_exceeding_ratio": 0.951222109696502,
+      "outlier_count_over_32": 2368085
+    },
+    "classification": "Host real-graph/render-path baseline: the output is exactly the opaque paper Loader, not a clipped-compositing result. Canvas and alpha are exact, so this is not a profile or alpha mismatch. Do not fit compositor math to this baseline."
+  },
+  "host_operation_note": {
+    "direct_loadcomp_saver_probe": "returned false with no artifact",
+    "report": ".local/p4-09-real-load-20260903",
+    "interpretation": "LoadComp/Saver staging is unstable in the current Resolve session; this does not replace the successful real baseline render above."
+  },
+  "checks": {
+    "offline_check": "PASS (60 tests)",
+    "git_diff_check": "PASS",
+    "micro_gate_pixel_verified": false,
+    "real_psd_pixel_verified": false,
+    "photoshop_pixel_parity": false,
+    "parity_005": "NOT_STARTED",
+    "parity_006": "NOT_STARTED"
+  },
+  "stop_reason": "The ChannelBoolean boundary precisely fixes the Operator=In alpha coverage contract, but the same RGB representation yields materially different Multiply/Linear Dodge/Overlay behavior than the PSD formula, while the real baseline is paper-only. More than one lowering remains plausible; stop P4-HOST-PIXEL here and do not advance PARITY-005/006."
+}
