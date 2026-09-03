@@ -28,9 +28,9 @@ _HARNESS_EVIDENCE = _EVIDENCE / "harness"
 _CHECK = Path("scripts/check.ps1")
 _REMOTE_GUARD = Path("scripts/remote_completion_guard.ps1")
 _REMOTE_GUARD_PY = Path("scripts/remote_completion_guard.py")
-_MAX_TEXT = 18_000
-_MAX_EVIDENCE_FILES = 14
-_MAX_EVIDENCE_ITEM = 12_000
+_MAX_TEXT = 9_000
+_MAX_EVIDENCE_FILES = 10
+_MAX_EVIDENCE_ITEM = 6_000
 _DROP_KEYS = {
     "conversation",
     "transcript",
@@ -54,6 +54,19 @@ def _read_text(path: Path) -> str:
         return path.read_text(encoding="utf-8")
     except (OSError, UnicodeError) as exc:
         raise ValueError(f"PSD2Fusion canonical text is unreadable: {path.as_posix()}") from exc
+
+
+def _parity004_section(text: str) -> str:
+    """Project only the active Goal section, not unrelated future tasks."""
+
+    marker = "### PARITY-004"
+    start = text.find(marker)
+    if start < 0:
+        return text
+    end = text.find("### PARITY-005", start)
+    if end < 0:
+        end = len(text)
+    return text[start:end]
 
 
 def _sha256_bytes(data: bytes) -> str:
@@ -216,6 +229,21 @@ def _orchestration_hint(latest: list[dict[str, Any]]) -> dict[str, Any]:
         "gate_order": ["P4-08", "P4-HOST-PIXEL", "P4-09", "localized_repair"],
         "blocked_until_parity004_closure": ["PARITY-005", "PARITY-006"],
         "manager_packet_guard": "Every exact path belongs to exactly one of read_paths or write_paths; put only files intended to change in write_paths and use handoff_refs for immutable evidence. Worker context_budget.max_files must cover all exact read/write/handoff files plus the generated WORKER.md, task.json, and context-manifest.json (at least that total). Use repository-supported unittest/check.ps1 commands rather than assuming pytest is installed.",
+        "manager_locate_guard": "EXACT_FILE requests must use the complete repository-relative filename (for example AGENTS.md, not AGENTS); every query must be non-empty and every path scope must exist in the repo map.",
+        "coordinator_selection": {
+            "goal_item_id": "PARITY-004",
+            "workload": "GroupOperator proxy/render-source split",
+            "immutable_read_paths": [
+                ".control/PARITY-004_TODO.md",
+                "docs/PARITY_004_HOST_PIXEL_GATE.md",
+            ],
+            "implementation_write_paths": [
+                "psd2fusion/fusion_comp.py",
+                "scripts/parity/p4_05.py",
+                "tests/test_parity004_p405_graph.py",
+            ],
+            "minimum_worker_context_files": 9,
+        },
         "latest_evidence_count": len(latest),
         "source": "repo-local canonical state plus current user workload instruction",
     }
@@ -258,7 +286,7 @@ class PSD2FusionAdapter:
         canonical_raw = _read_json(root / _CURRENT)
         if not isinstance(canonical_raw, Mapping):
             raise ValueError(".control/current.json must contain an object")
-        goal_text = _read_text(root / _GOAL)
+        goal_text = _parity004_section(_read_text(root / _GOAL))
         todo_text = _read_text(root / _TODO)
         latest = _latest_evidence(root)
         active = _active_task(canonical_raw)
