@@ -108,6 +108,37 @@ def _read_cycle_evidence(result: Mapping[str, Any], evidence_root: Path, run_id:
     return value if isinstance(value, Mapping) else None
 
 
+def _harness_contract_defect(
+    result: Mapping[str, Any], evidence_root: Path, run_id: str
+) -> dict[str, Any] | None:
+    """Classify a harness contract rejection separately from PSD2Fusion work.
+
+    The generic Runner is authoritative for accepting a role result.  A role
+    can therefore finish its isolated implementation while the cycle is still
+    blocked by a serialization/contract error.  Keep that distinction explicit
+    so a later adapter hint can repair the integration without treating the
+    PSD workload as semantically failed.
+    """
+
+    evidence = _read_cycle_evidence(result, evidence_root, run_id)
+    if not isinstance(evidence, Mapping):
+        return None
+    errors = evidence.get("errors")
+    if not isinstance(errors, list):
+        return None
+    messages = [str(item) for item in errors if isinstance(item, str)]
+    if not any("not an exact repository path" in item for item in messages):
+        return None
+    return {
+        "kind": "WORKER_EVIDENCE_PATH_CONTRACT",
+        "component": "codex-ephemeral-harness",
+        "status": "OBSERVED",
+        "project_failure": False,
+        "details": messages[:8],
+        "recovery": "instruct fresh Worker results to use repository-relative POSIX evidence paths; do not modify generic core",
+    }
+
+
 def _existing_in_progress_run(evidence_root: Path) -> str | None:
     """Return the generic journal's current unfinished run for safe recovery."""
 
@@ -623,6 +654,15 @@ def _run_production(root: Path, harness_root: Path, args: argparse.Namespace) ->
                 "recovery": "re-run the same run_id only after operator review; no blind duplicate role launch",
             }
             _atomic_json_write(evidence_root / run_id / "harness-defect.json", harness_defect)
+        if harness_defect is None:
+            contract_defect = _harness_contract_defect(result, evidence_root, run_id)
+            if contract_defect is not None:
+                harness_defect = {
+                    "schema": "psd2fusion-parity-004.harness-defect.v1",
+                    "run_id": run_id,
+                    **contract_defect,
+                }
+                _atomic_json_write(evidence_root / run_id / "harness-defect.json", harness_defect)
         record = _build_cycle_record(
             repo=root,
             evidence_root=evidence_root,
@@ -741,7 +781,10 @@ def main(argv: list[str] | None = None) -> int:
             "error": str(exc)[:2_000],
             "production_roles_launched": False,
         }
-    print(json.dumps(result, ensure_ascii=False, indent=2, sort_keys=True))
+    # The Windows console may still use a legacy code page.  Keep durable JSON
+    # UTF-8 above, but make the outer process stdout ASCII-safe for Dev Exec and
+    # direct PowerShell invocation.
+    print(json.dumps(result, ensure_ascii=True, indent=2, sort_keys=True))
     return 0 if result.get("status") in {"DRY_RUN", "PASS", "STOPPED"} else 2
 
 
