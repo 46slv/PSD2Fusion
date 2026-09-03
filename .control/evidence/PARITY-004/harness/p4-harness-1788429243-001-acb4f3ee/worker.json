@@ -1,0 +1,79 @@
+{
+  "cached_input_tokens": 2436352,
+  "ephemeral": true,
+  "exit_code": 0,
+  "input_tokens": 2659995,
+  "isolation": {
+    "allowed_workspace_read": true,
+    "allowed_workspace_write": true,
+    "backend": "codex-split-filesystem-profile",
+    "canonical_external_read": "DENIED",
+    "codex_executable": "C:\\Users\\shiro\\AppData\\Local\\OpenAI\\Codex\\bin\\b99306303521e97e\\codex.exe",
+    "command_exit_code": 0,
+    "exact_write": "PASS",
+    "forbidden_external_read": "DENIED",
+    "legacy_sandbox_mode_used": false,
+    "outside_write": "DENIED",
+    "platform": "win32",
+    "probe_mode": "codex-exec",
+    "profile_name": "ceh_worker_c6adbab73652",
+    "readonly_write": "DENIED",
+    "runtime_executable": "C:\\Users\\shiro\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\python\\python.exe",
+    "status": "PROVEN",
+    "stderr_bytes": 197,
+    "stderr_sha256": "122802a341d1b86fc6549d302bb1059b8c4d0119c46deb676124b686a71c234a",
+    "stdout_bytes": 2029,
+    "stdout_sha256": "4b75963bc670312d6517e29b3620f0e9aa5102c01d55b59d79ee8493a84fb0b3",
+    "wall_time_ms": 19454,
+    "workspace_access": "write",
+    "write_path_read": "PASS"
+  },
+  "isolation_profile": "ceh_worker_c6adbab73652",
+  "isolation_status": "PROVEN",
+  "model_visible_bytes": 106026,
+  "model_visible_file_count": 13,
+  "output_tokens": 42162,
+  "protocol_errors": [],
+  "result": {
+    "canonical_patch_applied": false,
+    "evidence": [
+      {
+        "kind": "implementation",
+        "path": "psd2fusion/fusion_comp.py",
+        "summary": "Implemented GroupOperator proxy/render-source separation and actual Pass Through backdrop attachment."
+      },
+      {
+        "kind": "fixture",
+        "path": "scripts/parity/p4_05.py",
+        "summary": "Added deterministic proxy, render-source, attachment, and misuse checks."
+      },
+      {
+        "kind": "tests",
+        "path": "tests/test_parity004_p405_graph.py",
+        "summary": "Added focused regression assertions for proxy-only ports and internal-terminal render wiring."
+      }
+    ],
+    "notes": [
+      "Only the three declared write paths changed.",
+      "Runner-owned tests and scripts/check were not run.",
+      "PARITY-004 host/pixel verification remains unresolved."
+    ],
+    "requested_context": [],
+    "status": "DONE",
+    "summary": "Implemented the bounded GroupOperator split within the isolated Worker scope."
+  },
+  "role": "worker",
+  "run_id": "p4-harness-1788429243-001-acb4f3ee",
+  "schema": "codex-ephemeral-harness.role-evidence.v1",
+  "schema_version": 1,
+  "status": "DONE",
+  "stderr_bytes": 1181,
+  "stderr_sha256": "949afeb2c4041db1774dd38c5b30004ed72ba569774e86457837d5a4e62392fb",
+  "stdout_bytes": 367386,
+  "stdout_sha256": "0163245bd32a5cff0d9fa0f4d401724b5c9d1f4ee245548f56b5d01c30751db0",
+  "thread_id": "01a066b6-4a7c-72d2-932a-6e899d4db4ca",
+  "timestamp": "2026-09-03T10:15:43.113125Z",
+  "transcripts_forwarded": false,
+  "uncached_input_tokens": 223643,
+  "wall_time_ms": 925422
+}

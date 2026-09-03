@@ -1,9 +1,9 @@
 {
   "adapter": "psd2fusion-parity-004",
-  "phase": "DISCOVERY",
+  "phase": "RUNNER_TESTS",
   "repo_identity": "ee28cee08a380e2c",
-  "run_id": "p4-harness-1788428973-001-ac4c133b",
+  "run_id": "p4-harness-1788429243-001-acb4f3ee",
   "schema": "codex-ephemeral-harness.cycle-state.v1",
-  "status": "BLOCKED",
-  "updated_at": "2026-09-03T09:52:32.589482Z"
+  "status": "TEST_FAILED",
+  "updated_at": "2026-09-03T10:15:51.232406Z"
 }
