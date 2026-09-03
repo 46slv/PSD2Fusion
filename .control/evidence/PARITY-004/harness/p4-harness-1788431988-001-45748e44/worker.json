@@ -1,0 +1,78 @@
+{
+  "cached_input_tokens": 665600,
+  "ephemeral": true,
+  "exit_code": 0,
+  "input_tokens": 749182,
+  "isolation": {
+    "allowed_workspace_read": true,
+    "allowed_workspace_write": true,
+    "backend": "codex-split-filesystem-profile",
+    "canonical_external_read": "DENIED",
+    "codex_executable": "C:\\Users\\shiro\\AppData\\Local\\OpenAI\\Codex\\bin\\b99306303521e97e\\codex.exe",
+    "command_exit_code": 0,
+    "exact_write": "PASS",
+    "forbidden_external_read": "DENIED",
+    "legacy_sandbox_mode_used": false,
+    "outside_write": "DENIED",
+    "platform": "win32",
+    "probe_mode": "codex-exec",
+    "profile_name": "ceh_worker_bf4bed0756d3",
+    "readonly_write": "DENIED",
+    "runtime_executable": "C:\\Users\\shiro\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\python\\python.exe",
+    "status": "PROVEN",
+    "stderr_bytes": 158,
+    "stderr_sha256": "5e951c12022e50cad07052b610c4ca6c03b5293a669baf8b75e579707176a402",
+    "stdout_bytes": 1882,
+    "stdout_sha256": "c3c2ee65c941b6e99077db0e4390cb6d23cdacc59065509b73de926929eca633",
+    "wall_time_ms": 22562,
+    "workspace_access": "write",
+    "write_path_read": "PASS"
+  },
+  "isolation_profile": "ceh_worker_bf4bed0756d3",
+  "isolation_status": "PROVEN",
+  "model_visible_bytes": 120973,
+  "model_visible_file_count": 13,
+  "output_tokens": 22805,
+  "protocol_errors": [],
+  "result": {
+    "canonical_patch_applied": false,
+    "evidence": [
+      {
+        "kind": "implementation",
+        "path": "psd2fusion/fusion_comp.py",
+        "summary": "GroupOperator proxy/render-source split is present."
+      },
+      {
+        "kind": "fixture",
+        "path": "scripts/parity/p4_05.py",
+        "summary": "Focused group-boundary ownership checks are present."
+      },
+      {
+        "kind": "tests",
+        "path": "tests/test_parity004_p405_graph.py",
+        "summary": "Regression assertions cover proxy and internal render attachments."
+      }
+    ],
+    "notes": [
+      "No test commands were run; they are Runner-owned per the isolated Worker contract.",
+      "No host_loaded or pixel_verified claim was made."
+    ],
+    "requested_context": [],
+    "status": "DONE",
+    "summary": "The isolated task is already fully implemented within the three declared write paths; no additional source edits were necessary."
+  },
+  "role": "worker",
+  "run_id": "p4-harness-1788431988-001-45748e44",
+  "schema": "codex-ephemeral-harness.role-evidence.v1",
+  "schema_version": 1,
+  "status": "DONE",
+  "stderr_bytes": 158,
+  "stderr_sha256": "b5ac6a2b10719c2d51f7a940da1f2003f7f57f12746d5efbbe3fcf48b7b9e9fa",
+  "stdout_bytes": 317245,
+  "stdout_sha256": "266045b3bdaf10c82b11a23186b71fb05b28bedbe37a3bcab35d1f42508e2551",
+  "thread_id": "01a066e1-293f-7b70-a9d1-470d27f1cae8",
+  "timestamp": "2026-09-03T10:54:39.680892Z",
+  "transcripts_forwarded": false,
+  "uncached_input_tokens": 83582,
+  "wall_time_ms": 452453
+}

@@ -1,0 +1,95 @@
+{
+  "budget": {
+    "max_total_bytes": 400000,
+    "max_total_results": 100
+  },
+  "repo_head": "244cd4d81040a1fe32bfb86d26ef61f5ea24d215",
+  "requests": [
+    {
+      "index": 0,
+      "kind": "EXACT_FILE",
+      "max_bytes": 5811,
+      "max_results": 1,
+      "path_scopes": [
+        "AGENTS.md"
+      ],
+      "query": "AGENTS.md",
+      "reason": "Read repository-specific instructions before planning the localized retry.",
+      "result_bytes": 5215,
+      "result_count": 1,
+      "truncated": false
+    },
+    {
+      "index": 1,
+      "kind": "EXACT_FILE",
+      "max_bytes": 49280,
+      "max_results": 1,
+      "path_scopes": [
+        "psd2fusion/fusion_comp.py"
+      ],
+      "query": "psd2fusion/fusion_comp.py",
+      "reason": "Inspect the GroupOperator proxy/render-source lowering implementation.",
+      "result_bytes": 0,
+      "result_count": 0,
+      "truncated": true
+    },
+    {
+      "index": 2,
+      "kind": "EXACT_FILE",
+      "max_bytes": 24551,
+      "max_results": 1,
+      "path_scopes": [
+        "scripts/parity/p4_05.py"
+      ],
+      "query": "scripts/parity/p4_05.py",
+      "reason": "Inspect the bounded P4-05 structural fixture affected by the failed retry.",
+      "result_bytes": 0,
+      "result_count": 0,
+      "truncated": true
+    },
+    {
+      "index": 3,
+      "kind": "EXACT_FILE",
+      "max_bytes": 3877,
+      "max_results": 1,
+      "path_scopes": [
+        "tests/test_parity004_p405_graph.py"
+      ],
+      "query": "tests/test_parity004_p405_graph.py",
+      "reason": "Inspect the failing GroupOperator regression assertions and expected topology.",
+      "result_bytes": 3372,
+      "result_count": 1,
+      "truncated": false
+    }
+  ],
+  "results": [
+    {
+      "binary": false,
+      "excerpt": "# PSD2Fusion agent entrypoint\r\n\r\n## Purpose\r\n\r\nPSD2Fusion turns Photoshop PSD structure into a readable, editable DaVinci Resolve/Fusion graph. The active program is correct Photoshop compositing for blend modes, opacity, groups, and especially clipping, verified against deterministic fixtures and the real reference case.\r\n\r\n## Authority\r\n\r\nUse this order when facts conflict:\r\n\r\n1. current user/Goal instruction;\r\n2. `.control/current.json` for current task/status and the current repository HEAD;\r\n3. current code, tests, `.control/CURRENT_GOAL.md`, and observed Photoshop/Resolve runtime evidence;\r\n4. this `AGENTS.md` and more-specific nested instructions;\r\n5. committed research/prior-art notes;\r\n6. inference.\r\n\r\nDo not treat chat history, memory, an uncommitted local note, or an agent completion message as repository authority.\r\n\r\n## Mandatory opening\r\n\r\nFor non-trivial work:\r\n\r\n1. read `.control/current.json`;\r\n2. read `.control/CURRENT_GOAL.md`;\r\n3. work only the `active_task_id`;\r\n4. inspect current branch/HEAD, relevant code/tests, and committed evidence;\r\n5. establish the current baseline or failure before editing.\r\n\r\nWhen `active_task_id` is `PARITY-004`, also read `.control/PARITY-004_TODO.md` and `docs/PARITY_004_HOST_PIXEL_GATE.md` before changing compositor code or advancing work.\r\n\r\nRead `docs/AGENT_OPERATIONS.md` only when delegation or a persistent loop materially helps. Do not load all research files by default.\r\n\r\n## Protected invariants\r\n\r\n- Keep raw PSD extraction, Semantic IR, Evaluation IR, Fusion lowering/layout, and host/reference verification separate.\r\n- Do not confuse visual grouping with Photoshop compositing semantics.\r\n- Treat clipping as a same-parent ordered compositing relation, not a per-layer mask shortcut.\r\n- Preserve raw blend/opacity/clipping/group provenance even when the backend cannot render it.\r\n- In strict parity work, never silently use Normal, 100% opacity, enabled visibility, unlabeled resize/color correction, or flattening.\r\n- Prefer an explicit verified bake/reject over an editable but knowingly wrong approximation.\r\n- Do not claim Photoshop pixel parity from parser structure, graph text, Resolve load success, or agent self-report.\r\n- The real PSD, reference PNG, full-resolution renders, and per-layer exports must not be committed to this public repository.\r\n- Material prior-art code reuse must be license-compatible and preserve attribution/provenance.\r\n\r\n## PARITY-004 execution guard\r\n\r\nWhile `PARITY-004` is active, P4-01 through P4-07 are a preserved structural candidate, not a completed pixel claim. Do not roll them back merely because host/pixel proof is pending.\r\n\r\nUnless actual Fusion evidence localizes a blocker elsewhere, the remaining order is mandatory:\r\n\r\n```text\r\nP4-08 ordinary Fusion load/readback\r\n-> P4-HOST-PIXEL deterministic micro renders\r\n-> P4-09 real Fusion/reference baseline\r\n-> smallest evidence-driven repair\r\n-> rerun focused micro fixture and real comparison\r\n```\r\n\r\nUntil that baseline exists:\r\n\r\n- do not start `PARITY-005` or `PARITY-006`;\r\n- do not mark `PARITY-004` done;\r\n- do not treat structural/load evidence as `pixel_verified`;\r\n- do not perform a broad Evaluation IR / Lowering Plan / compiler redesign merely because known architecture debt exists;\r\n- do not fit the reference with threshold relaxation, grading, resize, blur, flattening, or whole-image correction.\r\n\r\nKnown architecture debts must remain visible: capability decisions do not yet drive backend selection before graph compilation, and asset materialization still needs a verified ICC/straight-premult/transparent-RGB contract. Use host/pixel evidence to determine whether either debt is causal. Before introducing multiple backends, custom operations, verified bake paths, or broad feature expansion, capability planning must be connected to lowering so strict mode cannot silently emit an unverified backend.\r\n\r\n## Work and verification\r\n\r\n- A Worker may submit the active task as `awaiting_verification`; it may not self-mark `done` or advance `active_task_id`.\r\n- A fresh Verifier evaluates the Goal, exact candidate diff/commit, tests, and reproducible evidence, not the Worker's reasoning transcript.\r\n- Prefer executable fixtures, validators, comparison metrics, and scripts over more prompt prose.\r\n- Retry the same unchanged failure once at most; then change hypothesis/diagnostic or escalate.\r\n- Preserve unrelated work and both read-only reference inputs.\r\n\r\nRepository-level offline check:\r\n\r\n```powershell\r\npwsh -NoProfile -File .\\scripts\\check.ps1\r\n```\r\n\r\nHost/reference checks are defined by the active task. Offline checks cannot substitute for a required Photoshop/Resolve run.\r\nBefore reporting `done`/`verification=pass`, publish commits and run the inspection-only remo\n[TRUNCATED]",
+      "file_bytes": 5811,
+      "kind": "EXACT_FILE",
+      "line_end": 86,
+      "line_start": 1,
+      "path": "AGENTS.md",
+      "request_index": 0,
+      "sha256": "5cb01230752aee334e6518b40ed9042f12731ae9edb7219d0b74433796c6f5bc",
+      "truncated": true
+    },
+    {
+      "binary": false,
+      "excerpt": "import tempfile\r\nimport unittest\r\nfrom pathlib import Path\r\n\r\nfrom scripts.parity.p4_05 import CASES, build\r\n\r\n\r\nclass P405GroupBoundaryTests(unittest.TestCase):\r\n    def test_clipping_recipe_survives_group_boundary_cases(self):\r\n        with tempfile.TemporaryDirectory() as directory:\r\n            report = build(Path(directory))\r\n\r\n        self.assertTrue(report[\"pass\"])\r\n        self.assertEqual(\"PASS\", report[\"status\"])\r\n        self.assertEqual(\"operator_in_fixed_matte_local_stack\", report[\"recipe\"])\r\n        self.assertEqual(set(CASES), set(report[\"cases\"]))\r\n        for case in CASES:\r\n            self.assertTrue(report[\"cases\"][case][\"pass\"], case)\r\n            self.assertTrue(\r\n                report[\"cases\"][case][\"checks\"][\"clipping_recipe_inside_existing_stream\"],\r\n                case,\r\n            )\r\n\r\n    def test_direct_case_stays_on_the_parent_stream_without_group_proxies(self):\r\n        with tempfile.TemporaryDirectory() as directory:\r\n            report = build(Path(directory))\r\n\r\n        case = report[\"cases\"][\"direct\"]\r\n        self.assertEqual([], case[\"groups\"])\r\n        self.assertEqual([], case[\"containing_groups\"])\r\n        self.assertTrue(case[\"checks\"][\"direct_chain_stays_in_parent_stream\"])\r\n\r\n    def test_pass_through_exposes_the_single_outer_merge_as_group_input(self):\r\n        with tempfile.TemporaryDirectory() as directory:\r\n            report = build(Path(directory))\r\n\r\n        case = report[\"cases\"][\"pass_through\"]\r\n        self.assertEqual(1, len(case[\"groups\"]))\r\n        self.assertEqual(1, len(case[\"containing_groups\"]))\r\n        self.assertEqual(\r\n            case[\"chain\"][\"outer\"][\"name\"], case[\"groups\"][0][\"input_target\"]\r\n        )\r\n        self.assertEqual(\r\n            case[\"chain\"][\"outer\"][\"name\"],\r\n            case[\"groups\"][0][\"proxy\"][\"input\"][\"source_op\"],\r\n        )\r\n        self.assertEqual(\"MergeR_p405ptout\", case[\"chain\"][\"outer\"][\"background\"])\r\n        self.assertTrue(case[\"checks\"][\"pass_through_uses_actual_parent_backdrop\"])\r\n\r\n    def test_nested_and_adjacent_cases_keep_distinct_group_ownership(self):\r\n        with tempfile.TemporaryDirectory() as directory:\r\n            report = build(Path(directory))\r\n\r\n        nested = report[\"cases\"][\"nested_isolated\"]\r\n        self.assertEqual(2, len(nested[\"groups\"]))\r\n        self.assertEqual(2, len(nested[\"containing_groups\"]))\r\n        adjacent = report[\"cases\"][\"adjacent\"]\r\n        self.assertEqual(2, len(adjacent[\"groups\"]))\r\n        self.assertEqual([], adjacent[\"containing_groups\"])\r\n        outer_start = adjacent[\"chain\"][\"outer\"][\"start\"]\r\n        self.assertLess(adjacent[\"groups\"][0][\"end\"], outer_start)\r\n        self.assertLess(outer_start, adjacent[\"groups\"][1][\"start\"])\r\n\r\n    def test_group_ports_are_proxies_and_render_inputs_use_internal_terminals(self):\r\n        with tempfile.TemporaryDirec\n[TRUNCATED]",
+      "file_bytes": 3877,
+      "kind": "EXACT_FILE",
+      "line_end": 66,
+      "line_start": 1,
+      "path": "tests/test_parity004_p405_graph.py",
+      "request_index": 3,
+      "sha256": "550aca8348ef3f213ad1ca5198e1d2b3d2eba432cb084ad8048c2b4919e4c45b",
+      "truncated": true
+    }
+  ],
+  "schema": "codex-ephemeral-harness.discovery-packet.v2",
+  "skipped_large_files": 0,
+  "total_bytes": 8587,
+  "total_results": 2
+}

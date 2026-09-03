@@ -1,0 +1,15 @@
+{
+  "allowed_path_violations": [],
+  "baseline_commit": "13910f53b6dac4336d4c56ef50c7c663f4982a7a",
+  "changed_paths": [],
+  "patch": "",
+  "patch_bytes": 0,
+  "patch_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "run_id": "p4-harness-1788431988-001-45748e44",
+  "schema": "codex-ephemeral-harness.worker-patch.v2",
+  "write_paths": [
+    "psd2fusion/fusion_comp.py",
+    "scripts/parity/p4_05.py",
+    "tests/test_parity004_p405_graph.py"
+  ]
+}

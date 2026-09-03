@@ -1,0 +1,98 @@
+{
+  "cached_input_tokens": 188160,
+  "ephemeral": true,
+  "exit_code": 0,
+  "input_tokens": 245883,
+  "isolation": {
+    "allowed_workspace_read": true,
+    "allowed_workspace_write": false,
+    "backend": "codex-split-filesystem-profile",
+    "canonical_external_read": "DENIED",
+    "codex_executable": "C:\\Users\\shiro\\AppData\\Local\\OpenAI\\Codex\\bin\\b99306303521e97e\\codex.exe",
+    "command_exit_code": 0,
+    "exact_write": "DENIED",
+    "forbidden_external_read": "DENIED",
+    "legacy_sandbox_mode_used": false,
+    "outside_write": "DENIED",
+    "platform": "win32",
+    "probe_mode": "codex-exec",
+    "profile_name": "ceh_manager_locate_1de935d397a9",
+    "readonly_write": "DENIED",
+    "runtime_executable": "C:\\Users\\shiro\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\python\\python.exe",
+    "status": "PROVEN",
+    "stderr_bytes": 158,
+    "stderr_sha256": "b1ac2420db4bdeb71d500afcb1b68ce588d5425e032ed9aa4edb34fde23192e0",
+    "stdout_bytes": 2049,
+    "stdout_sha256": "b8d3360653c99b84bde86e4fd2971efea10c3b8d1b2821814e246500565895f8",
+    "wall_time_ms": 17969,
+    "workspace_access": "read",
+    "write_path_read": "PASS"
+  },
+  "isolation_profile": "ceh_manager_locate_1de935d397a9",
+  "isolation_status": "PROVEN",
+  "model_visible_bytes": 95669,
+  "model_visible_file_count": 4,
+  "output_tokens": 7704,
+  "protocol_errors": [],
+  "result": {
+    "goal_item_id": "PARITY-004",
+    "requests": [
+      {
+        "kind": "EXACT_FILE",
+        "max_bytes": 5811,
+        "max_results": 1,
+        "path_scopes": [
+          "AGENTS.md"
+        ],
+        "query": "AGENTS.md",
+        "reason": "Read repository-specific instructions before planning the localized retry."
+      },
+      {
+        "kind": "EXACT_FILE",
+        "max_bytes": 49280,
+        "max_results": 1,
+        "path_scopes": [
+          "psd2fusion/fusion_comp.py"
+        ],
+        "query": "psd2fusion/fusion_comp.py",
+        "reason": "Inspect the GroupOperator proxy/render-source lowering implementation."
+      },
+      {
+        "kind": "EXACT_FILE",
+        "max_bytes": 24551,
+        "max_results": 1,
+        "path_scopes": [
+          "scripts/parity/p4_05.py"
+        ],
+        "query": "scripts/parity/p4_05.py",
+        "reason": "Inspect the bounded P4-05 structural fixture affected by the failed retry."
+      },
+      {
+        "kind": "EXACT_FILE",
+        "max_bytes": 3877,
+        "max_results": 1,
+        "path_scopes": [
+          "tests/test_parity004_p405_graph.py"
+        ],
+        "query": "tests/test_parity004_p405_graph.py",
+        "reason": "Inspect the failing GroupOperator regression assertions and expected topology."
+      }
+    ],
+    "status": "DISCOVERY_REQUESTED",
+    "summary": "Selected active Goal PARITY-004. Request bounded context for one localized GroupOperator split retry after the prior P4-05 and check failures; P4-07 passed and host/pixel gates remain out of scope."
+  },
+  "role": "manager-locate",
+  "run_id": "p4-harness-1788431988-001-45748e44",
+  "schema": "codex-ephemeral-harness.role-evidence.v1",
+  "schema_version": 1,
+  "status": "DISCOVERY_REQUESTED",
+  "stderr_bytes": 158,
+  "stderr_sha256": "9cd7bc3d115a7c0fd4868e69836b2b57bce42f9cd1b56f91f5a2fd97753021dd",
+  "stdout_bytes": 183938,
+  "stdout_sha256": "03593d128a2c85804699126c87518fafaf02b336a9d56df406966c1f490a7388",
+  "thread_id": "01a066da-c064-7401-8142-d852ed8c1180",
+  "timestamp": "2026-09-03T10:42:48.564815Z",
+  "transcripts_forwarded": false,
+  "uncached_input_tokens": 57723,
+  "wall_time_ms": 161375
+}

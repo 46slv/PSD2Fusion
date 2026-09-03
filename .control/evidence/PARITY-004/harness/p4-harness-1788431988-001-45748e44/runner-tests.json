@@ -1,0 +1,53 @@
+{
+  "commands": [
+    "python -m unittest discover -s tests -p \"test_parity004_p405_graph.py\"",
+    "python -m unittest discover -s tests -p \"test_parity004_p407.py\"",
+    "pwsh -NoProfile -File scripts/check.ps1"
+  ],
+  "failed": 2,
+  "owner": "runner",
+  "passed": 1,
+  "results": [
+    {
+      "command": "python -m unittest discover -s tests -p \"test_parity004_p405_graph.py\"",
+      "exit_code": 1,
+      "status": "FAIL",
+      "stderr_sha256": "3b8410d3ef6d4e4c0d2b2ec82b04e2bca92e5f5d082c4f007464eb837f068448",
+      "stderr_tail": "F.F..\n======================================================================\nFAIL: test_clipping_recipe_survives_group_boundary_cases (test_parity004_p405_graph.P405GroupBoundaryTests.test_clipping_recipe_survives_group_boundary_cases)\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"D:\\Documents\\PSD2Fusion\\tests\\test_parity004_p405_graph.py\", line 13, in test_clipping_recipe_survives_group_boundary_cases\n    self.assertTrue(report[\"pass\"])\nAssertionError: False is not true\n\n======================================================================\nFAIL: test_group_ports_are_proxies_and_render_inputs_use_internal_terminals (test_parity004_p405_graph.P405GroupBoundaryTests.test_group_ports_are_proxies_and_render_inputs_use_internal_terminals)\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"D:\\Documents\\PSD2Fusion\\tests\\test_parity004_p405_graph.py\", line 68, in test_group_ports_are_proxies_and_render_inputs_use_internal_terminals\n    self.assertTrue(report[\"checks\"][\"all_cases_keep_group_proxy_render_split\"])\nAssertionError: False is not true\n\n----------------------------------------------------------------------\nRan 5 tests in 0.500s\n\nFAILED (failures=2)\n",
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": "",
+      "wall_time_ms": 828
+    },
+    {
+      "command": "python -m unittest discover -s tests -p \"test_parity004_p407.py\"",
+      "exit_code": 0,
+      "status": "PASS",
+      "stderr_sha256": "fb184ea57734512b1f088f9181209901b9cd46df3eb7eaa2500ea9e48dde20b5",
+      "stderr_tail": ".\n----------------------------------------------------------------------\nRan 1 test in 0.000s\n\nOK\n",
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": "",
+      "wall_time_ms": 375
+    },
+    {
+      "command": "pwsh -NoProfile -File scripts/check.ps1",
+      "exit_code": 1,
+      "status": "FAIL",
+      "stderr_sha256": "1d6498457a77458ebb91dc30fef6811d2c1a2481bb8cc5bd22b2556b6c0e8fbf",
+      "stderr_tail": ".............D:\\Documents\\PSD2Fusion\\scripts\\parity\\parity.py:132: DeprecationWarning: Image.Image.getdata is deprecated and will be removed in Pillow 14 (2027-10-15). Use get_flattened_data instead.\n  c, r = c.convert(\"RGBA\"), r.convert(\"RGBA\"); cp, rp = list(c.getdata()), list(r.getdata())\nD:\\Documents\\PSD2Fusion\\scripts\\parity\\parity.py:109: DeprecationWarning: Image.Image.getdata is deprecated and will be removed in Pillow 14 (2027-10-15). Use get_flattened_data instead.\n  ca, ra = list(c.getchannel(\"A\").getdata()), list(r.getchannel(\"A\").getdata()); w, h = c.size; out = []\n..D:\\Documents\\PSD2Fusion\\scripts\\parity\\parity.py:95: DeprecationWarning: Image.Image.getdata is deprecated and will be removed in Pillow 14 (2027-10-15). Use get_flattened_data instead.\n  for c, r in zip(candidate.getdata(), reference.getdata()):\n...................................F.F...........\n======================================================================\nFAIL: test_clipping_recipe_survives_group_boundary_cases (test_parity004_p405_graph.P405GroupBoundaryTests.test_clipping_recipe_survives_group_boundary_cases)\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"D:\\Documents\\PSD2Fusion\\tests\\test_parity004_p405_graph.py\", line 13, in test_clipping_recipe_survives_group_boundary_cases\n    self.assertTrue(report[\"pass\"])\nAssertionError: False is not true\n\n======================================================================\nFAIL: test_group_ports_are_proxies_and_render_inputs_use_internal_terminals (test_parity004_p405_graph.P405GroupBoundaryTests.test_group_ports_are_proxies_and_render_inputs_use_internal_terminals)\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"D:\\Documents\\PSD2Fusion\\tests\\test_parity004_p405_graph.py\", line 68, in test_group_ports_are_proxies_and_render_inputs_use_internal_terminals\n    self.assertTrue(report[\"checks\"][\"all_cases_keep_group_proxy_render_split\"])\nAssertionError: False is not true\n\n----------------------------------------------------------------------\nRan 64 tests in 3.012s\n\nFAILED (failures=2)\nException: D:\\Documents\\PSD2Fusion\\scripts\\check.ps1:19\nLine |\n  19 |          throw \"Command failed with exit code ${LASTEXITCODE}: $Comman …\n     |          ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n     | Command failed with exit code 1: python -m unittest discover -s tests -p\n     | test_*.py\n",
+      "stdout_sha256": "f065d390014203861fb62197ac52165ce671dc899a0a6fed4f920e835200208c",
+      "stdout_tail": "{\n  \"ok\": true,\n  \"state\": \"D:\\\\Documents\\\\PSD2Fusion\\\\.control\\\\current.json\",\n  \"errors\": []\n}\n",
+      "wall_time_ms": 4562
+    }
+  ],
+  "schema": "codex-ephemeral-harness.runner-test-evidence.v1",
+  "status": "FAIL",
+  "test_env": {
+    "PYTHONIOENCODING": "utf-8",
+    "assets": "External PSD and reference PNG remain read-only and are not materialized to a Worker.",
+    "fusion": "Actual Fusion is not required for this implementation tranche; host/pixel gates remain pending.",
+    "python": "Use the repository Python interpreter; do not assume pytest is installed.",
+    "shell": "PowerShell",
+    "working_directory": "Repository root"
+  },
+  "wall_time_ms": 5765
+}
