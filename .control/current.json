@@ -89,7 +89,8 @@
         ".control/evidence/PARITY-004/20260904-fusion-artifact-acquisition/summary.json",
         ".control/evidence/PARITY-004/20260904-photoshop-oracle-unavailable/summary.json",
         ".control/evidence/PARITY-004/20260904-operator-pixel-contract/decision.json",
-        ".control/evidence/PARITY-004/20260904-p409-offline-prep/summary.json"
+        ".control/evidence/PARITY-004/20260904-p409-offline-prep/summary.json",
+        ".control/evidence/PARITY-004/20260904-offline-prep-verifier/verifier.json"
       ]
     },
     {

@@ -1,0 +1,36 @@
+{
+  "schema": "psd2fusion-parity-004.offline-prep-verifier.v1",
+  "observed_at": "2026-09-04T01:42:00+09:00",
+  "task": "PARITY-004",
+  "verdict": "PASS",
+  "candidate_commit": "9327fb7039e630bd22728ec9220d0c9cda37e289",
+  "base_commit": "38a0f6e6cd1820d44a53dba6fb06099d6581af85",
+  "model_role": "fresh gpt-5.6-luna max verifier",
+  "host_apps_used": false,
+  "checks": [
+    {
+      "command": "python -m unittest tests.test_parity004_fusion_boundary_fixture tests.test_parity004_p403_graph tests.test_parity004_p405_graph",
+      "result": "PASS; 13 tests"
+    },
+    {
+      "command": "pwsh -NoProfile -File .\\scripts\\check.ps1",
+      "result": "PASS; state ok and 74 tests"
+    }
+  ],
+  "findings": [
+    "Exactly eight deterministic cases cover four modes across ungrouped and isolated scopes.",
+    "Every case reuses identical fractional RGBA inputs and opacity through the production compile_comp path.",
+    "The manifest records ClipIn, ChannelBoolean, BlendFunction, ClipStack, parent Merge and GroupOperator boundaries.",
+    "Ordinary render inputs do not consume GroupOperator output.",
+    "The fixture makes no pixel or formula parity claim."
+  ],
+  "false_pass_risks": {
+    "host_rendered": false,
+    "pixel_verified": false,
+    "p4_host_pixel_complete": false,
+    "p4_09_complete": false,
+    "parity_004_complete": false
+  },
+  "orchestrator_correction": "Verifier suggested P4-08 before the pixel gate, but canonical evidence already records P4-08 PASS for candidate 96112d5. Do not repeat it absent a material graph change.",
+  "permitted_next_action": "When DaVinci/Fusion use resumes, generate the eight fixtures and run the P4-HOST-PIXEL internal-boundary render/readback."
+}
