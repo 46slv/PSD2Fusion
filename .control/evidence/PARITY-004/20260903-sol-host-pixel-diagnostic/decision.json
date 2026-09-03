@@ -1,0 +1,127 @@
+{
+  "schema": "psd2fusion-parity-004.sol-diagnostic.v1",
+  "evidence_id": "sol-host-pixel-diagnostic-20260903",
+  "task": "PARITY-004",
+  "item": "P4-HOST-PIXEL",
+  "status": "DIAGNOSTIC_ESCALATION_RECORDED",
+  "escalation": {
+    "required": true,
+    "reason": "Focused actual-Fusion evidence leaves multiple materially plausible explanations for non-Normal RGB differences after the localized alpha/GroupOperator repairs.",
+    "write_authority": "none",
+    "host_mutation": "none",
+    "implementation_authority": "none",
+    "transcript_forwarded": false
+  },
+  "sol": {
+    "model": "gpt-5.6-sol",
+    "reasoning_effort": "max",
+    "fresh_context": true,
+    "read_set": [
+      ".control/current.json",
+      ".control/CURRENT_GOAL.md",
+      ".control/PARITY-004_TODO.md",
+      "docs/PARITY_004_HOST_PIXEL_GATE.md",
+      ".control/evidence/PARITY-004/20260903-p4-host-pixel-chbool/summary.json",
+      ".control/evidence/PARITY-004/20260903-p408-96112d5/summary.json",
+      ".control/evidence/PARITY-004/20260903-saver-artifact-blocker/summary.json",
+      ".control/evidence/PARITY-004/20260903-group-operator-contract/decision.md"
+    ],
+    "questions": [
+      "既存 clipping semantic decision に矛盾があるか",
+      "micro oracle または fixture が誤っているか",
+      "lowering implementation の位置または境界が誤っているか"
+    ]
+  },
+  "findings": {
+    "semantic_decisions": {
+      "clipping": {
+        "judgment": "not_contradicted",
+        "confidence": "high",
+        "basis": "ChannelBoolean boundary repair yields alpha error zero across the focused cases and preserves the same-parent ordered clipping relation."
+      },
+      "groupoperator_proxy_render_source": {
+        "judgment": "not_contradicted",
+        "confidence": "medium_high",
+        "basis": "Candidate 96112d5 follows the persisted decision: parent/sibling/MediaOut use the proxy while the internal terminal restores the render source; P4-05 and P4-08 structural/readback gates pass. Full nested save/reload pixel scope remains unproven."
+      },
+      "micro_oracle_fixture": {
+        "judgment": "normal_case_supported_non_normal_case_unproven",
+        "confidence": "medium",
+        "basis": "Normal and opacity/base-opacity cases are at zero to two LSB, while Multiply, Linear Dodge and Overlay differ by 5, 8 and 37 RGB levels. The formula oracle is not sufficient to declare the non-Normal Photoshop output wrong."
+      },
+      "lowering_boundary": {
+        "judgment": "primary_remaining_suspect",
+        "confidence": "medium_high",
+        "alternatives": [
+          "mode-specific straight/premultiplied RGB boundary",
+          "full-graph GroupOperator source propagation or placement",
+          "non-Normal formula oracle differs from the Photoshop actual output"
+        ]
+      }
+    },
+    "proven_observations": [
+      "Focused ChannelBoolean repair fixed alpha coverage: 13/13 alpha max error zero.",
+      "Normal and opacity/base-opacity focused cases are within quantization; Multiply, Linear Dodge and Overlay remain materially different.",
+      "The real P4-09 baseline renders the opaque paper Loader; it is not a valid compositor-math baseline.",
+      "P4-05 Runner tests, P4-07 tests and scripts/check.ps1 pass after a material three-file GroupOperator diff.",
+      "P4-08 ordinary Fusion LoadComp/readback passes for candidate 96112d5.",
+      "Saver render call was accepted but no artifact was materialized; this is an independent host-execution fingerprint."
+    ],
+    "not_established": [
+      "Photoshop pixel parity for non-Normal modes",
+      "A single mode-independent PSD lowering",
+      "Nested GroupOperator save/reload runtime source propagation",
+      "A compositor defect caused by the missing Saver artifact"
+    ]
+  },
+  "bounded_next_diagnostic": {
+    "required": true,
+    "scope": "One native-Background actual-Fusion micro fixture in the same Resolve composition: ungrouped and one isolated GroupOperator variants, plus a Normal control.",
+    "taps": [
+      "ClipIn -> ChannelBoolean boundary",
+      "BlendFunction",
+      "ClipStack",
+      "parent Merge"
+    ],
+    "readback": "host readback for each tap and one materialized render artifact",
+    "oracle": "Use a frozen tiny Photoshop actual output for expected non-Normal values; do not rely on formula-only expectations.",
+    "interpretation": {
+      "ungrouped_first_difference_at_blendfunction": "RGB lowering or color representation boundary",
+      "ungrouped_matches_grouped_parent_breaks": "GroupOperator placement/source propagation",
+      "fusion_taps_match_formula_photoshop_differs": "oracle or Photoshop semantic difference",
+      "normal_control_fails_or_artifact_absent": "fail_closed_host_or_fixture_blocker"
+    },
+    "constraints": [
+      "No broad Evaluation IR or compiler redesign",
+      "No PARITY-005 or PARITY-006",
+      "No write by Sol",
+      "Return any implementation to a fresh Luna Max Worker only after a concrete localized hypothesis is selected"
+    ]
+  },
+  "gate_state": {
+    "p4_05": "PASS",
+    "p4_07": "PASS",
+    "p4_08": "PASS",
+    "p4_host_pixel": "BLOCKED",
+    "p4_host_pixel_fingerprint": "HOST_SAVER_NO_ARTIFACT_AFTER_ACCEPTED_RENDER",
+    "p4_09": "NOT_RUN_BY_CURRENT_CANDIDATE_GATE",
+    "pixel_verified": false,
+    "parity_005": "NOT_STARTED",
+    "parity_006": "NOT_STARTED",
+    "stop_boundary": "Sol cannot select one implementation explanation from the retained evidence; keep PARITY-004 active and fail-closed until the bounded diagnostic has both a valid Photoshop oracle and a materialized Fusion artifact."
+  },
+  "correlation": {
+    "devexec_task_id": "devexec-psd2fusion-p004-20260903",
+    "harness_run_id": "p4-harness-1788440083-001-92972569",
+    "supervisor_target": "knotfield-harness-supervisor",
+    "candidate_commit": "96112d57ec52645a1d9797323d3551bf45538f27",
+    "runner_evidence": ".control/evidence/PARITY-004/harness/p4-harness-1788440083-001-92972569/runner-tests.json",
+    "worker_evidence": ".control/evidence/PARITY-004/harness/p4-harness-1788440083-001-92972569/worker-application.json",
+    "verifier_evidence": ".control/evidence/PARITY-004/harness/p4-harness-1788440083-001-92972569/verifier-result.json",
+    "p4_08_evidence": ".control/evidence/PARITY-004/20260903-p408-96112d5/summary.json",
+    "saver_blocker_evidence": ".control/evidence/PARITY-004/20260903-saver-artifact-blocker/summary.json",
+    "source_micro_gate": ".control/evidence/PARITY-004/20260903-p4-host-pixel-chbool/summary.json"
+  },
+  "next_owner": "fresh Luna Max Coordinator -> bounded P4-HOST-PIXEL diagnostic; no compositor implementation until a single localized hypothesis is supported",
+  "recording_note": "This is a durable Sol decision record, not a completion claim and not a replacement for host pixel evidence."
+}

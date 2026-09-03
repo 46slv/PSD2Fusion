@@ -1,0 +1,30 @@
+{
+  "schema": "psd2fusion-parity-004.harness-sol-escalation.v1",
+  "task": "PARITY-004",
+  "item": "P4-HOST-PIXEL",
+  "status": "BLOCKED",
+  "fingerprint": "HOST_SAVER_NO_ARTIFACT_AFTER_ACCEPTED_RENDER",
+  "sol_escalation": {
+    "required": true,
+    "reason": "Focused actual-Fusion evidence leaves multiple plausible RGB-lowering, GroupOperator runtime-boundary, and non-Normal oracle explanations.",
+    "decision": ".control/evidence/PARITY-004/20260903-sol-host-pixel-diagnostic/decision.json",
+    "model": "gpt-5.6-sol",
+    "reasoning_effort": "max",
+    "fresh_context": true,
+    "write_authority": "none",
+    "host_mutation": "none",
+    "transcript_forwarded": false
+  },
+  "cycle_role_telemetry": "not_applicable; this is a read-only Sol escalation record, not a Manager/Worker/Verifier production cycle",
+  "next_owner": "fresh Luna Max Coordinator for one bounded P4-HOST-PIXEL diagnostic only after a valid Photoshop oracle and materialized Fusion artifact are available",
+  "parity_005": "NOT_STARTED",
+  "parity_006": "NOT_STARTED",
+  "correlation": {
+    "devexec_task_id": "devexec-psd2fusion-p004-20260903",
+    "harness_run_id": "p4-harness-1788440083-001-92972569",
+    "supervisor_target": "knotfield-harness-supervisor",
+    "candidate_commit": "96112d57ec52645a1d9797323d3551bf45538f27",
+    "p4_08_evidence": ".control/evidence/PARITY-004/20260903-p408-96112d5/summary.json",
+    "host_blocker_evidence": ".control/evidence/PARITY-004/20260903-saver-artifact-blocker/summary.json"
+  }
+}
