@@ -16,7 +16,7 @@ base Loader
   -> one outer chain Merge with base blend/overall opacity
 ```
 
-The real `a.psd` structural audit covers 23 clipping chains, 59 clipped members, 34 groups, and a 363-tool generated graph. Preserve this candidate until host/pixel evidence identifies a concrete defect.
+The real `a.psd` structural audit covers 23 clipping chains, 59 clipped members, 34 groups, and the current 422-tool generated graph (the 59 additional tools are the explicit RGB/alpha boundary nodes). Preserve this candidate until host/pixel evidence identifies a concrete defect.
 
 ## Mandatory execution order
 
@@ -97,7 +97,7 @@ For every rendered fixture record candidate commit, host/version, project/color 
 
 ## P4-09 — real PSD baseline
 
-After the micro pixel gate is usable, render the current real 363-tool graph from the same candidate family and compare it directly with the qualified `D:\Downloads\20260812.png` reference.
+After the micro pixel gate is usable, render the current real 422-tool graph from the same candidate family and compare it directly with the qualified `D:\Downloads\20260812.png` reference.
 
 The first P4-09 run is a diagnostic baseline, not a requirement to pass immediately. Partition the difference before changing compositor math.
 

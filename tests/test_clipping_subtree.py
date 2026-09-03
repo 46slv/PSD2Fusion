@@ -84,6 +84,8 @@ class ClippingCompilerTests(unittest.TestCase):
         self.assertEqual("2", stats["clipping_count"])
         self.assertIn("PSD clipping subtree member", text)
         self.assertEqual(2, text.count("ProcessAlpha = Input { Value = 0, }"))
+        self.assertEqual(2, text.count("ChannelBoolean {"))
+        self.assertEqual(2, text.count("P4-HOST-PIXEL: ClipIn RGB + member alpha"))
         self.assertIn('ApplyMode = Input { Value = FuID { "Multiply" }, }', text)
         self.assertIn("Blend = Input { Value = 0.500000, }", text)
         self.assertEqual(1, text.count("PSD clipping chain merge"))

@@ -100,6 +100,7 @@ def _chain_control_row(
     for member in members:
         loaders = _role(tools, "Loader", member.id)
         clips = _role(tools, "ClipIn", member.id)
+        clip_rgbs = _role(tools, "ClipRGB", member.id)
         stacks = _role(tools, "ClipStack", member.id)
         visible = member.effective_visible
         row: Dict[str, Any] = {
@@ -116,9 +117,10 @@ def _chain_control_row(
             row["pass"] = True
             member_rows.append(row)
             continue
-        ok = len(loaders) == len(clips) == len(stacks) == 1
+        ok = len(loaders) == len(clips) == len(clip_rgbs) == len(stacks) == 1
         if ok:
             clip = clips[0]
+            clip_rgb = clip_rgbs[0]
             stack = stacks[0]
             mode_id = FUSION_BLEND_IDS.get(member.blend)
             expected_mode = 'FuID { "%s" }' % mode_id if mode_id else None
@@ -130,8 +132,10 @@ def _chain_control_row(
                     clip["apply_mode"] == 'FuID { "Normal" }',
                     clip["blend"] == "1.000000",
                     clip["operator"] == 'FuID { "In" }',
+                    clip_rgb["background"] == clip["name"],
+                    clip_rgb["foreground"] == loaders[0]["name"],
                     stack["background"] == previous,
-                    stack["foreground"] == clip["name"],
+                    stack["foreground"] == clip_rgb["name"],
                     expected_mode is not None and stack["apply_mode"] == expected_mode,
                     stack["blend"] == expected_blend,
                     stack["process_alpha"] == "0",
@@ -141,6 +145,7 @@ def _chain_control_row(
                 {
                     "loader": loaders[0]["name"],
                     "clip": clip["name"],
+                    "clip_rgb": clip_rgb["name"],
                     "stack": stack["name"],
                     "clip_background": clip["background"],
                     "stack_background": stack["background"],

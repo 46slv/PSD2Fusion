@@ -118,6 +118,23 @@ Required invariants:
 
 The current fixed-matte `ClipStack` with `ProcessAlpha=0` is a candidate Fusion lowering, not the Photoshop specification.
 
+The Fusion 21.0.3.7 host probe separates the two local stages. `Operator=In`
+produces the expected intersection alpha `A_b * A_m` and the member's straight
+RGB (therefore premultiplied RGB `C_m * A_b * A_m` on the Fusion stream). The
+following `ProcessAlpha=0` `ClipStack` preserves `A_b`, but its additive RGB
+term uses the intersection alpha as source coverage. The observed Normal
+formula is therefore `C_b * (1 - q * A_b * A_m) + C_m * q * A_m`, rather than
+the PSD clipping formula `C_b * (1 - q * A_m) + C_m * q * A_m`.
+
+The current lowering inserts a native `ChannelBoolean` Copy boundary between
+those stages: Background supplies `Operator=In` RGB and Foreground supplies the
+original member alpha, with `ProcessAlpha=0` retained on `ClipStack`. This is
+the smallest verified alpha-boundary repair. It removes the base-alpha
+attenuation for Normal and opacity/base-opacity controls, while Multiply,
+Linear Dodge and Overlay still show distinct premultiplied-mode RGB residuals;
+the fixture evidence does not justify a single generic mode-independent RGB
+lowering.
+
 ### P4-01 Fusion recipe decision
 
 P4-01 compares that lowering with a one-Merge direct-mask candidate. The
@@ -127,6 +144,8 @@ canonical recipe remains the explicit `Operator=In` form:
 base Loader ------------------------------> local ClipStack Merge (Background)
     |                                               ^
     +--> ClipIn Merge (Operator=In) <--- member     |
+                   |                               |
+                   +--> ChannelBoolean (ClipRGB) --+
                                                 ProcessAlpha=0
 outer backdrop ---------------------------> one outer Merge
 ```

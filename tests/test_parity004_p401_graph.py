@@ -35,11 +35,18 @@ class P401GraphRecipeTests(unittest.TestCase):
         self.assertEqual("LoaderR_p401member", clip["foreground"])
         self.assertIn("P4-01 fixed matte via Operator=In", clip["comments"])
 
+        rgb_nodes = [tool for tool in tools if tool["type"] == "ChannelBoolean"]
+        self.assertEqual(1, len(rgb_nodes))
+        rgb = rgb_nodes[0]
+        self.assertEqual(clip["name"], rgb["background"])
+        self.assertEqual("LoaderR_p401member", rgb["foreground"])
+        self.assertIn("P4-HOST-PIXEL: ClipIn RGB + member alpha", rgb["comments"])
+
         stacks = [tool for tool in tools if "P4-01 local Merge" in tool["comments"]]
         self.assertEqual(1, len(stacks))
         stack = stacks[0]
         self.assertEqual(clip["background"], stack["background"])
-        self.assertEqual(clip["name"], stack["foreground"])
+        self.assertEqual(rgb["name"], stack["foreground"])
         self.assertEqual("0", stack["process_alpha"])
 
         outers = [tool for tool in tools if "PSD clipping chain merge:" in tool["comments"]]

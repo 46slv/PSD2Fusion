@@ -11,7 +11,7 @@ from psd2fusion.semantic import index_layers, walk_layers
 
 TOOL_HEADER = re.compile(
     r"(?m)^([ \t]*)([A-Za-z_][A-Za-z0-9_]*) = "
-    r"(Background|Loader|Merge|MediaOut|GroupOperator|Note) \{"
+    r"(Background|Loader|Merge|ChannelBoolean|MediaOut|GroupOperator|Note) \{"
 )
 
 
@@ -137,18 +137,22 @@ def validate(psd_path, comp_path):
             visible_member_count += 1
             loaders = role(member.id, "Loader", "Loader")
             clips = role(member.id, "ClipIn", "Merge")
+            clip_rgb = role(member.id, "ClipRGB", "ChannelBoolean")
             stacks = role(member.id, "ClipStack", "Merge")
-            member_ok = len(loaders) == len(clips) == len(stacks) == 1
+            member_ok = len(loaders) == len(clips) == len(clip_rgb) == len(stacks) == 1
             if member_ok:
                 clip = clips[0]
+                rgb = clip_rgb[0]
                 stack = stacks[0]
                 member_ok = all(
                     (
                         clip["background"] == (base_nodes[0]["name"] if base_nodes else None),
                         clip["foreground"] == loaders[0]["name"],
                         clip["operator"] == 'FuID { "In" }',
+                        rgb["background"] == clip["name"],
+                        rgb["foreground"] == loaders[0]["name"],
                         stack["background"] == previous,
-                        stack["foreground"] == clip["name"],
+                        stack["foreground"] == rgb["name"],
                         stack["process_alpha"] == "0",
                     )
                 )

@@ -196,22 +196,27 @@ def _chain_shape(tools: Sequence[Dict[str, Any]], base_id: str, member_ids: Sequ
     for member_id in member_ids:
         loaders = _role(tools, "Loader", member_id)
         clips = [tool for tool in _role(tools, "ClipIn", member_id) if tool["type"] == "Merge"]
+        clip_rgbs = [tool for tool in _role(tools, "ClipRGB", member_id) if tool["type"] == "ChannelBoolean"]
         stacks = [tool for tool in _role(tools, "ClipStack", member_id) if tool["type"] == "Merge"]
         row = {
             "loader": loaders[0] if len(loaders) == 1 else None,
             "clip": clips[0] if len(clips) == 1 else None,
+            "clip_rgb": clip_rgbs[0] if len(clip_rgbs) == 1 else None,
             "stack": stacks[0] if len(stacks) == 1 else None,
         }
         row["pass"] = bool(
             len(base_loaders) == 1
             and row["loader"] is not None
             and row["clip"] is not None
+            and row["clip_rgb"] is not None
             and row["stack"] is not None
             and row["clip"]["background"] == base_loaders[0]["name"]
             and row["clip"]["foreground"] == row["loader"]["name"]
             and row["clip"]["operator"] == 'FuID { "In" }'
+            and row["clip_rgb"]["background"] == row["clip"]["name"]
+            and row["clip_rgb"]["foreground"] == row["loader"]["name"]
             and row["stack"]["background"] == previous
-            and row["stack"]["foreground"] == row["clip"]["name"]
+            and row["stack"]["foreground"] == row["clip_rgb"]["name"]
             and row["stack"]["process_alpha"] == "0"
         )
         if row["stack"] is not None:

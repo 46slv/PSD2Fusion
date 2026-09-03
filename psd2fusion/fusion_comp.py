@@ -197,6 +197,41 @@ def _merge(
     return _simple_tool(name, "Merge", inputs, comment, x, y)
 
 
+def _channel_boolean_clip_rgb(
+    name: str,
+    background: _Source,
+    foreground: _Source,
+    comment: str,
+    x: float,
+    y: float,
+) -> str:
+    """Keep Operator=In RGB while restoring the unclipped member alpha.
+
+    Fusion's additive Merge modes consume premultiplied RGB.  The host pixel
+    probe showed that ``Operator=In`` correctly produces ``base_alpha *
+    member_alpha`` RGB/alpha, but the following local Merge needs the member
+    alpha for its coverage term.  ChannelBoolean's Copy operation can carry
+    the clipped RGB from Background and the original member alpha from
+    Foreground without changing either RGB stream.
+    """
+
+    inputs = [
+        _input_connection("Background", background),
+        _input_connection("Foreground", foreground),
+        _input_value("Operation", "0"),
+        _input_value("ToRed", "5"),
+        _input_value("ToGreen", "6"),
+        _input_value("ToBlue", "7"),
+        _input_value("ToAlpha", "3"),
+        _input_value("Blend", "1"),
+        _input_value("ProcessRed", "1"),
+        _input_value("ProcessGreen", "1"),
+        _input_value("ProcessBlue", "1"),
+        _input_value("ProcessAlpha", "1"),
+    ]
+    return _simple_tool(name, "ChannelBoolean", inputs, comment, x, y)
+
+
 def _note(name: str, comment: str, x: float, y: float) -> str:
     lines = [
         "%s = Note {" % name,
@@ -506,7 +541,26 @@ class _Compiler:
                 operator="In",
             )
         )
-        return _Source(clip_name)
+        # Operator=In returns the correct clipped premultiplied RGB, but its
+        # alpha is the intersection (base * member).  The local Merge must
+        # see member alpha as its coverage while retaining that clipped RGB.
+        # Copy only the alpha boundary through a native ChannelBoolean node.
+        rgb_name = self.name("ClipRGB" + scope, layer.id)
+        rgb_row = self._clipping_clip_rows.get(layer.id, 2)
+        rgb_x, rgb_y = self.position(rgb_row - 0.25, depth)
+        self._current_tools.append(
+            _channel_boolean_clip_rgb(
+                rgb_name,
+                _Source(clip_name),
+                member.output,
+                "PSD clipping RGB/alpha boundary (base=%s): %s"
+                % (layer.clipping_base_id or "unknown", layer.name)
+                + " [P4-HOST-PIXEL: ClipIn RGB + member alpha]",
+                rgb_x,
+                rgb_y,
+            )
+        )
+        return _Source(rgb_name)
 
     def _collect_clipping_members(
         self,

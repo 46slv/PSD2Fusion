@@ -114,6 +114,11 @@ def build(output: Path) -> Dict[str, Any]:
             for tool in _role(tools, "ClipIn", member_id)
             if tool["type"] == "Merge"
         ]
+        clip_rgbs = [
+            tool
+            for tool in _role(tools, "ClipRGB", member_id)
+            if tool["type"] == "ChannelBoolean"
+        ]
         stacks = [
             tool
             for tool in _role(tools, "ClipStack", member_id)
@@ -124,9 +129,11 @@ def build(output: Path) -> Dict[str, Any]:
             "id": member_id,
             "loader_count": len(loaders),
             "clip_count": len(clips),
+            "clip_rgb_count": len(clip_rgbs),
             "stack_count": len(stacks),
             "loader": loaders[0]["name"] if len(loaders) == 1 else None,
             "clip": clips[0]["name"] if len(clips) == 1 else None,
+            "clip_rgb": clip_rgbs[0]["name"] if len(clip_rgbs) == 1 else None,
             "stack": stacks[0]["name"] if len(stacks) == 1 else None,
             "clip_background": clips[0]["background"] if len(clips) == 1 else None,
             "clip_foreground": clips[0]["foreground"] if len(clips) == 1 else None,
@@ -138,11 +145,12 @@ def build(output: Path) -> Dict[str, Any]:
             "stack_start": stacks[0]["start"] if len(stacks) == 1 else None,
         }
         row["shape"] = (
-            len(loaders) == len(clips) == len(stacks) == 1
+            len(loaders) == len(clips) == len(clip_rgbs) == len(stacks) == 1
             and row["clip_foreground"] == row["loader"]
             and row["clip_operator"] == 'FuID { "In" }'
+            and row["clip_rgb"] is not None
             and row["stack_background"] == previous_stack
-            and row["stack_foreground"] == row["clip"]
+            and row["stack_foreground"] == row["clip_rgb"]
             and row["stack_process_alpha"] == "0"
             and row["clip_start"] < row["stack_start"]
         )
@@ -160,7 +168,7 @@ def build(output: Path) -> Dict[str, Any]:
     local_tools = [
         tool
         for row in member_rows
-        for tool_name in (row["clip"], row["stack"])
+        for tool_name in (row["clip"], row["clip_rgb"], row["stack"])
         if tool_name is not None
         for tool in tools
         if tool["name"] == tool_name

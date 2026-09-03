@@ -199,6 +199,8 @@ def _artifact(path: Path) -> Dict[str, str]:
 def _candidate_a_checks(text: str) -> Dict[str, bool]:
     return {
         "one_operator_in": text.count('Operator = Input { Value = FuID { "In" }, }') == 1,
+        "one_clip_rgb_alpha_boundary": text.count("ChannelBoolean {") == 1
+        and text.count("P4-HOST-PIXEL: ClipIn RGB + member alpha") == 1,
         "one_fixed_alpha_stack": text.count("ProcessAlpha = Input { Value = 0, }") == 1,
         "one_outer_chain_merge": text.count("PSD clipping chain merge:") == 1,
         "member_local_merge_comment": "P4-01 local Merge" in text,
