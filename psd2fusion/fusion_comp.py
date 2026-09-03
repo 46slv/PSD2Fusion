@@ -197,39 +197,126 @@ def _merge(
     return _simple_tool(name, "Merge", inputs, comment, x, y)
 
 
-def _channel_boolean_clip_rgb(
+def _alpha_divide(
     name: str,
-    background: _Source,
-    foreground: _Source,
+    source: _Source,
     comment: str,
     x: float,
     y: float,
 ) -> str:
-    """Keep Operator=In RGB while restoring the unclipped member alpha.
+    """Convert a premultiplied stream to straight RGB while keeping alpha."""
 
-    Fusion's additive Merge modes consume premultiplied RGB.  The host pixel
-    probe showed that ``Operator=In`` correctly produces ``base_alpha *
-    member_alpha`` RGB/alpha, but the following local Merge needs the member
-    alpha for its coverage term.  ChannelBoolean's Copy operation can carry
-    the clipped RGB from Background and the original member alpha from
-    Foreground without changing either RGB stream.
+    return _simple_tool(
+        name,
+        "AlphaDivide",
+        [_input_connection("Input", source)],
+        comment,
+        x,
+        y,
+    )
+
+
+def _channel_boolean_copy(
+    name: str,
+    background: _Source,
+    foreground: Optional[_Source],
+    to_alpha: int,
+    comment: str,
+    x: float,
+    y: float,
+) -> str:
+    """Copy RGB from Background and a selected alpha channel.
+
+    Fusion's ChannelBoolean selectors are zero-based in the scripting API:
+    ``5/6/7`` are Background RGB, ``3`` is Foreground alpha, and ``16`` is
+    white.  Keeping those selectors in one serializer makes the straight/
+    opaque island deterministic and auditable.
     """
 
     inputs = [
         _input_connection("Background", background),
-        _input_connection("Foreground", foreground),
-        _input_value("Operation", "0"),
-        _input_value("ToRed", "5"),
-        _input_value("ToGreen", "6"),
-        _input_value("ToBlue", "7"),
-        _input_value("ToAlpha", "3"),
-        _input_value("Blend", "1"),
-        _input_value("ProcessRed", "1"),
-        _input_value("ProcessGreen", "1"),
-        _input_value("ProcessBlue", "1"),
-        _input_value("ProcessAlpha", "1"),
     ]
+    if foreground is not None:
+        inputs.append(_input_connection("Foreground", foreground))
+    inputs.extend(
+        [
+            _input_value("Operation", "0"),
+            _input_value("ToRed", "5"),
+            _input_value("ToGreen", "6"),
+            _input_value("ToBlue", "7"),
+            _input_value("ToAlpha", str(to_alpha)),
+            _input_value("Blend", "1"),
+            _input_value("ProcessRed", "1"),
+            _input_value("ProcessGreen", "1"),
+            _input_value("ProcessBlue", "1"),
+            _input_value("ProcessAlpha", "1"),
+        ]
+    )
     return _simple_tool(name, "ChannelBoolean", inputs, comment, x, y)
+
+
+def _channel_boolean_force_opaque(
+    name: str,
+    source: _Source,
+    comment: str,
+    x: float,
+    y: float,
+) -> str:
+    """Keep straight RGB and force alpha to one for a blend function."""
+
+    return _channel_boolean_copy(name, source, None, 16, comment, x, y)
+
+
+def _channel_boolean_attach_alpha(
+    name: str,
+    rgb_source: _Source,
+    alpha_source: _Source,
+    comment: str,
+    x: float,
+    y: float,
+) -> str:
+    """Keep RGB from one stream and copy alpha from another stream."""
+
+    return _channel_boolean_copy(
+        name, rgb_source, alpha_source, 3, comment, x, y
+    )
+
+
+def _brightness_contrast_clamp(
+    name: str,
+    source: _Source,
+    comment: str,
+    x: float,
+    y: float,
+) -> str:
+    """Clamp blend-function RGB before member-opacity interpolation."""
+
+    inputs = [
+        _input_connection("Input", source),
+        _input_value("ClipBlack", "1"),
+        _input_value("ClipWhite", "1"),
+        _input_value("ProcessAlpha", "0"),
+    ]
+    return _simple_tool(name, "BrightnessContrast", inputs, comment, x, y)
+
+
+def _alpha_multiply(
+    name: str,
+    source: _Source,
+    comment: str,
+    x: float,
+    y: float,
+) -> str:
+    """Premultiply RGB by the attached intersection alpha."""
+
+    return _simple_tool(
+        name,
+        "AlphaMultiply",
+        [_input_connection("Input", source)],
+        comment,
+        x,
+        y,
+    )
 
 
 def _note(name: str, comment: str, x: float, y: float) -> str:
@@ -313,6 +400,7 @@ class _Compiler:
         self.blend_modes: set[str] = set()
         self._x = 0.0
         self._external_input_target: Optional[str] = None
+        self._root_background_name: Optional[str] = None
         # Per-member rows keep the fixed-matte path readable in Flow without
         # changing the deterministic PSD evaluation order.
         self._clipping_loader_rows: Dict[str, int] = {}
@@ -479,6 +567,21 @@ class _Compiler:
         opacity: Optional[float] = None,
         mode: Optional[str] = None,
     ) -> _Source:
+        # The local clipping island is sufficient for an opaque/root
+        # backdrop. A fractional external backdrop plus a non-Normal base
+        # mode needs the same straight-function separation at this one
+        # diagnosed boundary; keep that repair local instead of changing every
+        # compiler Merge.
+        if comment_prefix == "PSD clipping chain merge" and mode not in (None, "Normal"):
+            return self._merge_clipping_outer_straight(
+                backdrop,
+                result,
+                layer,
+                depth,
+                scope,
+                opacity,
+                mode,
+            )
         merge_name = self.name("Merge" + scope, layer.id)
         self.merge_count += 1
         row = 0
@@ -514,6 +617,222 @@ class _Compiler:
         )
         return _Source(merge_name)
 
+    def _merge_clipping_outer_straight(
+        self,
+        backdrop: _Source,
+        result: _ItemResult,
+        layer: SemanticLayer,
+        depth: int,
+        scope: str,
+        opacity: Optional[float],
+        mode: Optional[str],
+    ) -> _Source:
+        """Lower one non-Normal clipping outer boundary in straight RGB.
+
+        result.output is the completed local clipping span (premultiplied RGB,
+        alpha M), while backdrop may have a fractional alpha D. The helper
+        stream constructs T=(1-D)S+D*B(C_D,S) and composites it with source
+        coverage q=M*opacity using a final Normal Merge. This is intentionally
+        scoped to the P4-09-localized outer boundary; ordinary layer merges
+        retain their established path.
+        """
+
+        if self._root_background_name is None:
+            raise ValueError("clipping outer straight boundary requires root canvas")
+        if mode is None:
+            mode = layer.blend
+        mode_id = FUSION_BLEND_IDS.get(mode)
+        if mode_id is None:
+            raise ValueError(
+                "Cannot lower unsupported/unverified blend mode without an "
+                "explicit capability decision: %s" % mode
+            )
+        member_opacity = layer.opacity if opacity is None else opacity
+        row = self._clipping_outer_rows.get(layer.id, 0)
+
+        def emit_name(role: str) -> str:
+            return self.name(role + scope, layer.id)
+
+        backdrop_straight_name = emit_name("OuterBlendBackdropStraight")
+        x, y = self.position(row + 3.0, depth)
+        self._current_tools.append(
+            _alpha_divide(
+                backdrop_straight_name,
+                backdrop,
+                "PSD clipping outer backdrop straight RGB: %s" % layer.name
+                + " [P4-HOST-PIXEL: localized fractional-backdrop boundary]",
+                x,
+                y,
+            )
+        )
+
+        backdrop_opaque_name = emit_name("OuterBlendBackdropOpaque")
+        x, y = self.position(row + 2.5, depth)
+        self._current_tools.append(
+            _channel_boolean_force_opaque(
+                backdrop_opaque_name,
+                _Source(backdrop_straight_name),
+                "PSD clipping outer backdrop opaque RGB: %s" % layer.name
+                + " [P4-HOST-PIXEL: force alpha=1 for base function]",
+                x,
+                y,
+            )
+        )
+
+        source_straight_name = emit_name("OuterBlendSourceStraight")
+        x, y = self.position(row + 1.5, depth)
+        self._current_tools.append(
+            _alpha_divide(
+                source_straight_name,
+                result.output,
+                "PSD clipping outer local source straight RGB: %s" % layer.name
+                + " [P4-HOST-PIXEL: completed clipping span]",
+                x,
+                y,
+            )
+        )
+
+        source_opaque_name = emit_name("OuterBlendSourceOpaque")
+        x, y = self.position(row + 1.0, depth)
+        self._current_tools.append(
+            _channel_boolean_force_opaque(
+                source_opaque_name,
+                _Source(source_straight_name),
+                "PSD clipping outer local source opaque RGB: %s" % layer.name
+                + " [P4-HOST-PIXEL: force alpha=1 for base function]",
+                x,
+                y,
+            )
+        )
+
+        function_name = emit_name("OuterBlendFunction")
+        self.merge_count += 1
+        x, y = self.position(row + 0.5, depth)
+        self._current_tools.append(
+            _merge(
+                function_name,
+                _Source(backdrop_opaque_name),
+                _Source(source_opaque_name),
+                mode_id,
+                1.0,
+                "PSD clipping outer blend function: %s" % layer.name
+                + " [P4-HOST-PIXEL: straight opaque; Blend=1]",
+                x,
+                y,
+            )
+        )
+
+        function_coverage_name = emit_name("OuterBlendFunctionCoverage")
+        x, y = self.position(row + 0.0, depth)
+        self._current_tools.append(
+            _channel_boolean_attach_alpha(
+                function_coverage_name,
+                _Source(function_name),
+                backdrop,
+                "PSD clipping outer blend backdrop coverage: %s" % layer.name
+                + " [P4-HOST-PIXEL: attach backdrop alpha D]",
+                x,
+                y,
+            )
+        )
+
+        function_premult_name = emit_name("OuterBlendFunctionPremult")
+        x, y = self.position(row - 0.25, depth)
+        self._current_tools.append(
+            _alpha_multiply(
+                function_premult_name,
+                _Source(function_coverage_name),
+                "PSD clipping outer blend function premultiply: %s" % layer.name
+                + " [P4-HOST-PIXEL: backdrop alpha * B(C_D,S)]",
+                x,
+                y,
+            )
+        )
+
+        source_mix_name = emit_name("OuterBlendSourceMix")
+        self.merge_count += 1
+        x, y = self.position(row - 0.5, depth)
+        self._current_tools.append(
+            _merge(
+                source_mix_name,
+                _Source(source_opaque_name),
+                _Source(function_premult_name),
+                "Normal",
+                1.0,
+                "PSD clipping outer straight source mix: %s" % layer.name
+                + " [P4-HOST-PIXEL: (1-D)S + D*B(C_D,S)]",
+                x,
+                y,
+            )
+        )
+
+        source_coverage_name = emit_name("OuterBlendCoverage")
+        self.merge_count += 1
+        x, y = self.position(row - 1.0, depth)
+        self._current_tools.append(
+            _merge(
+                source_coverage_name,
+                _Source(self._root_background_name),
+                result.output,
+                "Normal",
+                member_opacity,
+                "PSD clipping outer source coverage: %s" % layer.name
+                + " [P4-HOST-PIXEL: q=M*base opacity]",
+                x,
+                y,
+                process_alpha=True,
+            )
+        )
+
+        coverage_attached_name = emit_name("OuterBlendCoverageAttached")
+        x, y = self.position(row - 1.5, depth)
+        self._current_tools.append(
+            _channel_boolean_attach_alpha(
+                coverage_attached_name,
+                _Source(source_mix_name),
+                _Source(source_coverage_name),
+                "PSD clipping outer source mix coverage: %s" % layer.name
+                + " [P4-HOST-PIXEL: attach q alpha]",
+                x,
+                y,
+            )
+        )
+
+        premult_name = emit_name("OuterBlendPremult")
+        x, y = self.position(row - 2.0, depth)
+        self._current_tools.append(
+            _alpha_multiply(
+                premult_name,
+                _Source(coverage_attached_name),
+                "PSD clipping outer premultiply: %s" % layer.name
+                + " [P4-HOST-PIXEL: q*((1-D)S+D*B)]",
+                x,
+                y,
+            )
+        )
+
+        merge_name = self.name("Merge" + scope, layer.id)
+        self.merge_count += 1
+        x, y = self.position(row - 2.5, depth)
+        if not backdrop.name:
+            self._external_input_target = merge_name
+        self._current_tools.append(
+            _merge(
+                merge_name,
+                backdrop,
+                _Source(premult_name),
+                "Normal",
+                1.0,
+                "PSD clipping chain merge: %s" % layer.name
+                + " [P4-01 outer boundary; P4-04 base blend/opacity once; "
+                "P4-HOST-PIXEL localized straight outer boundary]",
+                x,
+                y,
+                process_alpha=True,
+            )
+        )
+        return _Source(merge_name)
+
     def clipping_merge(
         self,
         matte: _Source,
@@ -541,26 +860,10 @@ class _Compiler:
                 operator="In",
             )
         )
-        # Operator=In returns the correct clipped premultiplied RGB, but its
-        # alpha is the intersection (base * member).  The local Merge must
-        # see member alpha as its coverage while retaining that clipped RGB.
-        # Copy only the alpha boundary through a native ChannelBoolean node.
-        rgb_name = self.name("ClipRGB" + scope, layer.id)
-        rgb_row = self._clipping_clip_rows.get(layer.id, 2)
-        rgb_x, rgb_y = self.position(rgb_row - 0.25, depth)
-        self._current_tools.append(
-            _channel_boolean_clip_rgb(
-                rgb_name,
-                _Source(clip_name),
-                member.output,
-                "PSD clipping RGB/alpha boundary (base=%s): %s"
-                % (layer.clipping_base_id or "unknown", layer.name)
-                + " [P4-HOST-PIXEL: ClipIn RGB + member alpha]",
-                rgb_x,
-                rgb_y,
-            )
-        )
-        return _Source(rgb_name)
+        # Operator=In is deliberately kept as the fixed-matte coverage stage.
+        # Its premultiplied RGB and intersection alpha feed the common
+        # straight/opaque blend-function island emitted by clipping_subtree.
+        return _Source(clip_name)
 
     def _collect_clipping_members(
         self,
@@ -636,6 +939,143 @@ class _Compiler:
             clipped_source = self.clipping_merge(
                 fixed_matte, member_result, member, depth, scope
             )
+
+            # Fusion Merge evaluates non-Normal modes on premultiplied RGB.
+            # Separate both streams into straight RGB with opaque alpha before
+            # the mode function, then restore the ClipIn intersection coverage
+            # and the original member alpha around the final Normal Merge.
+            island_row = self._clipping_stack_rows[member.id]
+            base_straight_name = self.name("BlendBaseStraight" + scope, member.id)
+            base_straight_x, base_straight_y = self.position(island_row + 2.0, depth)
+            self._current_tools.append(
+                _alpha_divide(
+                    base_straight_name,
+                    current,
+                    "PSD clipping blend base straight RGB (base=%s): %s"
+                    % (base.id, member.name)
+                    + " [P4-HOST-PIXEL: AlphaDivide current local stream]",
+                    base_straight_x,
+                    base_straight_y,
+                )
+            )
+            base_opaque_name = self.name("BlendBaseOpaque" + scope, member.id)
+            base_opaque_x, base_opaque_y = self.position(island_row + 1.5, depth)
+            self._current_tools.append(
+                _channel_boolean_force_opaque(
+                    base_opaque_name,
+                    _Source(base_straight_name),
+                    "PSD clipping blend base opaque RGB (base=%s): %s"
+                    % (base.id, member.name)
+                    + " [P4-HOST-PIXEL: force alpha=1]",
+                    base_opaque_x,
+                    base_opaque_y,
+                )
+            )
+
+            member_straight_name = self.name("BlendMemberStraight" + scope, member.id)
+            member_straight_x, member_straight_y = self.position(island_row - 3.0, depth)
+            self._current_tools.append(
+                _alpha_divide(
+                    member_straight_name,
+                    member_result.output,
+                    "PSD clipping blend member straight RGB (base=%s): %s"
+                    % (base.id, member.name)
+                    + " [P4-HOST-PIXEL: AlphaDivide member stream]",
+                    member_straight_x,
+                    member_straight_y,
+                )
+            )
+            member_opaque_name = self.name("BlendMemberOpaque" + scope, member.id)
+            member_opaque_x, member_opaque_y = self.position(island_row - 2.5, depth)
+            self._current_tools.append(
+                _channel_boolean_force_opaque(
+                    member_opaque_name,
+                    _Source(member_straight_name),
+                    "PSD clipping blend member opaque RGB (base=%s): %s"
+                    % (base.id, member.name)
+                    + " [P4-HOST-PIXEL: force alpha=1]",
+                    member_opaque_x,
+                    member_opaque_y,
+                )
+            )
+
+            member_mode_id = self.mode_id(member)
+            function_name = self.name("BlendFunction" + scope, member.id)
+            function_x, function_y = self.position(island_row - 2.0, depth)
+            self.merge_count += 1
+            self._current_tools.append(
+                _merge(
+                    function_name,
+                    _Source(base_opaque_name),
+                    _Source(member_opaque_name),
+                    member_mode_id,
+                    1.0,
+                    "PSD clipping blend function (base=%s): %s"
+                    % (base.id, member.name)
+                    + " [P4-HOST-PIXEL: straight opaque; Blend=1]",
+                    function_x,
+                    function_y,
+                )
+            )
+
+            clamp_name = self.name("BlendClamp" + scope, member.id)
+            clamp_x, clamp_y = self.position(island_row - 1.5, depth)
+            self._current_tools.append(
+                _brightness_contrast_clamp(
+                    clamp_name,
+                    _Source(function_name),
+                    "PSD clipping blend clamp (base=%s): %s"
+                    % (base.id, member.name)
+                    + " [P4-HOST-PIXEL: RGB [0,1] before opacity]",
+                    clamp_x,
+                    clamp_y,
+                )
+            )
+
+            coverage_name = self.name("BlendCoverage" + scope, member.id)
+            coverage_x, coverage_y = self.position(island_row - 1.0, depth)
+            self._current_tools.append(
+                _channel_boolean_attach_alpha(
+                    coverage_name,
+                    _Source(clamp_name),
+                    clipped_source,
+                    "PSD clipping blend coverage (base=%s): %s"
+                    % (base.id, member.name)
+                    + " [P4-HOST-PIXEL: attach ClipIn M*A alpha]",
+                    coverage_x,
+                    coverage_y,
+                )
+            )
+
+            premult_name = self.name("BlendPremult" + scope, member.id)
+            premult_x, premult_y = self.position(island_row - 0.5, depth)
+            self._current_tools.append(
+                _alpha_multiply(
+                    premult_name,
+                    _Source(coverage_name),
+                    "PSD clipping blend premultiply (base=%s): %s"
+                    % (base.id, member.name)
+                    + " [P4-HOST-PIXEL: M*A*B(C,S)]",
+                    premult_x,
+                    premult_y,
+                )
+            )
+
+            restore_name = self.name("BlendRestoreAlpha" + scope, member.id)
+            restore_x, restore_y = self.position(island_row + 0.0, depth)
+            self._current_tools.append(
+                _channel_boolean_attach_alpha(
+                    restore_name,
+                    _Source(premult_name),
+                    member_result.output,
+                    "PSD clipping blend restore alpha (base=%s): %s"
+                    % (base.id, member.name)
+                    + " [P4-HOST-PIXEL: restore original member A]",
+                    restore_x,
+                    restore_y,
+                )
+            )
+
             merge_name = self.name("ClipStack" + scope, member.id)
             self.merge_count += 1
             x, y = self.position(self._clipping_stack_rows[member.id], depth)
@@ -643,15 +1083,15 @@ class _Compiler:
                 _merge(
                     merge_name,
                     current,
-                    clipped_source,
-                    self.mode_id(member),
+                    _Source(restore_name),
+                    "Normal",
                     member.opacity,
                     "PSD clipping subtree member (base=%s): %s"
                     % (base.id, member.name)
-                    + " [P4-01 local Merge; ProcessAlpha=0 preserves base alpha; "
+                    + " [P4-01 local Merge; straight blend island; ProcessAlpha=0 preserves base alpha; "
                     + (
                         "P4-02 shared base matte member %d/%d; "
-                        "P4-03 member blend/opacity local]"
+                        "P4-03 member opacity local; FunctionMerge carries member mode]"
                         % (member_index, member_total)
                     ),
                     x,
@@ -750,6 +1190,7 @@ class _Compiler:
 
     def compile(self) -> Dict[str, str]:
         root_bg = self.name("Background", self.doc.source_sha256)
+        self._root_background_name = root_bg
         root_tools: List[str] = [
             _background(
                 root_bg,

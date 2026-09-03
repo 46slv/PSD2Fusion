@@ -5,13 +5,14 @@ import json
 import re
 from pathlib import Path
 
+from psd2fusion.fusion_comp import FUSION_BLEND_IDS
 from psd2fusion.parse_psd import parse_psd
 from psd2fusion.semantic import index_layers, walk_layers
 
 
 TOOL_HEADER = re.compile(
     r"(?m)^([ \t]*)([A-Za-z_][A-Za-z0-9_]*) = "
-    r"(Background|Loader|Merge|ChannelBoolean|MediaOut|GroupOperator|Note) \{"
+    r"(Background|Loader|Merge|ChannelBoolean|AlphaDivide|BrightnessContrast|AlphaMultiply|MediaOut|GroupOperator|Note) \{"
 )
 
 
@@ -94,9 +95,17 @@ def parse_tools(path):
                 "end": end,
                 "background": _connection(block, "Background"),
                 "foreground": _connection(block, "Foreground"),
+                "input": _connection(block, "Input"),
                 "apply_mode": _value(block, "ApplyMode"),
                 "blend": _value(block, "Blend"),
                 "operator": _value(block, "Operator"),
+                "operation": _value(block, "Operation"),
+                "to_red": _value(block, "ToRed"),
+                "to_green": _value(block, "ToGreen"),
+                "to_blue": _value(block, "ToBlue"),
+                "to_alpha": _value(block, "ToAlpha"),
+                "clip_black": _value(block, "ClipBlack"),
+                "clip_white": _value(block, "ClipWhite"),
                 "process_alpha": _value(block, "ProcessAlpha"),
                 "input_target": _input_source_op(block, "MainInput1"),
                 "position": _position(block),
@@ -137,22 +146,79 @@ def validate(psd_path, comp_path):
             visible_member_count += 1
             loaders = role(member.id, "Loader", "Loader")
             clips = role(member.id, "ClipIn", "Merge")
-            clip_rgb = role(member.id, "ClipRGB", "ChannelBoolean")
+            base_straight = role(member.id, "BlendBaseStraight", "AlphaDivide")
+            base_opaque = role(member.id, "BlendBaseOpaque", "ChannelBoolean")
+            member_straight = role(member.id, "BlendMemberStraight", "AlphaDivide")
+            member_opaque = role(member.id, "BlendMemberOpaque", "ChannelBoolean")
+            blend_function = role(member.id, "BlendFunction", "Merge")
+            blend_clamp = role(member.id, "BlendClamp", "BrightnessContrast")
+            blend_coverage = role(member.id, "BlendCoverage", "ChannelBoolean")
+            blend_premult = role(member.id, "BlendPremult", "AlphaMultiply")
+            blend_restore = role(member.id, "BlendRestoreAlpha", "ChannelBoolean")
             stacks = role(member.id, "ClipStack", "Merge")
-            member_ok = len(loaders) == len(clips) == len(clip_rgb) == len(stacks) == 1
+            node_sets = (
+                loaders,
+                clips,
+                base_straight,
+                base_opaque,
+                member_straight,
+                member_opaque,
+                blend_function,
+                blend_clamp,
+                blend_coverage,
+                blend_premult,
+                blend_restore,
+                stacks,
+            )
+            member_ok = all(len(nodes) == 1 for nodes in node_sets)
             if member_ok:
                 clip = clips[0]
-                rgb = clip_rgb[0]
+                base_div = base_straight[0]
+                base_opaque_node = base_opaque[0]
+                member_div = member_straight[0]
+                member_opaque_node = member_opaque[0]
+                function = blend_function[0]
+                clamp = blend_clamp[0]
+                coverage = blend_coverage[0]
+                premult = blend_premult[0]
+                restore = blend_restore[0]
                 stack = stacks[0]
+                expected_mode_id = FUSION_BLEND_IDS.get(member.blend)
+                expected_mode = (
+                    'FuID { "%s" }' % expected_mode_id
+                    if expected_mode_id
+                    else None
+                )
                 member_ok = all(
                     (
                         clip["background"] == (base_nodes[0]["name"] if base_nodes else None),
                         clip["foreground"] == loaders[0]["name"],
                         clip["operator"] == 'FuID { "In" }',
-                        rgb["background"] == clip["name"],
-                        rgb["foreground"] == loaders[0]["name"],
+                        base_div["input"] == previous,
+                        base_opaque_node["background"] == base_div["name"],
+                        base_opaque_node["to_alpha"] == "16",
+                        member_div["input"] == loaders[0]["name"],
+                        member_opaque_node["background"] == member_div["name"],
+                        member_opaque_node["to_alpha"] == "16",
+                        function["background"] == base_opaque_node["name"],
+                        function["foreground"] == member_opaque_node["name"],
+                        expected_mode is not None
+                        and function["apply_mode"] == expected_mode,
+                        function["blend"] == "1.000000",
+                        clamp["input"] == function["name"],
+                        clamp["clip_black"] == "1",
+                        clamp["clip_white"] == "1",
+                        clamp["process_alpha"] == "0",
+                        coverage["background"] == clamp["name"],
+                        coverage["foreground"] == clip["name"],
+                        coverage["to_alpha"] == "3",
+                        premult["input"] == coverage["name"],
+                        restore["background"] == premult["name"],
+                        restore["foreground"] == loaders[0]["name"],
+                        restore["to_alpha"] == "3",
                         stack["background"] == previous,
-                        stack["foreground"] == rgb["name"],
+                        stack["foreground"] == restore["name"],
+                        stack["apply_mode"] == 'FuID { "Normal" }',
                         stack["process_alpha"] == "0",
                     )
                 )

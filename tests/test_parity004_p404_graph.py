@@ -14,9 +14,13 @@ class P404BaseBoundaryTests(unittest.TestCase):
         self.assertTrue(report["pass"])
         self.assertEqual("PASS", report["status"])
         self.assertEqual("operator_in_fixed_matte_local_stack", report["recipe"])
-        self.assertEqual(('FuID { "Multiply" }', "0.500000"), (
-            report["primary_outer"]["apply_mode"], report["primary_outer"]["blend"]
+        self.assertEqual(('FuID { "Multiply" }', "1.000000"), (
+            report["primary_outer_function"]["apply_mode"],
+            report["primary_outer_function"]["blend"],
         ))
+        self.assertEqual("0.500000", report["primary_outer_coverage"]["blend"])
+        self.assertEqual('FuID { "Normal" }', report["primary_outer"]["apply_mode"])
+        self.assertEqual("1.000000", report["primary_outer"]["blend"])
         self.assertTrue(report["checks"]["outer_boundary_is_after_complete_local_stack"])
         self.assertIn("P4-04 base blend/opacity once", report["primary_outer"]["comments"])
 
@@ -28,7 +32,7 @@ class P404BaseBoundaryTests(unittest.TestCase):
 
         self.assertTrue(report["checks"]["local_member_controls_do_not_change_with_base"])
         self.assertEqual(report["primary_local_controls"], report["alternate_local_controls"])
-        self.assertEqual(2, len([tool for tool in tools if "P4-03 member blend/opacity local" in tool["comments"]]))
+        self.assertEqual(2, len([tool for tool in tools if "P4-03 member opacity local" in tool["comments"]]))
         self.assertEqual(1, len([tool for tool in tools if "PSD clipping chain merge:" in tool["comments"]]))
         self.assertEqual(2, len(MEMBER_CONTROLS))
 

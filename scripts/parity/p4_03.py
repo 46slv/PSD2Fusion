@@ -1,9 +1,10 @@
 """Build and validate member-control placement for the P4-03 graph.
 
 The fixture keeps the selected P4-01/P4-02 topology and varies only clipped
-member blend modes and opacity.  It proves that those controls live on each
-local ClipStack Merge, while the single outer chain Merge remains the base
-boundary.
+member blend modes and opacity. It proves that the mode lives on each
+straight/opaque Function Merge, while member opacity and alpha preservation
+live on the Normal ClipStack Merge and the single outer chain Merge remains
+the base boundary.
 """
 
 from __future__ import annotations
@@ -116,7 +117,15 @@ def build(output: Path) -> Dict[str, Any]:
     ):
         loaders = _role(tools, "Loader", member_id)
         clips = [tool for tool in _role(tools, "ClipIn", member_id) if tool["type"] == "Merge"]
-        clip_rgbs = [tool for tool in _role(tools, "ClipRGB", member_id) if tool["type"] == "ChannelBoolean"]
+        base_straights = [tool for tool in _role(tools, "BlendBaseStraight", member_id) if tool["type"] == "AlphaDivide"]
+        base_opaques = [tool for tool in _role(tools, "BlendBaseOpaque", member_id) if tool["type"] == "ChannelBoolean"]
+        member_straights = [tool for tool in _role(tools, "BlendMemberStraight", member_id) if tool["type"] == "AlphaDivide"]
+        member_opaques = [tool for tool in _role(tools, "BlendMemberOpaque", member_id) if tool["type"] == "ChannelBoolean"]
+        blend_functions = [tool for tool in _role(tools, "BlendFunction", member_id) if tool["type"] == "Merge"]
+        blend_clamps = [tool for tool in _role(tools, "BlendClamp", member_id) if tool["type"] == "BrightnessContrast"]
+        blend_coverages = [tool for tool in _role(tools, "BlendCoverage", member_id) if tool["type"] == "ChannelBoolean"]
+        blend_premults = [tool for tool in _role(tools, "BlendPremult", member_id) if tool["type"] == "AlphaMultiply"]
+        blend_restores = [tool for tool in _role(tools, "BlendRestoreAlpha", member_id) if tool["type"] == "ChannelBoolean"]
         stacks = [tool for tool in _role(tools, "ClipStack", member_id) if tool["type"] == "Merge"]
         row: Dict[str, Any] = {
             "index": index,
@@ -125,11 +134,21 @@ def build(output: Path) -> Dict[str, Any]:
             "expected_blend": "%.6f" % opacity,
             "loader_count": len(loaders),
             "clip_count": len(clips),
-            "clip_rgb_count": len(clip_rgbs),
+            "blend_function_count": len(blend_functions),
+            "blend_clamp_count": len(blend_clamps),
+            "blend_coverage_count": len(blend_coverages),
+            "blend_premult_count": len(blend_premults),
+            "blend_restore_count": len(blend_restores),
             "stack_count": len(stacks),
             "loader": loaders[0]["name"] if len(loaders) == 1 else None,
             "clip": clips[0]["name"] if len(clips) == 1 else None,
-            "clip_rgb": clip_rgbs[0]["name"] if len(clip_rgbs) == 1 else None,
+            "blend_function": blend_functions[0]["name"] if len(blend_functions) == 1 else None,
+            "blend_clamp": blend_clamps[0]["name"] if len(blend_clamps) == 1 else None,
+            "blend_coverage": blend_coverages[0]["name"] if len(blend_coverages) == 1 else None,
+            "blend_premult": blend_premults[0]["name"] if len(blend_premults) == 1 else None,
+            "blend_restore": blend_restores[0]["name"] if len(blend_restores) == 1 else None,
+            "blend_function_apply_mode": blend_functions[0]["apply_mode"] if len(blend_functions) == 1 else None,
+            "blend_function_blend": blend_functions[0]["blend"] if len(blend_functions) == 1 else None,
             "stack": stacks[0]["name"] if len(stacks) == 1 else None,
             "clip_background": clips[0]["background"] if len(clips) == 1 else None,
             "clip_foreground": clips[0]["foreground"] if len(clips) == 1 else None,
@@ -144,17 +163,27 @@ def build(output: Path) -> Dict[str, Any]:
             "stack_start": stacks[0]["start"] if len(stacks) == 1 else None,
         }
         row["shape"] = bool(
-            len(loaders) == len(clips) == len(clip_rgbs) == len(stacks) == 1
+            len(loaders) == len(clips) == len(stacks) == 1
+            and len(base_straights) == len(base_opaques) == 1
+            and len(member_straights) == len(member_opaques) == 1
+            and len(blend_functions) == len(blend_clamps) == 1
+            and len(blend_coverages) == len(blend_premults) == len(blend_restores) == 1
             and len(base_loaders) == 1
             and row["clip_background"] == base_loaders[0]["name"]
             and row["clip_foreground"] == row["loader"]
             and row["clip_apply_mode"] == 'FuID { "Normal" }'
             and row["clip_blend"] == "1.000000"
             and row["clip_operator"] == 'FuID { "In" }'
-            and row["clip_rgb"] is not None
+            and row["blend_function"] is not None
+            and row["blend_clamp"] is not None
+            and row["blend_coverage"] is not None
+            and row["blend_premult"] is not None
+            and row["blend_restore"] is not None
             and row["stack_background"] == previous_stack
-            and row["stack_foreground"] == row["clip_rgb"]
-            and row["stack_apply_mode"] == 'FuID { "%s" }' % FUSION_BLEND_IDS[mode]
+            and row["stack_foreground"] == row["blend_restore"]
+            and row["blend_function_apply_mode"] == 'FuID { "%s" }' % FUSION_BLEND_IDS[mode]
+            and row["blend_function_blend"] == "1.000000"
+            and row["stack_apply_mode"] == 'FuID { "Normal" }'
             and row["stack_blend"] == "%.6f" % opacity
             and row["stack_process_alpha"] == "0"
         )
@@ -176,8 +205,9 @@ def build(output: Path) -> Dict[str, Any]:
         "member_modes_are_not_outer_controls": (
             outer is not None
             and all(
-                row["stack_apply_mode"] != outer["apply_mode"]
-                or row["stack_blend"] != outer["blend"]
+                row["blend_function"] is not None
+                and row["blend_function_blend"] == "1.000000"
+                and row["stack_apply_mode"] == 'FuID { "Normal" }'
                 for row in member_rows
             )
         ),

@@ -100,7 +100,15 @@ def _chain_control_row(
     for member in members:
         loaders = _role(tools, "Loader", member.id)
         clips = _role(tools, "ClipIn", member.id)
-        clip_rgbs = _role(tools, "ClipRGB", member.id)
+        base_straights = _role(tools, "BlendBaseStraight", member.id)
+        base_opaques = _role(tools, "BlendBaseOpaque", member.id)
+        member_straights = _role(tools, "BlendMemberStraight", member.id)
+        member_opaques = _role(tools, "BlendMemberOpaque", member.id)
+        blend_functions = _role(tools, "BlendFunction", member.id)
+        blend_clamps = _role(tools, "BlendClamp", member.id)
+        blend_coverages = _role(tools, "BlendCoverage", member.id)
+        blend_premults = _role(tools, "BlendPremult", member.id)
+        blend_restores = _role(tools, "BlendRestoreAlpha", member.id)
         stacks = _role(tools, "ClipStack", member.id)
         visible = member.effective_visible
         row: Dict[str, Any] = {
@@ -117,10 +125,34 @@ def _chain_control_row(
             row["pass"] = True
             member_rows.append(row)
             continue
-        ok = len(loaders) == len(clips) == len(clip_rgbs) == len(stacks) == 1
+        ok = all(
+            len(nodes) == 1
+            for nodes in (
+                loaders,
+                clips,
+                base_straights,
+                base_opaques,
+                member_straights,
+                member_opaques,
+                blend_functions,
+                blend_clamps,
+                blend_coverages,
+                blend_premults,
+                blend_restores,
+                stacks,
+            )
+        )
         if ok:
             clip = clips[0]
-            clip_rgb = clip_rgbs[0]
+            base_straight = base_straights[0]
+            base_opaque = base_opaques[0]
+            member_straight = member_straights[0]
+            member_opaque = member_opaques[0]
+            blend_function = blend_functions[0]
+            blend_clamp = blend_clamps[0]
+            blend_coverage = blend_coverages[0]
+            blend_premult = blend_premults[0]
+            blend_restore = blend_restores[0]
             stack = stacks[0]
             mode_id = FUSION_BLEND_IDS.get(member.blend)
             expected_mode = 'FuID { "%s" }' % mode_id if mode_id else None
@@ -132,11 +164,30 @@ def _chain_control_row(
                     clip["apply_mode"] == 'FuID { "Normal" }',
                     clip["blend"] == "1.000000",
                     clip["operator"] == 'FuID { "In" }',
-                    clip_rgb["background"] == clip["name"],
-                    clip_rgb["foreground"] == loaders[0]["name"],
+                    base_straight["input"] == previous,
+                    base_opaque["background"] == base_straight["name"],
+                    base_opaque["to_alpha"] == "16",
+                    member_straight["input"] == loaders[0]["name"],
+                    member_opaque["background"] == member_straight["name"],
+                    member_opaque["to_alpha"] == "16",
+                    blend_function["background"] == base_opaque["name"],
+                    blend_function["foreground"] == member_opaque["name"],
+                    blend_function["apply_mode"] == expected_mode,
+                    blend_function["blend"] == "1.000000",
+                    blend_clamp["input"] == blend_function["name"],
+                    blend_clamp["clip_black"] == "1",
+                    blend_clamp["clip_white"] == "1",
+                    blend_clamp["process_alpha"] == "0",
+                    blend_coverage["background"] == blend_clamp["name"],
+                    blend_coverage["foreground"] == clip["name"],
+                    blend_coverage["to_alpha"] == "3",
+                    blend_premult["input"] == blend_coverage["name"],
+                    blend_restore["background"] == blend_premult["name"],
+                    blend_restore["foreground"] == loaders[0]["name"],
+                    blend_restore["to_alpha"] == "3",
                     stack["background"] == previous,
-                    stack["foreground"] == clip_rgb["name"],
-                    expected_mode is not None and stack["apply_mode"] == expected_mode,
+                    stack["foreground"] == blend_restore["name"],
+                    stack["apply_mode"] == 'FuID { "Normal" }',
                     stack["blend"] == expected_blend,
                     stack["process_alpha"] == "0",
                 )
@@ -145,7 +196,15 @@ def _chain_control_row(
                 {
                     "loader": loaders[0]["name"],
                     "clip": clip["name"],
-                    "clip_rgb": clip_rgb["name"],
+                    "base_straight": base_straight["name"],
+                    "base_opaque": base_opaque["name"],
+                    "member_straight": member_straight["name"],
+                    "member_opaque": member_opaque["name"],
+                    "blend_function": blend_function["name"],
+                    "blend_clamp": blend_clamp["name"],
+                    "blend_coverage": blend_coverage["name"],
+                    "blend_premult": blend_premult["name"],
+                    "blend_restore": blend_restore["name"],
                     "stack": stack["name"],
                     "clip_background": clip["background"],
                     "stack_background": stack["background"],

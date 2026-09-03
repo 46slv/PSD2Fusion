@@ -196,27 +196,70 @@ def _chain_shape(tools: Sequence[Dict[str, Any]], base_id: str, member_ids: Sequ
     for member_id in member_ids:
         loaders = _role(tools, "Loader", member_id)
         clips = [tool for tool in _role(tools, "ClipIn", member_id) if tool["type"] == "Merge"]
-        clip_rgbs = [tool for tool in _role(tools, "ClipRGB", member_id) if tool["type"] == "ChannelBoolean"]
+        base_straights = [tool for tool in _role(tools, "BlendBaseStraight", member_id) if tool["type"] == "AlphaDivide"]
+        base_opaques = [tool for tool in _role(tools, "BlendBaseOpaque", member_id) if tool["type"] == "ChannelBoolean"]
+        member_straights = [tool for tool in _role(tools, "BlendMemberStraight", member_id) if tool["type"] == "AlphaDivide"]
+        member_opaques = [tool for tool in _role(tools, "BlendMemberOpaque", member_id) if tool["type"] == "ChannelBoolean"]
+        blend_functions = [tool for tool in _role(tools, "BlendFunction", member_id) if tool["type"] == "Merge"]
+        blend_clamps = [tool for tool in _role(tools, "BlendClamp", member_id) if tool["type"] == "BrightnessContrast"]
+        blend_coverages = [tool for tool in _role(tools, "BlendCoverage", member_id) if tool["type"] == "ChannelBoolean"]
+        blend_premults = [tool for tool in _role(tools, "BlendPremult", member_id) if tool["type"] == "AlphaMultiply"]
+        blend_restores = [tool for tool in _role(tools, "BlendRestoreAlpha", member_id) if tool["type"] == "ChannelBoolean"]
         stacks = [tool for tool in _role(tools, "ClipStack", member_id) if tool["type"] == "Merge"]
         row = {
             "loader": loaders[0] if len(loaders) == 1 else None,
             "clip": clips[0] if len(clips) == 1 else None,
-            "clip_rgb": clip_rgbs[0] if len(clip_rgbs) == 1 else None,
+            "base_straight": base_straights[0] if len(base_straights) == 1 else None,
+            "base_opaque": base_opaques[0] if len(base_opaques) == 1 else None,
+            "member_straight": member_straights[0] if len(member_straights) == 1 else None,
+            "member_opaque": member_opaques[0] if len(member_opaques) == 1 else None,
+            "blend_function": blend_functions[0] if len(blend_functions) == 1 else None,
+            "blend_clamp": blend_clamps[0] if len(blend_clamps) == 1 else None,
+            "blend_coverage": blend_coverages[0] if len(blend_coverages) == 1 else None,
+            "blend_premult": blend_premults[0] if len(blend_premults) == 1 else None,
+            "blend_restore": blend_restores[0] if len(blend_restores) == 1 else None,
             "stack": stacks[0] if len(stacks) == 1 else None,
         }
         row["pass"] = bool(
             len(base_loaders) == 1
             and row["loader"] is not None
             and row["clip"] is not None
-            and row["clip_rgb"] is not None
+            and row["base_straight"] is not None
+            and row["base_opaque"] is not None
+            and row["member_straight"] is not None
+            and row["member_opaque"] is not None
+            and row["blend_function"] is not None
+            and row["blend_clamp"] is not None
+            and row["blend_coverage"] is not None
+            and row["blend_premult"] is not None
+            and row["blend_restore"] is not None
             and row["stack"] is not None
             and row["clip"]["background"] == base_loaders[0]["name"]
             and row["clip"]["foreground"] == row["loader"]["name"]
             and row["clip"]["operator"] == 'FuID { "In" }'
-            and row["clip_rgb"]["background"] == row["clip"]["name"]
-            and row["clip_rgb"]["foreground"] == row["loader"]["name"]
+            and row["base_straight"]["input"] == previous
+            and row["base_opaque"]["background"] == row["base_straight"]["name"]
+            and row["base_opaque"]["to_alpha"] == "16"
+            and row["member_straight"]["input"] == row["loader"]["name"]
+            and row["member_opaque"]["background"] == row["member_straight"]["name"]
+            and row["member_opaque"]["to_alpha"] == "16"
+            and row["blend_function"]["background"] == row["base_opaque"]["name"]
+            and row["blend_function"]["foreground"] == row["member_opaque"]["name"]
+            and row["blend_function"]["blend"] == "1.000000"
+            and row["blend_clamp"]["input"] == row["blend_function"]["name"]
+            and row["blend_clamp"]["clip_black"] == "1"
+            and row["blend_clamp"]["clip_white"] == "1"
+            and row["blend_clamp"]["process_alpha"] == "0"
+            and row["blend_coverage"]["background"] == row["blend_clamp"]["name"]
+            and row["blend_coverage"]["foreground"] == row["clip"]["name"]
+            and row["blend_coverage"]["to_alpha"] == "3"
+            and row["blend_premult"]["input"] == row["blend_coverage"]["name"]
+            and row["blend_restore"]["background"] == row["blend_premult"]["name"]
+            and row["blend_restore"]["foreground"] == row["loader"]["name"]
+            and row["blend_restore"]["to_alpha"] == "3"
             and row["stack"]["background"] == previous
-            and row["stack"]["foreground"] == row["clip_rgb"]["name"]
+            and row["stack"]["foreground"] == row["blend_restore"]["name"]
+            and row["stack"]["apply_mode"] == 'FuID { "Normal" }'
             and row["stack"]["process_alpha"] == "0"
         )
         if row["stack"] is not None:

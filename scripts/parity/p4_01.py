@@ -199,9 +199,22 @@ def _artifact(path: Path) -> Dict[str, str]:
 def _candidate_a_checks(text: str) -> Dict[str, bool]:
     return {
         "one_operator_in": text.count('Operator = Input { Value = FuID { "In" }, }') == 1,
-        "one_clip_rgb_alpha_boundary": text.count("ChannelBoolean {") == 1
-        and text.count("P4-HOST-PIXEL: ClipIn RGB + member alpha") == 1,
-        "one_fixed_alpha_stack": text.count("ProcessAlpha = Input { Value = 0, }") == 1,
+        "one_base_straight_divide": text.count("BlendBaseStraightR_p401member = AlphaDivide") == 1,
+        "one_member_straight_divide": text.count("BlendMemberStraightR_p401member = AlphaDivide") == 1,
+        "one_base_opaque_copy": text.count("BlendBaseOpaqueR_p401member = ChannelBoolean") == 1
+        and text.count("P4-HOST-PIXEL: force alpha=1") == 2,
+        "one_member_opaque_copy": text.count("BlendMemberOpaqueR_p401member = ChannelBoolean") == 1,
+        "one_blend_function": text.count("BlendFunctionR_p401member = Merge") == 1
+        and text.count("P4-HOST-PIXEL: straight opaque; Blend=1") == 1,
+        "one_blend_clamp": text.count("BlendClampR_p401member = BrightnessContrast") == 1
+        and text.count("P4-HOST-PIXEL: RGB [0,1] before opacity") == 1,
+        "one_blend_coverage": text.count("BlendCoverageR_p401member = ChannelBoolean") == 1
+        and text.count("P4-HOST-PIXEL: attach ClipIn M*A alpha") == 1,
+        "one_blend_premult": text.count("BlendPremultR_p401member = AlphaMultiply") == 1,
+        "one_blend_restore": text.count("BlendRestoreAlphaR_p401member = ChannelBoolean") == 1
+        and text.count("P4-HOST-PIXEL: restore original member A") == 1,
+        "one_fixed_alpha_stack": text.count("ClipStackR_p401member = Merge") == 1
+        and text.count("ProcessAlpha = Input { Value = 0, }") >= 2,
         "one_outer_chain_merge": text.count("PSD clipping chain merge:") == 1,
         "member_local_merge_comment": "P4-01 local Merge" in text,
         "base_matte_comment": "P4-01 fixed matte via Operator=In" in text,

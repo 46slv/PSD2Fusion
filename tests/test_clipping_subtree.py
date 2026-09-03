@@ -83,11 +83,27 @@ class ClippingCompilerTests(unittest.TestCase):
 
         self.assertEqual("2", stats["clipping_count"])
         self.assertIn("PSD clipping subtree member", text)
-        self.assertEqual(2, text.count("ProcessAlpha = Input { Value = 0, }"))
-        self.assertEqual(2, text.count("ChannelBoolean {"))
-        self.assertEqual(2, text.count("P4-HOST-PIXEL: ClipIn RGB + member alpha"))
+        self.assertEqual(4, text.count("ProcessAlpha = Input { Value = 0, }"))
+        self.assertEqual(8, text.count("ChannelBoolean {"))
+        self.assertEqual(4, text.count("P4-HOST-PIXEL: force alpha=1"))
+        self.assertEqual(2, text.count("P4-HOST-PIXEL: attach ClipIn M*A alpha"))
+        self.assertEqual(2, text.count("P4-HOST-PIXEL: restore original member A"))
+        self.assertEqual(2, text.count("PSD clipping blend function"))
+        self.assertEqual(2, text.count("PSD clipping blend premultiply"))
         self.assertIn('ApplyMode = Input { Value = FuID { "Multiply" }, }', text)
         self.assertIn("Blend = Input { Value = 0.500000, }", text)
+        self.assertIn(
+            'ClipStackR_member0000_2 = Merge',
+            text,
+        )
+        self.assertIn(
+            'Foreground = Input { SourceOp = "BlendRestoreAlphaR_member0000_2"',
+            text,
+        )
+        self.assertIn(
+            'ApplyMode = Input { Value = FuID { "Normal" }, }',
+            text,
+        )
         self.assertEqual(1, text.count("PSD clipping chain merge"))
         self.assertNotIn("PSD clipped layer merge", text)
         self.assertIn("StartFrame = -1,", text)

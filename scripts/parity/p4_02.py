@@ -114,9 +114,40 @@ def build(output: Path) -> Dict[str, Any]:
             for tool in _role(tools, "ClipIn", member_id)
             if tool["type"] == "Merge"
         ]
-        clip_rgbs = [
-            tool
-            for tool in _role(tools, "ClipRGB", member_id)
+        base_straights = [
+            tool for tool in _role(tools, "BlendBaseStraight", member_id)
+            if tool["type"] == "AlphaDivide"
+        ]
+        base_opaques = [
+            tool for tool in _role(tools, "BlendBaseOpaque", member_id)
+            if tool["type"] == "ChannelBoolean"
+        ]
+        member_straights = [
+            tool for tool in _role(tools, "BlendMemberStraight", member_id)
+            if tool["type"] == "AlphaDivide"
+        ]
+        member_opaques = [
+            tool for tool in _role(tools, "BlendMemberOpaque", member_id)
+            if tool["type"] == "ChannelBoolean"
+        ]
+        blend_functions = [
+            tool for tool in _role(tools, "BlendFunction", member_id)
+            if tool["type"] == "Merge"
+        ]
+        blend_clamps = [
+            tool for tool in _role(tools, "BlendClamp", member_id)
+            if tool["type"] == "BrightnessContrast"
+        ]
+        blend_coverages = [
+            tool for tool in _role(tools, "BlendCoverage", member_id)
+            if tool["type"] == "ChannelBoolean"
+        ]
+        blend_premults = [
+            tool for tool in _role(tools, "BlendPremult", member_id)
+            if tool["type"] == "AlphaMultiply"
+        ]
+        blend_restores = [
+            tool for tool in _role(tools, "BlendRestoreAlpha", member_id)
             if tool["type"] == "ChannelBoolean"
         ]
         stacks = [
@@ -129,11 +160,23 @@ def build(output: Path) -> Dict[str, Any]:
             "id": member_id,
             "loader_count": len(loaders),
             "clip_count": len(clips),
-            "clip_rgb_count": len(clip_rgbs),
+            "blend_function_count": len(blend_functions),
+            "blend_clamp_count": len(blend_clamps),
+            "blend_coverage_count": len(blend_coverages),
+            "blend_premult_count": len(blend_premults),
+            "blend_restore_count": len(blend_restores),
             "stack_count": len(stacks),
             "loader": loaders[0]["name"] if len(loaders) == 1 else None,
             "clip": clips[0]["name"] if len(clips) == 1 else None,
-            "clip_rgb": clip_rgbs[0]["name"] if len(clip_rgbs) == 1 else None,
+            "base_straight": base_straights[0]["name"] if len(base_straights) == 1 else None,
+            "base_opaque": base_opaques[0]["name"] if len(base_opaques) == 1 else None,
+            "member_straight": member_straights[0]["name"] if len(member_straights) == 1 else None,
+            "member_opaque": member_opaques[0]["name"] if len(member_opaques) == 1 else None,
+            "blend_function": blend_functions[0]["name"] if len(blend_functions) == 1 else None,
+            "blend_clamp": blend_clamps[0]["name"] if len(blend_clamps) == 1 else None,
+            "blend_coverage": blend_coverages[0]["name"] if len(blend_coverages) == 1 else None,
+            "blend_premult": blend_premults[0]["name"] if len(blend_premults) == 1 else None,
+            "blend_restore": blend_restores[0]["name"] if len(blend_restores) == 1 else None,
             "stack": stacks[0]["name"] if len(stacks) == 1 else None,
             "clip_background": clips[0]["background"] if len(clips) == 1 else None,
             "clip_foreground": clips[0]["foreground"] if len(clips) == 1 else None,
@@ -145,13 +188,30 @@ def build(output: Path) -> Dict[str, Any]:
             "stack_start": stacks[0]["start"] if len(stacks) == 1 else None,
         }
         row["shape"] = (
-            len(loaders) == len(clips) == len(clip_rgbs) == len(stacks) == 1
+            len(loaders) == len(clips) == 1
+            and len(base_straights) == len(base_opaques) == 1
+            and len(member_straights) == len(member_opaques) == 1
+            and len(blend_functions) == len(blend_clamps) == 1
+            and len(blend_coverages) == len(blend_premults) == len(blend_restores) == 1
+            and len(stacks) == 1
             and row["clip_foreground"] == row["loader"]
             and row["clip_operator"] == 'FuID { "In" }'
-            and row["clip_rgb"] is not None
+            and row["base_straight"] is not None
+            and row["base_opaque"] is not None
+            and row["member_straight"] is not None
+            and row["member_opaque"] is not None
+            and row["blend_function"] is not None
+            and row["blend_clamp"] is not None
+            and row["blend_coverage"] is not None
+            and row["blend_premult"] is not None
+            and row["blend_restore"] is not None
+            and row["stack_foreground"] == row["blend_restore"]
             and row["stack_background"] == previous_stack
-            and row["stack_foreground"] == row["clip_rgb"]
             and row["stack_process_alpha"] == "0"
+            and next(
+                tool["input"] == row["loader"]
+                for tool in member_straights
+            )
             and row["clip_start"] < row["stack_start"]
         )
         if row["stack"] is not None:
@@ -168,7 +228,19 @@ def build(output: Path) -> Dict[str, Any]:
     local_tools = [
         tool
         for row in member_rows
-        for tool_name in (row["clip"], row["clip_rgb"], row["stack"])
+        for tool_name in (
+            row["clip"],
+            row["base_straight"],
+            row["base_opaque"],
+            row["member_straight"],
+            row["member_opaque"],
+            row["blend_function"],
+            row["blend_clamp"],
+            row["blend_coverage"],
+            row["blend_premult"],
+            row["blend_restore"],
+            row["stack"],
+        )
         if tool_name is not None
         for tool in tools
         if tool["name"] == tool_name
