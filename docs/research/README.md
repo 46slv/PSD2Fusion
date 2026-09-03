@@ -2,6 +2,7 @@
 
 Initial research: 2026-08-31  
 PSD format foundations added: 2026-09-01  
+Photoshop compositing semantics deep dive added: 2026-09-03  
 Initial host scope: Windows / DaVinci Resolve `21.0.3.7`  
 Status: **Evidence/research baseline, not current task state.**
 
@@ -32,6 +33,7 @@ Adobe's binary format specification describes storage, not the complete visual c
 4. [Native importer observations](04-native-importer-observations.md)
 5. [Unresolved questions and host probes](05-unresolved-questions-and-host-probes.md)
 6. [Architecture implications](06-architecture-implications.md)
+7. [Photoshop compositing semantics deep dive](07-photoshop-compositing-semantics-deep-dive.md) — evaluation scope, advanced blending, color/gamma/alpha, current psd-tools gaps, and future fixture matrix
 
 ## Durable conclusions
 
@@ -42,7 +44,9 @@ Adobe's binary format specification describes storage, not the complete visual c
 - Clipping is a same-parent ordered relationship involving base coverage, member order, base blend/opacity, and `Blend Clipped Layers As Group`.
 - Layer transparency, pixel/real/vector masks, and document alpha are distinct.
 - Overall and fill opacity are distinct.
-- psd-tools is useful for parsing/raster access but is not the Photoshop visual oracle.
+- Advanced blending flags such as Blend If, effect grouping/scope, channel restrictions, transparency-shape behavior, and Knockout can alter pixels independently of the ordinary layer blend-mode name.
+- Photoshop exposes application Color Settings that can alter RGB compositing, so color/gamma environment evidence belongs in strict pixel-proof records until file-level persistence is proven.
+- psd-tools is useful for parsing/raster access and cross-checking but is not the Photoshop visual oracle; current upstream still has explicit advanced-compositor gaps.
 - Fusion Group/Underlay does not automatically implement Photoshop group semantics.
 - Resolve importer behavior remains version-scoped.
 - Unknown resources/tags must be length-safe and visible to capability/loss policy.
