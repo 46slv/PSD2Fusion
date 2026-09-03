@@ -2,6 +2,18 @@
 
 Status: active execution contract for the remaining host/pixel portion of `PARITY-004`.
 
+## Active pixel truth contract
+
+Operator instruction on 2026-09-04 supersedes any earlier evidence or decision that made a Photoshop actual micro oracle a prerequisite. Do not use Photoshop in this Goal, and do not treat its absence as a blocker or stop condition. Retain the historical evidence rather than deleting it.
+
+Use these three evidence classes:
+
+1. actual Fusion micro artifacts;
+2. actual differences between Fusion graph internal boundaries;
+3. the real P4-09 comparison against the read-only golden reference.
+
+A formula-only oracle may assist diagnosis but is not absolute pixel truth. The bounded micro diagnostic localizes the first divergent Fusion boundary between otherwise identical ungrouped and isolated-GroupOperator paths. If the internal stages are stable and consistent, proceed to P4-09 without waiting for an external micro oracle.
+
 This document starts from the already-published structural candidate. Do not roll back P4-03 through P4-07 merely because host/pixel proof is still pending. Those items are structural evidence for the candidate graph; they are not pixel proof.
 
 ## Current structural baseline
