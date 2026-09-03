@@ -1,0 +1,31 @@
+{
+  "schema": "psd2fusion-parity-004.adapter-projection-after-sol.v1",
+  "adapter": "psd2fusion-parity-004",
+  "status": "PASS",
+  "reload": {
+    "source": "repo-local canonical state plus current evidence only",
+    "latest_evidence_count": 11,
+    "transcript_forwarded": false
+  },
+  "projection": {
+    "runner_status": "PASS",
+    "p4_08_status": "PASS",
+    "p4_host_pixel_status": "BLOCKED",
+    "p4_host_pixel_fingerprint": "HOST_SAVER_NO_ARTIFACT_AFTER_ACCEPTED_RENDER",
+    "next_workload": "P4-HOST-PIXEL host artifact recovery; no compositor change",
+    "implementation_write_paths": [],
+    "host_blocker_is_not_compositor_failure": true
+  },
+  "sol_boundary": {
+    "decision": ".control/evidence/PARITY-004/20260903-sol-host-pixel-diagnostic/decision.json",
+    "next_owner": "fresh Luna Max Coordinator only after valid Photoshop oracle and materialized Fusion artifact",
+    "parity_005": "NOT_STARTED",
+    "parity_006": "NOT_STARTED"
+  },
+  "correlation": {
+    "devexec_task_id": "devexec-psd2fusion-p004-20260903",
+    "harness_run_id": "p4-harness-1788440083-001-92972569",
+    "supervisor_target": "knotfield-harness-supervisor"
+  },
+  "assertion": "After Sol escalation, a fresh adapter reload keeps P4-08 PASS, retains the independent Saver artifact blocker, and schedules no compositor implementation write."
+}
