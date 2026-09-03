@@ -400,6 +400,10 @@ class _Compiler:
         self.blend_modes: set[str] = set()
         self._x = 0.0
         self._external_input_target: Optional[str] = None
+        # During Pass Through lowering this captures the first internal tool
+        # that consumes the real parent backdrop.  It exists only to expose a
+        # GroupOperator InstanceInput proxy; render connections remain direct.
+        self._group_proxy_backdrop: Optional[_Source] = None
         self._root_background_name: Optional[str] = None
         # Per-member rows keep the fixed-matte path readable in Flow without
         # changing the deterministic PSD evaluation order.
@@ -422,6 +426,21 @@ class _Compiler:
     def position(self, row: int = 0, depth: int = 0) -> Tuple[float, float]:
         self._x += 180.0
         return (self._x + depth * 40.0, float(row) * 110.0)
+
+    def _capture_group_proxy_input(self, backdrop: Optional[_Source], target: str) -> None:
+        if backdrop is None:
+            return
+        if not backdrop.name:
+            self._external_input_target = target
+            return
+        probe = self._group_proxy_backdrop
+        if (
+            probe is not None
+            and self._external_input_target is None
+            and backdrop.name == probe.name
+            and backdrop.port == probe.port
+        ):
+            self._external_input_target = target
 
     def mode_id(self, layer: SemanticLayer) -> str:
         self.blend_modes.add(layer.blend)
@@ -470,17 +489,20 @@ class _Compiler:
             inner_tools: List[str] = []
             previous_tools = self._current_tools
             previous_target = self._external_input_target
+            previous_proxy_backdrop = self._group_proxy_backdrop
             self._current_tools = inner_tools
             self._external_input_target = None
+            self._group_proxy_backdrop = backdrop
             nested = self.sequence(
                 layer.children,
-                _Source("", "Output"),
+                backdrop,
                 depth + 1,
                 inner_scope,
             )
             input_target = self._external_input_target
             self._current_tools = previous_tools
             self._external_input_target = previous_target
+            self._group_proxy_backdrop = previous_proxy_backdrop
             gx, gy = self.position(2, depth)
             if input_target is None:
                 # Empty pass-through groups are kept as a readable marker and
@@ -508,11 +530,11 @@ class _Compiler:
                 )
             )
             return _ItemResult(
-                _Source(group_name, "MainOutput1"),
-                _Source(group_name, "MainOutput1"),
-                # The GroupOperator consumes the caller's stream through its
-                # exposed MainInput1.  Adding a parent Normal merge would
-                # double-composite the pass-through result.
+                nested.output,
+                nested.output,
+                # The real parent stream was consumed directly by the internal
+                # sequence.  GroupOperator MainInput/MainOutput are UI proxies
+                # only, so a parent Normal merge would double-composite it.
                 consumed_backdrop=True,
             )
 
@@ -549,7 +571,10 @@ class _Compiler:
                 gy,
             )
         )
-        return _ItemResult(_Source(group_name, "MainOutput1"), _Source(group_name, "MainOutput1"))
+        # GroupOperator is an editable container/proxy boundary, not a
+        # runtime image source.  Parent/sibling/MediaOut consumers must use the
+        # actual internal terminal directly; InstanceOutput remains for Flow UI.
+        return _ItemResult(nested.output, nested.output)
 
     def item(self, layer: SemanticLayer, backdrop: _Source, depth: int, scope: str) -> _ItemResult:
         if layer.is_group:
@@ -598,8 +623,7 @@ class _Compiler:
                     "Cannot lower unsupported/unverified blend mode without an "
                     "explicit capability decision: %s" % mode
                 )
-        if backdrop is not None and not backdrop.name:
-            self._external_input_target = merge_name
+        self._capture_group_proxy_input(backdrop, merge_name)
         comment = "%s: %s" % (comment_prefix, layer.name)
         if comment_prefix == "PSD clipping chain merge":
             comment += " [P4-01 outer boundary; P4-04 base blend/opacity once]"
@@ -814,8 +838,7 @@ class _Compiler:
         merge_name = self.name("Merge" + scope, layer.id)
         self.merge_count += 1
         x, y = self.position(row - 2.5, depth)
-        if not backdrop.name:
-            self._external_input_target = merge_name
+        self._capture_group_proxy_input(backdrop, merge_name)
         self._current_tools.append(
             _merge(
                 merge_name,
