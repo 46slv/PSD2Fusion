@@ -1,0 +1,77 @@
+{
+  "schema_version": 1,
+  "task": "PARITY-004",
+  "item": "P4-HOST-PIXEL",
+  "verifier": "fresh_luna",
+  "model": "gpt-5.6-luna",
+  "reasoning": "medium",
+  "candidate_head": "2c13cd8efef8061dccb17ba89a320664c5d1c206",
+  "branch": "codex/parity-004",
+  "verdict": "BLOCKED",
+  "reproduced_checks": [
+    {
+      "name": "repository_check",
+      "status": "PASS",
+      "command": "pwsh -NoProfile -File .\\scripts\\check.ps1",
+      "metrics": {
+        "tests": 60,
+        "control_state": "PASS",
+        "python_compile": "PASS"
+      }
+    },
+    {
+      "name": "current_comp_readback",
+      "status": "PASS",
+      "evidence": [".local/current-check-20260903.txt"],
+      "metrics": {
+        "tools": 364,
+        "media_out_connected": true,
+        "clipin_operator": "In",
+        "clipstack_process_alpha": 0
+      }
+    },
+    {
+      "name": "p4_host_pixel_loader_contract",
+      "status": "BLOCKED",
+      "evidence": [
+        ".local/p4-loader-probe-20260903/host.log",
+        ".local/p4-paste-loader-20260903/existing-stdout.txt",
+        ".local/p4-loader-probe-20260903/comparator-post0.json"
+      ],
+      "metrics": {
+        "postmultiply_1_artifact": false,
+        "postmultiply_0_artifact": true,
+        "comparator_status": "FAIL",
+        "alpha_error_max": 0,
+        "rgb_error_max": 230
+      }
+    },
+    {
+      "name": "background_control",
+      "status": "PASS",
+      "evidence": [".local/p4-current-render-probe4-20260903/probe0000.png"],
+      "metrics": {
+        "dimensions": [4, 4],
+        "rgba8": [51, 102, 153, 255]
+      }
+    }
+  ],
+  "false_pass_checks": [
+    {
+      "check": "loader_failure_is_not_pixel_proof",
+      "result": "PASS",
+      "detail": "No valid Loader-backed artifact; host_pixel_verified remains false"
+    },
+    {
+      "check": "scope_boundary",
+      "result": "PASS",
+      "detail": "P4-09, repairs, PARITY-005/006 not run"
+    },
+    {
+      "check": "real_inputs_read_only",
+      "result": "PASS",
+      "detail": "PSD/reference untouched"
+    }
+  ],
+  "permitted_state_transition": "Keep PARITY-004 active/in_progress; resolve Loader/PNG contract, rerun P4-HOST-PIXEL, then consider P4-09."
+}

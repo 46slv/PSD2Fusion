@@ -1,0 +1,115 @@
+{
+  "schema_version": 1,
+  "task": "PARITY-004",
+  "items": ["P4-HOST-PIXEL"],
+  "status": "BLOCKED",
+  "verification": "fresh_luna_blocked",
+  "verifier": ".control/evidence/PARITY-004/20260903-p4-host-pixel/verifier.json",
+  "branch": "codex/parity-004",
+  "candidate_head": "2c13cd8efef8061dccb17ba89a320664c5d1c206",
+  "scope": {
+    "p4_08": "already evidenced and not repeated",
+    "p4_09": "NOT_RUN_BY_STOP_CONDITION",
+    "repair_iterations": 0,
+    "parity_005": "NOT_STARTED",
+    "parity_006": "NOT_STARTED",
+    "clipping_recipe_changed": false,
+    "real_inputs_modified": false
+  },
+  "host": {
+    "application": "DaVinci Resolve Studio",
+    "version": "21.0.3.7",
+    "project": "PSD2Fusion P4-08 20260902",
+    "script_endpoint": "Fusion localhost scripting endpoint",
+    "current_comp_readback": {
+      "status": "PASS",
+      "artifact": ".local/current-check-20260903.txt",
+      "tools": 364,
+      "media_out": [
+        {"name": "MediaOut2", "connected": true},
+        {"name": "MediaOut1", "connected": true}
+      ],
+      "representative_clipin": {
+        "name": "ClipInRIIII_0bed15e775",
+        "operator": "In",
+        "background": "LoaderRIIII_8e83942a64",
+        "foreground": "LoaderRIIII_0bed15e775"
+      },
+      "representative_clipstack": {
+        "name": "ClipStackRIIII_0bed15e775",
+        "process_alpha": 0,
+        "background": "LoaderRIIII_8e83942a64",
+        "foreground": "ClipInRIIII_0bed15e775"
+      }
+    }
+  },
+  "micro_gate": {
+    "status": "BLOCKED",
+    "stop_condition": "unresolved Loader/alpha/color contract",
+    "render_format": "PNG RGBA, Saver PNGFormat.PreDivide=1",
+    "fixture": {
+      "path": ".local/p4-loader-probe-20260903/loader-probe-unprofiled.png",
+      "sha256": "397e4781972cfe887f8a09d184ec1d6fef3a488b5ca92b7411e9466308309cc0",
+      "dimensions": [5, 1],
+      "channels": "RGBA",
+      "pixels": "transparent plus 25/50/75/100% alpha, straight RGB"
+    },
+    "postmultiply_probe": {
+      "script": ".local/p4_loader_probe.lua",
+      "artifact": ".local/p4-loader-probe-20260903/host.log",
+      "postmultiply_1": {
+        "render_return": true,
+        "artifact_found": false,
+        "target": ".local/p4-loader-probe-20260903/postmultiply1.png"
+      },
+      "postmultiply_0": {
+        "render_return": true,
+        "artifact_found": true,
+        "artifact": ".local/p4-loader-probe-20260903/postmultiply0.png",
+        "sha256": "1a59ffcda388e1fc7fca441da7a53e4512bbd8954b7604801ee7243a5c3ac6cd",
+        "dimensions": [5, 1],
+        "rgba8": [[0, 0, 0, 0], [255, 203, 103, 64], [255, 101, 51, 128], [255, 68, 34, 191], [230, 51, 26, 255]],
+        "profile": "unprofiled"
+      }
+    },
+    "comparator_postmultiply_0_vs_raw": {
+      "status": "FAIL",
+      "artifact": ".local/p4-loader-probe-20260903/comparator-post0.json",
+      "profile_status": "unverified",
+      "rgba_error": {"max": 230, "mean": 91.4, "p99": 226.88},
+      "rgb_error": {"max": 230, "mean": 91.4, "p99": 226.88},
+      "alpha_error": {"max": 0, "mean": 0.0, "p99": 0.0},
+      "difference_bbox": [0, 0, 4, 1],
+      "interpretation": "Alpha coverage is preserved, but RGB is materially altered when PostMultiply=0; the required PostMultiply=1 straight-RGBA path did not produce an artifact."
+    },
+    "static_paste_probe": {
+      "script": ".local/p4_paste_loader_render.lua",
+      "composition": ".local/p4-paste-loader-20260903/loader-pasted.comp",
+      "composition_sha256": "0ee56683b191cb6bdd8b2909579e70f0a2e0e67c3c51f14bf3ad08985b63d6f4",
+      "artifact": ".local/p4-paste-loader-20260903/existing-stdout.txt",
+      "loader_postmultiply": 1,
+      "render_return": false,
+      "artifact_found": false,
+      "host_log_pattern": "LoaderR_staticlaye failed to load file at frame 0"
+    },
+    "independent_background_control": {
+      "artifact": ".local/p4-current-render-probe4-20260903/probe0000.png",
+      "sha256": "aa9f2497e1343b38dcf5811410f1c6eff38d3c76d5905b95b308a83eaad5bba5",
+      "dimensions": [4, 4],
+      "rgba8": [51, 102, 153, 255],
+      "interpretation": "Saver/render path works for native Background; failure is localized to Loader input contract"
+    }
+  },
+  "classification": {
+    "category": "loader_input_contract",
+    "material_difference": "not classified; no valid Loader-backed Fusion pixel artifact",
+    "confidence": "high",
+    "reason": "Both dynamic and compiler-dialect static Loader probes with RGBA PNG input fail to produce an artifact; Resolve logs report Loader failed to load file. The native Background control renders successfully.",
+    "next_action": "Resolve the Loader/PNG alpha-color contract or host decoder boundary, then rerun P4-HOST-PIXEL before P4-09"
+  },
+  "claims": {
+    "host_pixel_verified": false,
+    "real_baseline": false,
+    "photoshop_pixel_parity": false
+  }
+}
