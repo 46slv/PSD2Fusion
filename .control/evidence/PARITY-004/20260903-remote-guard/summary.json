@@ -1,0 +1,34 @@
+{
+  "schema": "psd2fusion-parity-004.remote-completion-guard.v1",
+  "evidence_id": "remote-guard-20260903-52f03bb",
+  "status": "PASS",
+  "inspection_only": true,
+  "command": "pwsh -NoProfile -File scripts/remote_completion_guard.ps1 -TaskId PARITY-004 -ExpectedActiveTaskId PARITY-004 -ExpectedStatus in_progress -ExpectedVerification pending",
+  "checks": {
+    "remote_branch_exists": true,
+    "candidate_reachable": true,
+    "state_reachable": true,
+    "state_matches": true,
+    "remote_expectations": true
+  },
+  "remote": {
+    "main": "2c13cd8efef8061dccb17ba89a320664c5d1c206",
+    "branch": "52f03bbaae7eef9ed21c0629834b1710145d2d9c",
+    "candidate_from_canonical_task": "a65339563dce878f0e3ddf438f811d00c50109a5",
+    "state_commit": "4d9ddb014e4343d9828869c346908c6243730e2d"
+  },
+  "canonical_state": {
+    "active_task_id": "PARITY-004",
+    "status": "in_progress",
+    "verification": "pending",
+    "mutation": "none; guard did not edit .control/current.json"
+  },
+  "correlation": {
+    "devexec_task_id": "devexec-psd2fusion-p004-20260903",
+    "harness_run_id": "p4-harness-1788440083-001-92972569",
+    "supervisor_target": "knotfield-harness-supervisor",
+    "p4_08_evidence": ".control/evidence/PARITY-004/20260903-p408-96112d5/summary.json",
+    "host_blocker": ".control/evidence/PARITY-004/20260903-saver-artifact-blocker/summary.json"
+  },
+  "next": "Remain on PARITY-004 P4-HOST-PIXEL; do not advance canonical state or start PARITY-005/006."
+}
