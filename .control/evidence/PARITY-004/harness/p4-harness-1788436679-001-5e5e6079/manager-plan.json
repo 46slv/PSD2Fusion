@@ -1,0 +1,180 @@
+{
+  "cached_input_tokens": 221696,
+  "ephemeral": true,
+  "exit_code": 0,
+  "input_tokens": 279436,
+  "isolation": {
+    "allowed_workspace_read": true,
+    "allowed_workspace_write": false,
+    "backend": "codex-split-filesystem-profile",
+    "canonical_external_read": "DENIED",
+    "codex_executable": "C:\\Users\\shiro\\AppData\\Local\\OpenAI\\Codex\\bin\\b99306303521e97e\\codex.exe",
+    "command_exit_code": 0,
+    "exact_write": "DENIED",
+    "forbidden_external_read": "DENIED",
+    "legacy_sandbox_mode_used": false,
+    "outside_write": "DENIED",
+    "platform": "win32",
+    "probe_mode": "codex-exec",
+    "profile_name": "ceh_manager_plan_21cb4b7c193a",
+    "readonly_write": "DENIED",
+    "runtime_executable": "C:\\Users\\shiro\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\python\\python.exe",
+    "status": "PROVEN",
+    "stderr_bytes": 158,
+    "stderr_sha256": "f0ef39be701daf83e774331c054bf8624c52d2be312cbbc80e34b86c705b1cf9",
+    "stdout_bytes": 2045,
+    "stdout_sha256": "3404d843c30f141c2edcd6a9eb48a2cb291436f258298f569a9ef618c4689ad7",
+    "wall_time_ms": 18063,
+    "workspace_access": "read",
+    "write_path_read": "PASS"
+  },
+  "isolation_profile": "ceh_manager_plan_21cb4b7c193a",
+  "isolation_status": "PROVEN",
+  "model_visible_bytes": 86185,
+  "model_visible_file_count": 4,
+  "output_tokens": 11387,
+  "protocol_errors": [],
+  "result": {
+    "run_id": "p4-harness-1788436679-001-5e5e6079",
+    "schema": "codex-ephemeral-harness.task.v2",
+    "selected_by": "manager",
+    "task": {
+      "acceptance": [
+        "Implement the localized GroupOperator proxy/render-source split without regressing the published PARITY-004 clipping-island candidate.",
+        "Keep PARITY-004 awaiting verification; do not claim host or pixel completion in this tranche."
+      ],
+      "completion_scope": "TRANCHE",
+      "constraints": [
+        "Modify only the declared write paths and preserve unrelated user changes.",
+        "Keep GroupOperator and exposed proxy ports for editability, but never use GroupOperator outputs as ordinary render sources.",
+        "For isolated groups, return nested internal output and matte to parent consumers.",
+        "For Pass Through groups, pass the actual parent backdrop into the internal sequence, preserve consumed_backdrop semantics, and avoid double compositing.",
+        "Do not change the fixed matte, Operator=In, ProcessAlpha=0, member order, clipping controls, PARITY-005, PARITY-006, or broad compiler architecture.",
+        "Do not materialize or modify the external PSD or reference PNG."
+      ],
+      "context_budget": {
+        "max_discovery_rounds": 0,
+        "max_files": 18,
+        "max_handoff_files": 2,
+        "max_total_bytes": 250000
+      },
+      "evidence_required": [
+        "Fresh Runner evidence for the focused P4-05 graph tests.",
+        "Fresh Runner evidence for the P4-07 structural regression.",
+        "Fresh Runner evidence from scripts/check.ps1.",
+        "No host_loaded or pixel_verified claim until the ordered Fusion gates produce actual evidence."
+      ],
+      "goal_done_when": [
+        "The GroupOperator boundary repair is implemented in the three declared write paths and is ready for fresh verification.",
+        "PARITY-004 remains in_progress until P4-08, the actual-Fusion micro pixel gate, P4-09, and fresh verifier approval are complete."
+      ],
+      "goal_item_id": "PARITY-004",
+      "handoff_refs": [
+        {
+          "path": ".control/evidence/PARITY-004/20260903-group-operator-contract/decision.md",
+          "reason": "Immutable implementation-ready GroupOperator proxy/render-source contract.",
+          "sha256": "75c81de553d1167c6166e99b902e2134596280ec41f6dc87589471cbf9746f71"
+        },
+        {
+          "path": ".control/evidence/PARITY-004/harness/p4-harness-1788433139-001-1f426efc/runner-tests.json",
+          "reason": "Immutable latest Runner evidence identifying the two failing P4-05 checks and the passing P4-07 regression.",
+          "sha256": "2c7d658fbf733c02fb9d01270dbe305f6540859b0b7e8d14c6ddc3bccd40bc16"
+        }
+      ],
+      "id": "PARITY-004-groupoperator-proxy-render-source-split",
+      "non_goals": [
+        "P4-08 ordinary Fusion load/readback.",
+        "P4-HOST-PIXEL deterministic actual-Fusion renders.",
+        "P4-09 real PSD render/reference comparison.",
+        "Explicit clbl=false semantics, PARITY-005, PARITY-006, new importer mechanisms, and broad backend/compiler redesign."
+      ],
+      "objective": "Repair the localized PARITY-004 GroupOperator boundary after the published clipping-island candidate. Make GroupOperator ports UI/display proxies only: isolated and nested group render consumers must use internal terminal sources, while Pass Through lowering must consume the actual parent backdrop and return the nested internal output. Address the currently failing P4-05 proxy/render-split and group-boundary checks; preserve the already passing P4-07 candidate behavior.",
+      "read_paths": [
+        {
+          "path": "AGENTS.md",
+          "reason": "Repository-local implementation and verification instructions."
+        },
+        {
+          "path": ".control/current.json",
+          "reason": "Current canonical task state and active PARITY-004 candidate metadata."
+        },
+        {
+          "path": ".control/CURRENT_GOAL.md",
+          "reason": "Authoritative PARITY-004 task contract."
+        },
+        {
+          "path": ".control/PARITY-004_TODO.md",
+          "reason": "Ordered PARITY-004 procedure, scope, and preserved clipping recipe."
+        },
+        {
+          "path": "docs/PARITY_004_HOST_PIXEL_GATE.md",
+          "reason": "Host/pixel gate requirements and boundaries for later verification."
+        },
+        {
+          "path": ".control/evidence/PARITY-004/20260903-group-operator-contract/decision.md",
+          "reason": "Immutable semantic decision governing GroupOperator proxies versus render sources."
+        },
+        {
+          "path": ".control/evidence/PARITY-004/harness/p4-harness-1788433139-001-1f426efc/runner-tests.json",
+          "reason": "Latest failing Runner details for localized P4-05 repair."
+        },
+        {
+          "path": "scripts/check.ps1",
+          "reason": "Repository-supported full verification command and test environment."
+        }
+      ],
+      "runner_acceptance": [
+        "The focused P4-05 unittest exits 0 and reports that ordinary render inputs use internal terminals, nested isolated wiring is correct, Pass Through receives the actual parent stream, and GroupOperator proxy ports remain present.",
+        "The focused P4-07 unittest exits 0.",
+        "scripts/check.ps1 exits 0 with no unrelated regressions.",
+        "Runner records host/pixel gates as still pending rather than promoting structural or readback evidence to pixel verification."
+      ],
+      "test_env": {
+        "PYTHONIOENCODING": "utf-8",
+        "assets": "External PSD and reference PNG are read-only and must not be materialized to the Worker.",
+        "fusion": "Actual Fusion is not required for this implementation tranche; P4-08, P4-HOST-PIXEL, and P4-09 remain pending.",
+        "runner": "Run from the repository root; Runner owns execution and verification evidence."
+      },
+      "tests": [
+        "python -m unittest discover -s tests -p \"test_parity004_p405_graph.py\"",
+        "python -m unittest discover -s tests -p \"test_parity004_p407.py\"",
+        "pwsh -NoProfile -File scripts/check.ps1"
+      ],
+      "title": "Implement PARITY-004 GroupOperator proxy/render-source split",
+      "worker_acceptance": [
+        "In psd2fusion/fusion_comp.py, retain _group_operator and InstanceOutput proxies while returning nested internal output and matte for isolated groups; no ordinary render Input references a GroupOperator output.",
+        "In psd2fusion/fusion_comp.py, pass the actual parent backdrop into Pass Through internal lowering, retain lowering-only first-backdrop-consumer metadata for the InstanceInput proxy, return nested.output, preserve consumed_backdrop=True, and avoid adding a parent Normal Merge.",
+        "In scripts/parity/p4_05.py and tests/test_parity004_p405_graph.py, encode the nested isolated and Pass Through proxy/render-source invariants and the required regression cases.",
+        "Keep changes limited to the three declared write paths and leave the existing clipping-island semantics intact."
+      ],
+      "write_paths": [
+        {
+          "path": "psd2fusion/fusion_comp.py",
+          "reason": "Implement the GroupOperator proxy/render-source boundary split."
+        },
+        {
+          "path": "scripts/parity/p4_05.py",
+          "reason": "Update the P4-05 structural fixture/report for nested group boundary invariants."
+        },
+        {
+          "path": "tests/test_parity004_p405_graph.py",
+          "reason": "Add or repair focused regression assertions for the GroupOperator split."
+        }
+      ]
+    }
+  },
+  "role": "manager-plan",
+  "run_id": "p4-harness-1788436679-001-5e5e6079",
+  "schema": "codex-ephemeral-harness.role-evidence.v1",
+  "schema_version": 1,
+  "status": "COMPLETED",
+  "stderr_bytes": 158,
+  "stderr_sha256": "b2aa84b095ecbf595e141303b5d1b6751f19c34b0ac10c7c40c63357e2fb8df0",
+  "stdout_bytes": 191723,
+  "stdout_sha256": "6b9431f18a77a1980c6f9bd4fb5c4ea864c10f6bc00fe615d659ed4325691044",
+  "thread_id": "01a06723-b983-7bc3-9995-97cfe8b31579",
+  "timestamp": "2026-09-03T12:03:42.606763Z",
+  "transcripts_forwarded": false,
+  "uncached_input_tokens": 57740,
+  "wall_time_ms": 233062
+}

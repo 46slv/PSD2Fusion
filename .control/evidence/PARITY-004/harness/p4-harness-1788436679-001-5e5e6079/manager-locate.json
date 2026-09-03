@@ -1,0 +1,98 @@
+{
+  "cached_input_tokens": 89344,
+  "ephemeral": true,
+  "exit_code": 0,
+  "input_tokens": 129958,
+  "isolation": {
+    "allowed_workspace_read": true,
+    "allowed_workspace_write": false,
+    "backend": "codex-split-filesystem-profile",
+    "canonical_external_read": "DENIED",
+    "codex_executable": "C:\\Users\\shiro\\AppData\\Local\\OpenAI\\Codex\\bin\\b99306303521e97e\\codex.exe",
+    "command_exit_code": 0,
+    "exact_write": "DENIED",
+    "forbidden_external_read": "DENIED",
+    "legacy_sandbox_mode_used": false,
+    "outside_write": "DENIED",
+    "platform": "win32",
+    "probe_mode": "codex-exec",
+    "profile_name": "ceh_manager_locate_e087df4db30f",
+    "readonly_write": "DENIED",
+    "runtime_executable": "C:\\Users\\shiro\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\python\\python.exe",
+    "status": "PROVEN",
+    "stderr_bytes": 158,
+    "stderr_sha256": "b9d2b021e64295fbfefec298e4b8800b3907ede56e3a6b9a59a4228f2351d5ae",
+    "stdout_bytes": 2044,
+    "stdout_sha256": "ad56aea238aab82b57b8974420c0ff630515e55532e7731d53b95947433c06cc",
+    "wall_time_ms": 20469,
+    "workspace_access": "read",
+    "write_path_read": "PASS"
+  },
+  "isolation_profile": "ceh_manager_locate_e087df4db30f",
+  "isolation_status": "PROVEN",
+  "model_visible_bytes": 93863,
+  "model_visible_file_count": 4,
+  "output_tokens": 2966,
+  "protocol_errors": [],
+  "result": {
+    "goal_item_id": "PARITY-004",
+    "requests": [
+      {
+        "kind": "EXACT_FILE",
+        "max_bytes": 10000,
+        "max_results": 1,
+        "path_scopes": [
+          ".control/PARITY-004_TODO.md"
+        ],
+        "query": ".control/PARITY-004_TODO.md",
+        "reason": "Read the ordered PARITY-004 procedure and scope."
+      },
+      {
+        "kind": "EXACT_FILE",
+        "max_bytes": 20000,
+        "max_results": 1,
+        "path_scopes": [
+          "docs/PARITY_004_HOST_PIXEL_GATE.md"
+        ],
+        "query": "docs/PARITY_004_HOST_PIXEL_GATE.md",
+        "reason": "Read host/pixel gate requirements."
+      },
+      {
+        "kind": "EXACT_FILE",
+        "max_bytes": 5000,
+        "max_results": 1,
+        "path_scopes": [
+          ".control/evidence/PARITY-004/20260903-group-operator-contract/decision.md"
+        ],
+        "query": ".control/evidence/PARITY-004/20260903-group-operator-contract/decision.md",
+        "reason": "Read the GroupOperator proxy/render-source contract."
+      },
+      {
+        "kind": "EXACT_FILE",
+        "max_bytes": 7000,
+        "max_results": 1,
+        "path_scopes": [
+          ".control/evidence/PARITY-004/harness/p4-harness-1788433139-001-1f426efc/runner-tests.json"
+        ],
+        "query": ".control/evidence/PARITY-004/harness/p4-harness-1788433139-001-1f426efc/runner-tests.json",
+        "reason": "Read details of the latest failing runner tests for localized repair planning."
+      }
+    ],
+    "status": "DISCOVERY_REQUESTED",
+    "summary": "Selected PARITY-004 and requested four bounded files needed to plan the GroupOperator split and address the latest failed runner."
+  },
+  "role": "manager-locate",
+  "run_id": "p4-harness-1788436679-001-5e5e6079",
+  "schema": "codex-ephemeral-harness.role-evidence.v1",
+  "schema_version": 1,
+  "status": "DISCOVERY_REQUESTED",
+  "stderr_bytes": 158,
+  "stderr_sha256": "837cae6d65a727d2bdbcc3eb2bc463112c7dc75705c209319b0e57465dd06ccf",
+  "stdout_bytes": 129511,
+  "stdout_sha256": "5efe210a669b62fe3d5921825e226e1c52d08a0d84f069188cf43452c5f764ea",
+  "thread_id": "01a06722-5ee4-7462-8106-68dbbae61b9f",
+  "timestamp": "2026-09-03T11:59:31.135921Z",
+  "transcripts_forwarded": false,
+  "uncached_input_tokens": 40614,
+  "wall_time_ms": 70391
+}

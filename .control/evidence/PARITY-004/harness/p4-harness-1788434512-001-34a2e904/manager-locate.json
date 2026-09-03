@@ -1,0 +1,118 @@
+{
+  "cached_input_tokens": 126976,
+  "ephemeral": true,
+  "exit_code": 0,
+  "input_tokens": 169459,
+  "isolation": {
+    "allowed_workspace_read": true,
+    "allowed_workspace_write": false,
+    "backend": "codex-split-filesystem-profile",
+    "canonical_external_read": "DENIED",
+    "codex_executable": "C:\\Users\\shiro\\AppData\\Local\\OpenAI\\Codex\\bin\\b99306303521e97e\\codex.exe",
+    "command_exit_code": 0,
+    "exact_write": "DENIED",
+    "forbidden_external_read": "DENIED",
+    "legacy_sandbox_mode_used": false,
+    "outside_write": "DENIED",
+    "platform": "win32",
+    "probe_mode": "codex-exec",
+    "profile_name": "ceh_manager_locate_381772d2cf27",
+    "readonly_write": "DENIED",
+    "runtime_executable": "C:\\Users\\shiro\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\python\\python.exe",
+    "status": "PROVEN",
+    "stderr_bytes": 158,
+    "stderr_sha256": "f9e8dd203fedc0a1d425b5bac6f75de5e7e5d86fe5884ef315e8be9c4f93e36b",
+    "stdout_bytes": 2014,
+    "stdout_sha256": "f3612c9ca5c3bd5a31b96af37c8cde0d60a8bb9a4643ec11983129dd99a45d19",
+    "wall_time_ms": 17172,
+    "workspace_access": "read",
+    "write_path_read": "PASS"
+  },
+  "isolation_profile": "ceh_manager_locate_381772d2cf27",
+  "isolation_status": "PROVEN",
+  "model_visible_bytes": 101892,
+  "model_visible_file_count": 4,
+  "output_tokens": 7978,
+  "protocol_errors": [],
+  "result": {
+    "goal_item_id": "PARITY-004",
+    "requests": [
+      {
+        "kind": "EXACT_FILE",
+        "max_bytes": 8065,
+        "max_results": 1,
+        "path_scopes": [
+          ".control/PARITY-004_TODO.md"
+        ],
+        "query": ".control/PARITY-004_TODO.md",
+        "reason": "Read the bounded PARITY-004 procedure for the next implementation task."
+      },
+      {
+        "kind": "EXACT_FILE",
+        "max_bytes": 6117,
+        "max_results": 1,
+        "path_scopes": [
+          "docs/PARITY_004_HOST_PIXEL_GATE.md"
+        ],
+        "query": "docs/PARITY_004_HOST_PIXEL_GATE.md",
+        "reason": "Read the required host/pixel gate constraints relevant to planning."
+      },
+      {
+        "kind": "EXACT_FILE",
+        "max_bytes": 3539,
+        "max_results": 1,
+        "path_scopes": [
+          ".control/evidence/PARITY-004/20260903-group-operator-contract/decision.md"
+        ],
+        "query": ".control/evidence/PARITY-004/20260903-group-operator-contract/decision.md",
+        "reason": "Read the immutable GroupOperator proxy/render-source semantic contract."
+      },
+      {
+        "kind": "EXACT_FILE",
+        "max_bytes": 49412,
+        "max_results": 1,
+        "path_scopes": [
+          "psd2fusion/fusion_comp.py"
+        ],
+        "query": "psd2fusion/fusion_comp.py",
+        "reason": "Inspect the implementation target for GroupOperator lowering and output wiring."
+      },
+      {
+        "kind": "EXACT_FILE",
+        "max_bytes": 25811,
+        "max_results": 1,
+        "path_scopes": [
+          "scripts/parity/p4_05.py"
+        ],
+        "query": "scripts/parity/p4_05.py",
+        "reason": "Inspect the structural parity fixture that must reflect the GroupOperator split."
+      },
+      {
+        "kind": "EXACT_FILE",
+        "max_bytes": 4408,
+        "max_results": 1,
+        "path_scopes": [
+          "tests/test_parity004_p405_graph.py"
+        ],
+        "query": "tests/test_parity004_p405_graph.py",
+        "reason": "Inspect the focused regression assertions for the implementation task."
+      }
+    ],
+    "status": "DISCOVERY_REQUESTED",
+    "summary": "PARITY-004 is active and the next bounded task is the GroupOperator proxy/render-source split. Runner status is pending, not failed; request the six coordinator-selected files needed to plan that task."
+  },
+  "role": "manager-locate",
+  "run_id": "p4-harness-1788434512-001-34a2e904",
+  "schema": "codex-ephemeral-harness.role-evidence.v1",
+  "schema_version": 1,
+  "status": "DISCOVERY_REQUESTED",
+  "stderr_bytes": 158,
+  "stderr_sha256": "fd7fba45cd3ce6edc6e205310fa1096b2a780f423f159a8a4ece30b526b1bf3e",
+  "stdout_bytes": 140750,
+  "stdout_sha256": "95f6c49c8389f0e954a3bdbc8b2831d6929d5bba151176f279dacc46f9bf5e54",
+  "thread_id": "01a06701-4013-7280-84a4-2792f733f848",
+  "timestamp": "2026-09-03T11:24:54.054730Z",
+  "transcripts_forwarded": false,
+  "uncached_input_tokens": 42483,
+  "wall_time_ms": 163875
+}

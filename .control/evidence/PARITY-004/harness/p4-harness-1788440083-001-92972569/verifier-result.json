@@ -1,0 +1,34 @@
+{
+  "acceptance": [
+    {
+      "check": "Scoped patch",
+      "status": "PASS",
+      "summary": "Patch changes only the three declared write paths with no path violations."
+    },
+    {
+      "check": "GroupOperator contract",
+      "status": "PASS",
+      "summary": "Render and matte edges use internal terminals while editable proxy ports and pass-through metadata are preserved."
+    },
+    {
+      "check": "Regression coverage",
+      "status": "PASS",
+      "summary": "Focused P4-05 and P4-07 tests pass; clipping-boundary coverage remains intact."
+    },
+    {
+      "check": "Runner verification",
+      "status": "PASS",
+      "summary": "All three declared Runner commands exit 0 and report PASS."
+    },
+    {
+      "check": "Transition discipline",
+      "status": "PASS",
+      "summary": "PARITY-004 remains pending; no host-loaded or pixel-verified claim is made."
+    }
+  ],
+  "failure_fingerprint": null,
+  "item_complete": true,
+  "next_action": "Keep PARITY-004 in progress; run P4-08, the actual-Fusion micro pixel gate, then the P4-09 baseline.",
+  "summary": "The localized GroupOperator proxy/render-source split satisfies the tranche contract and all Runner checks pass.",
+  "verdict": "PASS"
+}

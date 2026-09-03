@@ -1,0 +1,127 @@
+{
+  "adapter": "psd2fusion-parity-004",
+  "checkpoint": {
+    "task": {
+      "run_id": "p4-harness-1788438789-001-639e61c0",
+      "schema": "codex-ephemeral-harness.task.v2",
+      "selected_by": "manager",
+      "task": {
+        "acceptance": [
+          "Implement the localized GroupOperator proxy/render-source split while preserving the published grouped/default clipping candidate.",
+          "Make the implementation ready for fresh Runner verification; this tranche does not close PARITY-004."
+        ],
+        "completion_scope": "TRANCHE",
+        "constraints": [
+          "Keep GroupOperator and InstanceOutput as editable/display proxies; ordinary render consumers must use internal render terminals.",
+          "Pass the actual parent backdrop through Pass Through groups, preserve consumed_backdrop metadata, and avoid double compositing.",
+          "Do not alter fixed-matte clipping, member order, Operator=In, ProcessAlpha=0, or introduce Semantic IR/backend redesign.",
+          "Do not implement clbl=false, PARITY-005/006, Photoshop automation, broad real-PSD convergence, or host/pixel rendering in this tranche.",
+          "External PSD and reference assets remain read-only and are not materialized to the Worker.",
+          "Limit implementation writes to the three declared write paths."
+        ],
+        "context_budget": {
+          "max_discovery_rounds": 0,
+          "max_files": 10,
+          "max_handoff_files": 1,
+          "max_total_bytes": 400000
+        },
+        "evidence_required": [
+          "Fresh Runner evidence must report exit codes and statuses for every declared test command.",
+          "Evidence must demonstrate nested isolated and Pass Through render-source/proxy separation, retained proxy ports, and preserved clipping-boundary checks.",
+          "Evidence must confirm the P4-07 structural regression remains passing.",
+          "Do not infer host_loaded or pixel_verified from structural or offline test evidence."
+        ],
+        "goal_done_when": [
+          "The Worker implementation satisfies the GroupOperator decision and updates P4-05 structural coverage for the localized failure.",
+          "The Runner reports PASS for the focused group-boundary tests, the P4-07 regression, and the repository offline check.",
+          "PARITY-004 remains in_progress until the later P4-08, host-pixel, and P4-09 gates complete."
+        ],
+        "goal_item_id": "PARITY-004",
+        "handoff_refs": [
+          {
+            "path": ".control/evidence/PARITY-004/harness/p4-harness-1788433139-001-1f426efc/runner-tests.json",
+            "reason": "Immutable latest Runner evidence: the focused P4-05 tests and offline check fail on the GroupOperator proxy/render-source split while the P4-07 regression passes.",
+            "sha256": "2c7d658fbf733c02fb9d01270dbe305f6540859b0b7e8d14c6ddc3bccd40bc16"
+          }
+        ],
+        "id": "PARITY-004-groupoperator-proxy-render-source-split",
+        "non_goals": [
+          "Closing PARITY-004 or advancing its host/pixel gates.",
+          "Changing clipping-island math or default/true clbl semantics.",
+          "Implementing explicit clbl=false semantics.",
+          "Broad compiler, planner, capability, backend, importer, or asset-materialization redesign.",
+          "Reference-image fitting or any global correction."
+        ],
+        "objective": "Repair the localized GroupOperator boundary so Fusion render inputs consume internal terminals and actual parent streams while preserving GroupOperator proxy ports, pass-through semantics, and the published clipping candidate.",
+        "read_paths": [
+          {
+            "path": ".control/PARITY-004_TODO.md",
+            "reason": "Read the ordered PARITY-004 procedure and current clipping/host-pixel scope."
+          },
+          {
+            "path": "docs/PARITY_004_HOST_PIXEL_GATE.md",
+            "reason": "Read the required gate order and the boundary between structural implementation work and later host/pixel proof."
+          },
+          {
+            "path": ".control/evidence/PARITY-004/20260903-group-operator-contract/decision.md",
+            "reason": "Read the implementation-ready GroupOperator proxy/render-source contract and required regression proof."
+          }
+        ],
+        "runner_acceptance": [
+          "The focused P4-05 unittest command exits 0 and its report proves proxy/render-source separation for isolated, nested, and Pass Through cases.",
+          "The focused P4-07 unittest command exits 0.",
+          "The repository offline check exits 0.",
+          "Runner evidence is fresh and does not claim actual Fusion load or pixel verification."
+        ],
+        "test_env": {
+          "PYTHONIOENCODING": "utf-8",
+          "assets": "External PSD and reference PNG remain read-only and are not materialized to a Worker.",
+          "fusion": "Actual Fusion is not required for this implementation tranche; host/pixel gates remain pending."
+        },
+        "tests": [
+          "python -m unittest discover -s tests -p \"test_parity004_p405_graph.py\"",
+          "python -m unittest discover -s tests -p \"test_parity004_p407.py\"",
+          "pwsh -NoProfile -File scripts/check.ps1"
+        ],
+        "title": "Implement GroupOperator proxy/render-source split",
+        "worker_acceptance": [
+          "For isolated groups, _ItemResult.output and matte resolve to the nested internal render source rather than a GroupOperator output, while GroupOperator and InstanceOutput remain available as proxies.",
+          "For Pass Through groups, the actual parent backdrop enters the internal sequence, the nested output is returned, consumed_backdrop remains true, and no parent Normal Merge double-composites the result.",
+          "Ordinary parent, sibling, and MediaOut render inputs contain no GroupOperator render source references.",
+          "P4-05 structural generation and assertions cover proxy ports, internal-terminal wiring, actual pass-through backdrop wiring, nested groups, and clipping boundary preservation.",
+          "No changes are made outside the three declared write paths."
+        ],
+        "write_paths": [
+          {
+            "path": "psd2fusion/fusion_comp.py",
+            "reason": "Implement the GroupOperator proxy/render-source split in Fusion graph lowering."
+          },
+          {
+            "path": "scripts/parity/p4_05.py",
+            "reason": "Update P4-05 structural coverage and checks for isolated and Pass Through group boundary wiring."
+          },
+          {
+            "path": "tests/test_parity004_p405_graph.py",
+            "reason": "Update focused regression tests to assert the GroupOperator proxy/render-source contract."
+          }
+        ]
+      }
+    }
+  },
+  "created_at": "2026-09-03T12:33:09.550349Z",
+  "discovery_round": 1,
+  "error": "git apply --check failed: error: patch failed: scripts/parity/p4_05.py:247\nerror: scripts/parity/p4_05.py: patch does not apply\nerror: patch failed: tests/test_parity004_p405_graph.py:65\nerror: tests/test_parity004_p405_graph.py: patch does not apply",
+  "expansion_count": 0,
+  "patch_applied": false,
+  "phase": "WORKER",
+  "plan_attempt": 1,
+  "recovered": false,
+  "repo_identity": "ee28cee08a380e2c",
+  "run_id": "p4-harness-1788438789-001-639e61c0",
+  "schema": "codex-ephemeral-harness.cycle-state.v1",
+  "second_cycle": "NOT_RUN",
+  "status": "BLOCKED",
+  "transition_applied": false,
+  "updated_at": "2026-09-03T12:50:04.562074Z",
+  "worker_attempt": 1
+}

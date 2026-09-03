@@ -1,0 +1,15 @@
+P4-08 live DaVinci Resolve MCP readback
+candidate=96112d57ec52645a1d9797323d3551bf45538f27
+host=DaVinci Resolve Studio 21.0.3.7 project=PSD2Fusion P4-08 96112d5 page=fusion
+bridge=signed localhost 127.0.0.1:49632
+load_1=PASS load_2=PASS reload_signature_equal=true tools=894
+loaders=100 paths_resolved=100 postmultiply_absent_or_default=100
+groups=34 groups_with_children=34 direct_child_total=886
+mediaout=MediaOut1 connected=true source=MergeR_48d6509e64
+clipin=59 complete=59 operator_in=59
+clipstack=59 complete=59 process_alpha_zero=59 fixed_matte_complete=59
+blendfunction=59 complete=59 Normal=43 Multiply=12 LinearDodge=3 Overlay=1
+unknown_tools=0 invalid_tools=0
+current_comp_paste=PASS reported_before=0 added=894 reported_after=894
+current_comp_post_probe=895 tools, 2 MediaOuts: MediaOut2->MergeR_48d6509e64 and MediaOut1->MediaOut2
+pixel_verified=false; P4-HOST-PIXEL and P4-09 remain separate gates

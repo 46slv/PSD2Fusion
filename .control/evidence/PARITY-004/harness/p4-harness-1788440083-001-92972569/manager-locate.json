@@ -1,0 +1,138 @@
+{
+  "cached_input_tokens": 272384,
+  "ephemeral": true,
+  "exit_code": 0,
+  "input_tokens": 337249,
+  "isolation": {
+    "allowed_workspace_read": true,
+    "allowed_workspace_write": false,
+    "backend": "codex-split-filesystem-profile",
+    "canonical_external_read": "DENIED",
+    "codex_executable": "C:\\Users\\shiro\\AppData\\Local\\OpenAI\\Codex\\bin\\b99306303521e97e\\codex.exe",
+    "command_exit_code": 0,
+    "exact_write": "DENIED",
+    "forbidden_external_read": "DENIED",
+    "legacy_sandbox_mode_used": false,
+    "outside_write": "DENIED",
+    "platform": "win32",
+    "probe_mode": "codex-exec",
+    "profile_name": "ceh_manager_locate_89e6d209e9c9",
+    "readonly_write": "DENIED",
+    "runtime_executable": "C:\\Users\\shiro\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\python\\python.exe",
+    "status": "PROVEN",
+    "stderr_bytes": 526,
+    "stderr_sha256": "84bed26deb4fbf433cc013a3160f46c9520b6e1821a74488065d4f0308965b81",
+    "stdout_bytes": 2006,
+    "stdout_sha256": "899887f2d422dfb7cde2c3c383af48c19c5b0632e8986a11f7fe1016f1223f07",
+    "wall_time_ms": 49797,
+    "workspace_access": "read",
+    "write_path_read": "PASS"
+  },
+  "isolation_profile": "ceh_manager_locate_89e6d209e9c9",
+  "isolation_status": "PROVEN",
+  "model_visible_bytes": 110328,
+  "model_visible_file_count": 4,
+  "output_tokens": 7478,
+  "protocol_errors": [],
+  "result": {
+    "goal_item_id": "PARITY-004",
+    "requests": [
+      {
+        "kind": "EXACT_FILE",
+        "max_bytes": 5811,
+        "max_results": 1,
+        "path_scopes": [
+          "AGENTS.md"
+        ],
+        "query": "AGENTS.md",
+        "reason": "Read repository-local instructions before planning the implementation task."
+      },
+      {
+        "kind": "EXACT_FILE",
+        "max_bytes": 8065,
+        "max_results": 1,
+        "path_scopes": [
+          ".control/PARITY-004_TODO.md"
+        ],
+        "query": ".control/PARITY-004_TODO.md",
+        "reason": "Read the PARITY-004 task procedure and scope."
+      },
+      {
+        "kind": "EXACT_FILE",
+        "max_bytes": 6117,
+        "max_results": 1,
+        "path_scopes": [
+          "docs/PARITY_004_HOST_PIXEL_GATE.md"
+        ],
+        "query": "docs/PARITY_004_HOST_PIXEL_GATE.md",
+        "reason": "Read the required host/pixel gate constraints."
+      },
+      {
+        "kind": "EXACT_FILE",
+        "max_bytes": 3539,
+        "max_results": 1,
+        "path_scopes": [
+          ".control/evidence/PARITY-004/20260903-group-operator-contract/decision.md"
+        ],
+        "query": ".control/evidence/PARITY-004/20260903-group-operator-contract/decision.md",
+        "reason": "Read the immutable GroupOperator proxy/render-source contract."
+      },
+      {
+        "kind": "EXACT_FILE",
+        "max_bytes": 48099,
+        "max_results": 1,
+        "path_scopes": [
+          "psd2fusion/fusion_comp.py"
+        ],
+        "query": "psd2fusion/fusion_comp.py",
+        "reason": "Inspect the declared compositor implementation target."
+      },
+      {
+        "kind": "EXACT_FILE",
+        "max_bytes": 25187,
+        "max_results": 1,
+        "path_scopes": [
+          "scripts/parity/p4_05.py"
+        ],
+        "query": "scripts/parity/p4_05.py",
+        "reason": "Inspect the declared P4-05 parity implementation target."
+      },
+      {
+        "kind": "EXACT_FILE",
+        "max_bytes": 4308,
+        "max_results": 1,
+        "path_scopes": [
+          "tests/test_parity004_p405_graph.py"
+        ],
+        "query": "tests/test_parity004_p405_graph.py",
+        "reason": "Inspect the declared regression test target."
+      },
+      {
+        "kind": "EXACT_FILE",
+        "max_bytes": 6163,
+        "max_results": 1,
+        "path_scopes": [
+          ".control/evidence/PARITY-004/harness/p4-harness-1788433139-001-1f426efc/runner-tests.json"
+        ],
+        "query": ".control/evidence/PARITY-004/harness/p4-harness-1788433139-001-1f426efc/runner-tests.json",
+        "reason": "Inspect the immutable failing runner-test artifact and localize the required repair."
+      }
+    ],
+    "status": "DISCOVERY_REQUESTED",
+    "summary": "Selected PARITY-004 and bounded discovery to the repository instructions, GroupOperator contract, declared implementation and regression targets, and the latest failing runner-test artifact."
+  },
+  "role": "manager-locate",
+  "run_id": "p4-harness-1788440083-001-92972569",
+  "schema": "codex-ephemeral-harness.role-evidence.v1",
+  "schema_version": 1,
+  "status": "DISCOVERY_REQUESTED",
+  "stderr_bytes": 4055,
+  "stderr_sha256": "c6a6a3bce3c0e91bbd3ea29f65e2d1d7a5b745996e405660af98732d6c0f5a55",
+  "stdout_bytes": 188566,
+  "stdout_sha256": "a5f46380ea2da81616182ced726a50d53832900e6faaf4982df7054304c0642e",
+  "thread_id": "01a06756-c2bc-7530-8720-cfaa4b5b756d",
+  "timestamp": "2026-09-03T12:58:56.433035Z",
+  "transcripts_forwarded": false,
+  "uncached_input_tokens": 64865,
+  "wall_time_ms": 202265
+}

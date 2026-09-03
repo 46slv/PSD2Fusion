@@ -1,0 +1,26 @@
+{
+  "schema": "psd2fusion-parity-004.adapter-projection.v1",
+  "adapter": "psd2fusion-parity-004",
+  "adapter_source": "psd2fusion/harness_adapter.py",
+  "status": "PASS",
+  "projection": {
+    "runner_status": "PASS",
+    "p4_08_status": "PASS",
+    "p4_host_pixel_status": "BLOCKED",
+    "p4_host_pixel_fingerprint": "HOST_SAVER_NO_ARTIFACT_AFTER_ACCEPTED_RENDER",
+    "next_workload": "P4-HOST-PIXEL host artifact recovery; no compositor change",
+    "implementation_write_paths": [],
+    "host_blocker_is_not_compositor_failure": true
+  },
+  "assertion": "A fresh Manager projection advances past the completed GroupOperator tranche and does not schedule a compositor write for the independent Saver artifact blocker.",
+  "checks": [
+    "python -m unittest discover -s tests -p test_harness_adapter.py",
+    "python .\\scripts\\harness_closed_loop.py --mode dry"
+  ],
+  "correlation": {
+    "devexec_task_id": "devexec-psd2fusion-p004-20260903",
+    "harness_run_id": "p4-harness-1788440083-001-92972569",
+    "supervisor_target": "knotfield-harness-supervisor"
+  },
+  "transcript_forwarded": false
+}

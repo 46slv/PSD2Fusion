@@ -1,0 +1,85 @@
+{
+  "cached_input_tokens": 89344,
+  "ephemeral": true,
+  "exit_code": 0,
+  "input_tokens": 131152,
+  "isolation": {
+    "allowed_workspace_read": true,
+    "allowed_workspace_write": false,
+    "backend": "codex-split-filesystem-profile",
+    "canonical_external_read": "DENIED",
+    "codex_executable": "C:\\Users\\shiro\\AppData\\Local\\OpenAI\\Codex\\bin\\b99306303521e97e\\codex.exe",
+    "command_exit_code": 0,
+    "exact_write": "DENIED",
+    "forbidden_external_read": "DENIED",
+    "legacy_sandbox_mode_used": false,
+    "outside_write": "DENIED",
+    "platform": "win32",
+    "probe_mode": "codex-exec",
+    "profile_name": "ceh_verifier_4821e3c4fefa",
+    "readonly_write": "DENIED",
+    "runtime_executable": "C:\\Users\\shiro\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\python\\python.exe",
+    "status": "PROVEN",
+    "stderr_bytes": 158,
+    "stderr_sha256": "2fd7be43758fc049578bc269f213b848e091de21d413aa29ce0328a625c0ba8b",
+    "stdout_bytes": 2032,
+    "stdout_sha256": "bbaa23c68387a1de3ce7e92456d043fb34138f2bcc58021d6db4fb9e8305381b",
+    "wall_time_ms": 21360,
+    "workspace_access": "read",
+    "write_path_read": "PASS"
+  },
+  "isolation_profile": "ceh_verifier_4821e3c4fefa",
+  "isolation_status": "PROVEN",
+  "model_visible_bytes": 39846,
+  "model_visible_file_count": 2,
+  "output_tokens": 2556,
+  "protocol_errors": [],
+  "result": {
+    "acceptance": [
+      {
+        "check": "Scoped patch",
+        "status": "PASS",
+        "summary": "Patch changes only the three declared write paths with no path violations."
+      },
+      {
+        "check": "GroupOperator contract",
+        "status": "PASS",
+        "summary": "Render and matte edges use internal terminals while editable proxy ports and pass-through metadata are preserved."
+      },
+      {
+        "check": "Regression coverage",
+        "status": "PASS",
+        "summary": "Focused P4-05 and P4-07 tests pass; clipping-boundary coverage remains intact."
+      },
+      {
+        "check": "Runner verification",
+        "status": "PASS",
+        "summary": "All three declared Runner commands exit 0 and report PASS."
+      },
+      {
+        "check": "Transition discipline",
+        "status": "PASS",
+        "summary": "PARITY-004 remains pending; no host-loaded or pixel-verified claim is made."
+      }
+    ],
+    "failure_fingerprint": null,
+    "item_complete": true,
+    "next_action": "Keep PARITY-004 in progress; run P4-08, the actual-Fusion micro pixel gate, then the P4-09 baseline.",
+    "summary": "The localized GroupOperator proxy/render-source split satisfies the tranche contract and all Runner checks pass.",
+    "verdict": "PASS"
+  },
+  "role": "verifier",
+  "run_id": "p4-harness-1788440083-001-92972569",
+  "schema": "codex-ephemeral-harness.role-evidence.v1",
+  "schema_version": 1,
+  "status": "PASS",
+  "stderr_bytes": 158,
+  "stderr_sha256": "ead770cef7f5892e9c7728b28b06d9a2ae108909f428655c1dff26a4d5c60502",
+  "stdout_bytes": 72988,
+  "stdout_sha256": "c9a30e27acb9f7f90f95bdfdc1d35f7299a13d7aa008ea35ad58a5bf455b397a",
+  "thread_id": "01a0676d-67bf-7d21-a6c6-2cf057926f48",
+  "timestamp": "2026-09-03T13:21:20.297963Z",
+  "transcripts_forwarded": false,
+  "uncached_input_tokens": 41808,
+  "wall_time_ms": 62031
+}

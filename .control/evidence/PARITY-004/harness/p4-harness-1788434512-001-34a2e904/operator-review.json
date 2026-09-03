@@ -1,0 +1,17 @@
+{
+  "schema": "psd2fusion-parity-004.harness-recovery-review.v1",
+  "run_id": "p4-harness-1788434512-001-34a2e904",
+  "reviewed_at": "2026-09-03T11:52:09Z",
+  "decision": "SAFE_TO_RESUME_SAME_RUN_ID",
+  "scope": "Harness recovery only; no PSD2Fusion implementation verdict inferred",
+  "observations": [
+    "Context Firewall six-probe status was PASS and production_roles_launched was false in preflight.",
+    "Manager Locate, discovery, and Manager Plan artifacts are present for this run.",
+    "The Worker process exited through the generic timeout path after 1200 seconds; no worker role evidence, worker patch, runner-tests, or verifier result was produced.",
+    "The PSD2Fusion working tree still contains the pre-existing GroupOperator candidate changes and no change attributable to this timed-out Worker was applied.",
+    "The defect is classified as codex-ephemeral-harness role-process timeout, project_failure=false, and is independent of P4-05/P4-07 test behavior.",
+    "Recovery will use the existing explicit --resume-in-progress path with the same run_id; no blind duplicate Worker launch is authorized."
+  ],
+  "next_action": "Resume the retained generic cycle journal after this review; re-materialize a fresh Luna Max Worker context and let Runner own P4-05, P4-07, and scripts/check.ps1.",
+  "transcript_forwarded": false
+}

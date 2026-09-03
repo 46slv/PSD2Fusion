@@ -1,0 +1,50 @@
+{
+  "commands": [
+    "python -m unittest discover -s tests -p \"test_parity004_p405_graph.py\"",
+    "python -m unittest discover -s tests -p \"test_parity004_p407.py\"",
+    "pwsh -NoProfile -File scripts/check.ps1"
+  ],
+  "failed": 0,
+  "owner": "runner",
+  "passed": 3,
+  "results": [
+    {
+      "command": "python -m unittest discover -s tests -p \"test_parity004_p405_graph.py\"",
+      "exit_code": 0,
+      "status": "PASS",
+      "stderr_sha256": "c7a2b96ce0017e3e156a2656c82b47c9014e41b0e14e93dea1946dd076df5162",
+      "stderr_tail": "......\n----------------------------------------------------------------------\nRan 6 tests in 0.832s\n\nOK\n",
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": "",
+      "wall_time_ms": 1297
+    },
+    {
+      "command": "python -m unittest discover -s tests -p \"test_parity004_p407.py\"",
+      "exit_code": 0,
+      "status": "PASS",
+      "stderr_sha256": "fb184ea57734512b1f088f9181209901b9cd46df3eb7eaa2500ea9e48dde20b5",
+      "stderr_tail": ".\n----------------------------------------------------------------------\nRan 1 test in 0.000s\n\nOK\n",
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": "",
+      "wall_time_ms": 391
+    },
+    {
+      "command": "pwsh -NoProfile -File scripts/check.ps1",
+      "exit_code": 0,
+      "status": "PASS",
+      "stderr_sha256": "aaf1bd804f7c03353f830521e4c3e340799fccc3c9d31c06ac067b7f725cf915",
+      "stderr_tail": "...............D:\\Documents\\PSD2Fusion\\scripts\\parity\\parity.py:132: DeprecationWarning: Image.Image.getdata is deprecated and will be removed in Pillow 14 (2027-10-15). Use get_flattened_data instead.\n  c, r = c.convert(\"RGBA\"), r.convert(\"RGBA\"); cp, rp = list(c.getdata()), list(r.getdata())\nD:\\Documents\\PSD2Fusion\\scripts\\parity\\parity.py:109: DeprecationWarning: Image.Image.getdata is deprecated and will be removed in Pillow 14 (2027-10-15). Use get_flattened_data instead.\n  ca, ra = list(c.getchannel(\"A\").getdata()), list(r.getchannel(\"A\").getdata()); w, h = c.size; out = []\n..D:\\Documents\\PSD2Fusion\\scripts\\parity\\parity.py:95: DeprecationWarning: Image.Image.getdata is deprecated and will be removed in Pillow 14 (2027-10-15). Use get_flattened_data instead.\n  for c, r in zip(candidate.getdata(), reference.getdata()):\n..................................................\n----------------------------------------------------------------------\nRan 67 tests in 3.933s\n\nOK\n",
+      "stdout_sha256": "f065d390014203861fb62197ac52165ce671dc899a0a6fed4f920e835200208c",
+      "stdout_tail": "{\n  \"ok\": true,\n  \"state\": \"D:\\\\Documents\\\\PSD2Fusion\\\\.control\\\\current.json\",\n  \"errors\": []\n}\n",
+      "wall_time_ms": 6469
+    }
+  ],
+  "schema": "codex-ephemeral-harness.runner-test-evidence.v1",
+  "status": "PASS",
+  "test_env": {
+    "PYTHONIOENCODING": "utf-8",
+    "assets": "External PSD and reference PNG remain read-only and are not materialized to a Worker.",
+    "fusion": "Actual Fusion is not required for this implementation tranche; host/pixel gates remain pending."
+  },
+  "wall_time_ms": 8157
+}

@@ -1,0 +1,51 @@
+{
+  "schema": "psd2fusion-parity-004.host-blocker.v1",
+  "task": "PARITY-004",
+  "item": "P4-HOST-PIXEL",
+  "evidence_id": "host-saver-no-artifact-20260903",
+  "status": "BLOCKED",
+  "fingerprint": "HOST_SAVER_NO_ARTIFACT_AFTER_ACCEPTED_RENDER",
+  "classification": "HOST_EXECUTION_ARTIFACT_MISSING",
+  "basis": {
+    "source_evidence": ".control/evidence/PARITY-004/20260903-mcp-fusion-readback/summary.json",
+    "source_evidence_status": "BLOCKED",
+    "source_evidence_is_immutable": true,
+    "note": "This record preserves the previously observed disposable Resolve host result; P4-08 current-candidate readback did not invoke another Saver render."
+  },
+  "host": {
+    "application": "DaVinci Resolve Studio",
+    "version": "21.0.3.7",
+    "bridge_surface": "signed localhost Resolve bridge",
+    "fixture_load_readback": "PASS",
+    "saver_added_in_memory": true,
+    "saver_input_connected": true,
+    "render_call_accepted": true,
+    "is_rendering_after_call": false,
+    "output_path": "C:\\Users\\shiro\\psd2fusion-mcp-p4-20260903-fractional-connected2.png",
+    "artifact_exists": false,
+    "pixel_comparison": "NOT_RUN"
+  },
+  "boundary": {
+    "p4_08": "PASS independently; ordinary load/readback is not blocked by this artifact absence",
+    "p4_host_pixel": "BLOCKED",
+    "p4_09": "NOT_RUN",
+    "pixel_verified": false,
+    "parity_005": "NOT_STARTED",
+    "parity_006": "NOT_STARTED"
+  },
+  "fault_separation": {
+    "project_failure": false,
+    "harness_defect": false,
+    "compositor_failure": "not established",
+    "host_execution_problem": true,
+    "interpretation": "Resolve accepted the render call and stopped without materializing the requested Saver artifact; this is insufficient for pixel evidence and is not evidence of compositor math failure."
+  },
+  "correlation": {
+    "devexec_task_id": "devexec-psd2fusion-p004-20260903",
+    "harness_run_id": "p4-harness-1788440083-001-92972569",
+    "supervisor_target": "knotfield-harness-supervisor",
+    "candidate_commit": "96112d57ec52645a1d9797323d3551bf45538f27",
+    "p4_08_evidence": ".control/evidence/PARITY-004/20260903-p408-96112d5/summary.json"
+  },
+  "stop_condition": "Preserve host-loaded/readback evidence only; do not claim pixel_verified or advance to P4-09 until an actual Fusion artifact is materialized and hashed."
+}

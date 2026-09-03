@@ -1,0 +1,14 @@
+{
+  "schema": "psd2fusion-parity-004.harness-recovery-attempt.v1",
+  "run_id": "p4-harness-1788434512-001-34a2e904",
+  "attempted_at": "2026-09-03T11:55:07Z",
+  "decision": "RECOVERY_NOT_REUSABLE",
+  "observed_status": "BLOCKED",
+  "observed_phase": "MANAGER_PLAN",
+  "error_type": "duplicate_role_evidence_conflict",
+  "error": "duplicate role evidence conflicts with retained record: manager-plan.json",
+  "project_failure": false,
+  "harness_failure_fingerprint": "retained-role-evidence-conflict-on-same-run-id",
+  "operator_action": "Do not retry the same run_id again; preserve its timeout and recovery evidence and start a fresh generic cycle so fresh role evidence has a new run namespace.",
+  "transcript_forwarded": false
+}

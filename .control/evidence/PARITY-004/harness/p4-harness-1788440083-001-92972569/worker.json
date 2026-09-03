@@ -1,0 +1,78 @@
+{
+  "cached_input_tokens": 3500800,
+  "ephemeral": true,
+  "exit_code": 0,
+  "input_tokens": 3661319,
+  "isolation": {
+    "allowed_workspace_read": true,
+    "allowed_workspace_write": true,
+    "backend": "codex-split-filesystem-profile",
+    "canonical_external_read": "DENIED",
+    "codex_executable": "C:\\Users\\shiro\\AppData\\Local\\OpenAI\\Codex\\bin\\b99306303521e97e\\codex.exe",
+    "command_exit_code": 0,
+    "exact_write": "PASS",
+    "forbidden_external_read": "DENIED",
+    "legacy_sandbox_mode_used": false,
+    "outside_write": "DENIED",
+    "platform": "win32",
+    "probe_mode": "codex-exec",
+    "profile_name": "ceh_worker_2bf7813fa902",
+    "readonly_write": "DENIED",
+    "runtime_executable": "C:\\Users\\shiro\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\python\\python.exe",
+    "status": "PROVEN",
+    "stderr_bytes": 527,
+    "stderr_sha256": "0d32a895a44b7b1f3f554707af414f6213ba045ac3605cd47a2c92eb9b5039c3",
+    "stdout_bytes": 2024,
+    "stdout_sha256": "27c9bd0cb887b26a7b6c1fec46d98dd055810bec226a340e0e9fd075f8ad444a",
+    "wall_time_ms": 25672,
+    "workspace_access": "write",
+    "write_path_read": "PASS"
+  },
+  "isolation_profile": "ceh_worker_2bf7813fa902",
+  "isolation_status": "PROVEN",
+  "model_visible_bytes": 109189,
+  "model_visible_file_count": 9,
+  "output_tokens": 47902,
+  "protocol_errors": [],
+  "result": {
+    "canonical_patch_applied": false,
+    "evidence": [
+      {
+        "kind": "implementation",
+        "path": "psd2fusion/fusion_comp.py",
+        "summary": "Group results explicitly return internal terminals for render output and matte while preserving pass-through backdrop metadata."
+      },
+      {
+        "kind": "structural-coverage",
+        "path": "scripts/parity/p4_05.py",
+        "summary": "P4-05 now validates nested Flow source edges and rejects GroupOperator references in ordinary render inputs."
+      },
+      {
+        "kind": "regression-tests",
+        "path": "tests/test_parity004_p405_graph.py",
+        "summary": "Added focused assertions for proxy/render-source separation."
+      }
+    ],
+    "notes": [
+      "Python syntax and in-memory P4-05 structural smoke checks passed.",
+      "Fresh Runner verification remains required for the declared unittest and offline-check commands; PARITY-004 stays in progress."
+    ],
+    "requested_context": [],
+    "status": "DONE",
+    "summary": "Implemented the GroupOperator proxy/render-source split within the three declared write paths."
+  },
+  "role": "worker",
+  "run_id": "p4-harness-1788440083-001-92972569",
+  "schema": "codex-ephemeral-harness.role-evidence.v1",
+  "schema_version": 1,
+  "status": "DONE",
+  "stderr_bytes": 1734,
+  "stderr_sha256": "8ab84c4d9fde4306b5cb930083efa66f08a86289187b283c3ca27681887cf2c3",
+  "stdout_bytes": 449920,
+  "stdout_sha256": "caa0801532bd42447ab1e127ed490534d7a62f578251e9cb0036d66879af453d",
+  "thread_id": "01a0675c-cb70-78b0-8d05-71876597b47b",
+  "timestamp": "2026-09-03T13:19:47.977941Z",
+  "transcripts_forwarded": false,
+  "uncached_input_tokens": 160519,
+  "wall_time_ms": 1058328
+}

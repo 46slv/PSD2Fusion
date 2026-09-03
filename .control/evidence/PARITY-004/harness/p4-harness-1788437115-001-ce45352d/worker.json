@@ -1,0 +1,79 @@
+{
+  "cached_input_tokens": 2507264,
+  "ephemeral": true,
+  "exit_code": 0,
+  "input_tokens": 2661770,
+  "isolation": {
+    "allowed_workspace_read": true,
+    "allowed_workspace_write": true,
+    "backend": "codex-split-filesystem-profile",
+    "canonical_external_read": "DENIED",
+    "codex_executable": "C:\\Users\\shiro\\AppData\\Local\\OpenAI\\Codex\\bin\\b99306303521e97e\\codex.exe",
+    "command_exit_code": 0,
+    "exact_write": "PASS",
+    "forbidden_external_read": "DENIED",
+    "legacy_sandbox_mode_used": false,
+    "outside_write": "DENIED",
+    "platform": "win32",
+    "probe_mode": "codex-exec",
+    "profile_name": "ceh_worker_f60275cf0b9b",
+    "readonly_write": "DENIED",
+    "runtime_executable": "C:\\Users\\shiro\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\python\\python.exe",
+    "status": "PROVEN",
+    "stderr_bytes": 158,
+    "stderr_sha256": "1e987159d43bb50ebe1351407fa793ad9b9d2e553c4cfb0434c274148f4edc20",
+    "stdout_bytes": 2024,
+    "stdout_sha256": "832757d07d27fa3a9d05d6aa7526c803726bb1c179aa40428d6afe10242af5fd",
+    "wall_time_ms": 18312,
+    "workspace_access": "write",
+    "write_path_read": "PASS"
+  },
+  "isolation_profile": "ceh_worker_f60275cf0b9b",
+  "isolation_status": "PROVEN",
+  "model_visible_bytes": 111226,
+  "model_visible_file_count": 9,
+  "output_tokens": 41518,
+  "protocol_errors": [],
+  "result": {
+    "canonical_patch_applied": false,
+    "evidence": [
+      {
+        "kind": "implementation",
+        "path": "psd2fusion/fusion_comp.py",
+        "summary": "Group results now explicitly propagate nested internal terminals for render and matte sources; pass-through groups retain backdrop metadata without double compositing."
+      },
+      {
+        "kind": "coverage",
+        "path": "scripts/parity/p4_05.py",
+        "summary": "P4-05 now audits nested GroupOperator tools, proxy/render separation, and ordinary render consumers."
+      },
+      {
+        "kind": "tests",
+        "path": "tests/test_parity004_p405_graph.py",
+        "summary": "Focused assertions now cover proxy exclusion, internal terminal consumers, and pass-through MediaOut wiring."
+      }
+    ],
+    "notes": [
+      "Only the three declared write paths were modified.",
+      "git diff --check passed.",
+      "Runner-owned tests remain for fresh verification; no host or pixel verification is claimed."
+    ],
+    "requested_context": [],
+    "status": "DONE",
+    "summary": "Implemented the scoped GroupOperator proxy/render-source split and P4-05 regression coverage."
+  },
+  "role": "worker",
+  "run_id": "p4-harness-1788437115-001-ce45352d",
+  "schema": "codex-ephemeral-harness.role-evidence.v1",
+  "schema_version": 1,
+  "status": "DONE",
+  "stderr_bytes": 902,
+  "stderr_sha256": "cccf9a5032ce5d52b2035d5cfdeedbeacbc5ab0a5726999b58ac46abd5836b84",
+  "stdout_bytes": 423230,
+  "stdout_sha256": "f4a322311f348c93949c1f09688da9fcfb6952d875729a3d54881011c71055b6",
+  "thread_id": "01a0672e-fb9b-7043-9c82-674ca284a4f8",
+  "timestamp": "2026-09-03T12:26:39.360146Z",
+  "transcripts_forwarded": false,
+  "uncached_input_tokens": 154506,
+  "wall_time_ms": 872141
+}

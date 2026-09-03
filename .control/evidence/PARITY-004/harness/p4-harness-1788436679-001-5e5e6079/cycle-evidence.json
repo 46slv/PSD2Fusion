@@ -1,0 +1,1122 @@
+{
+  "adapter": "psd2fusion-parity-004",
+  "context_expansion": 0,
+  "discovery": {
+    "rounds": 1,
+    "total_bytes": 26124,
+    "total_results": 4
+  },
+  "errors": [
+    "manager-plan Task Packet is invalid: handoff_refs must not duplicate read_paths"
+  ],
+  "goal": {
+    "active_task_id": "PARITY-004",
+    "current_goal_markdown": "### PARITY-004 \\u2014 Grouped/default clipping\n\nP4-01 through P4-07 have a published structural candidate. Preserve that work unless actual Fusion host/pixel evidence identifies a concrete defect. Structural completion does not imply host or pixel completion.\n\nCurrent structural candidate:\n\n```text\nbase Loader\n  -> one fixed base matte reused by every clipped member\n  -> one `Operator=In` ClipIn per member\n  -> local ClipStack Merge per member with `ProcessAlpha=0`\n  -> one outer chain Merge carrying base blend/overall opacity\n```\n\nThe real read-only `a.psd` structural audit currently covers 23 clipping chains, 59 clipped members, 34 groups, and 363 generated Fusion tools.\n\nRemaining work must run in this order:\n\n```text\nP4-08 ordinary Fusion load/readback\n-> P4-HOST-PIXEL deterministic micro renders\n-> P4-09 real Fusion render/reference baseline\n-> smallest evidence-driven repair, if needed\n-> rerun focused micro fixture then real comparison\n```\n\nDo not start PARITY-005 or PARITY-006, and do not perform a broad compiler/planner redesign, before the first P4-09 baseline unless the current graph cannot load/render and that blocker is already localized to such an architecture boundary.\n\nVerify absent/default true and explicit true `clbl`. The final gate order is: deterministic semantic/math fixtures; real PSD bytes, structure and provenance; actual Fusion load/readback; actual Fusion micro-render evidence for alpha/blend/clipping boundaries; full real Fusion render compared with `D:\\Downloads\\20260812.png`; then optional independent cross-render evidence if useful. PSD bytes/semantic provenance remain authoritative for structure, and graph/load evidence never promotes a pixel claim. Photoshop evidence is optional/additional. Do not claim `clbl=false`.\n\nKnown architecture debts remain visible but are not automatic blockers for the first host/pixel baseline: Evaluation IR/capability decisions do not yet drive backend selection before graph compilation, and asset materialization still needs an explicitly verified ICC/straight-premult/transparent-RGB contract. Use host/pixel evidence to decide whether either is causal. Before multiple backends, custom operations, verified bake paths, or broader PSD feature support are introduced, capability planning must be connected to lowering so strict mode cannot silently emit an unverified backend.\n\nDetailed remaining procedure: `.control/PARITY-004_TODO.md` and `docs/PARITY_004_HOST_PIXEL_GATE.md`.\n\n",
+    "current_goal_path": ".control/CURRENT_GOAL.md",
+    "objective": "Advance PSD2Fusion PARITY-004 through the ordered Fusion host/pixel gates with fresh isolated roles and durable evidence.",
+    "orchestration": {
+      "blocked_until_parity004_closure": [
+        "PARITY-005",
+        "PARITY-006"
+      ],
+      "coordinator_selection": {
+        "goal_item_id": "PARITY-004",
+        "immutable_read_paths": [
+          ".control/PARITY-004_TODO.md",
+          "docs/PARITY_004_HOST_PIXEL_GATE.md",
+          ".control/evidence/PARITY-004/20260903-group-operator-contract/decision.md"
+        ],
+        "implementation_write_paths": [
+          "psd2fusion/fusion_comp.py",
+          "scripts/parity/p4_05.py",
+          "tests/test_parity004_p405_graph.py"
+        ],
+        "minimum_worker_context_files": 10,
+        "workload": "GroupOperator proxy/render-source split"
+      },
+      "gate_order": [
+        "P4-08",
+        "P4-HOST-PIXEL",
+        "P4-09",
+        "localized_repair"
+      ],
+      "latest_evidence_count": 11,
+      "latest_runner_feedback": {
+        "current_run_id": "p4-harness-1788436679-001-5e5e6079",
+        "cycle_status": "IN_PROGRESS",
+        "failed": 2,
+        "passed": 1,
+        "phase": "START",
+        "results": [
+          {
+            "command": "python -m unittest discover -s tests -p \"test_parity004_p405_graph.py\"",
+            "exit_code": 1,
+            "status": "FAIL"
+          },
+          {
+            "command": "python -m unittest discover -s tests -p \"test_parity004_p407.py\"",
+            "exit_code": 0,
+            "status": "PASS"
+          },
+          {
+            "command": "pwsh -NoProfile -File scripts/check.ps1",
+            "exit_code": 1,
+            "status": "FAIL"
+          }
+        ],
+        "run_id": "p4-harness-1788433139-001-1f426efc",
+        "runner_status": "FAIL",
+        "runner_tests": {
+          "bytes": 6163,
+          "path": ".control/evidence/PARITY-004/harness/p4-harness-1788433139-001-1f426efc/runner-tests.json",
+          "present": true,
+          "sha256": "2c7d658fbf733c02fb9d01270dbe305f6540859b0b7e8d14c6ddc3bccd40bc16"
+        },
+        "runner_tests_path": ".control/evidence/PARITY-004/harness/p4-harness-1788433139-001-1f426efc/runner-tests.json"
+      },
+      "manager_locate_guard": "EXACT_FILE requests must use the complete repository-relative filename (for example AGENTS.md, not AGENTS); every query must be non-empty and every path scope must exist in the repo map.",
+      "manager_packet_guard": "Every exact path belongs to exactly one of read_paths or write_paths; put only files intended to change in write_paths and use handoff_refs for immutable evidence. Include .control/evidence/PARITY-004/20260903-group-operator-contract/decision.md as an immutable read path when implementing the GroupOperator split. If latest_runner_feedback.runner_status is FAIL, include its runner_tests_path as an immutable handoff/read path and plan a localized repair; do not return a no-op implementation while the declared Runner tests fail. Worker context_budget.max_files must cover all exact read/write/handoff files plus the generated WORKER.md, task.json, and context-manifest.json (at least that total). Worker evidence.path values are contract fields: emit only repository-relative POSIX paths exactly matching task.write_paths, never isolated-temp absolute paths or Windows drive paths. Use repository-supported unittest/check.ps1 commands rather than assuming pytest is installed.",
+      "next_workload": "GroupOperator proxy/render-source split implementation after the published clipping-island candidate",
+      "sequence": [
+        "preserve_and_publish_candidate",
+        "groupoperator_proxy_render_source_split",
+        "nested_group_actual_fusion_micro_proof",
+        "clipping_regression",
+        "p4_09_real_fusion_reference_baseline",
+        "difference_classification",
+        "smallest_evidence_driven_repair"
+      ],
+      "source": "repo-local canonical state plus current user workload instruction"
+    },
+    "parity_todo_markdown": "# PARITY-004 Fusion-first implementation TODO\n\nPurpose: finish grouped/default PSD clipping as a readable Fusion graph, then verify that the exact graph produces the required pixels in actual Fusion. Graph structure is a prerequisite, not pixel proof.\n\nDetailed remaining host/pixel procedure: `docs/PARITY_004_HOST_PIXEL_GATE.md`.\n\n## Working rule\n\nWork the remaining gates in order. Preserve the already-published P4-03 through P4-07 structural candidate unless host/pixel evidence identifies a concrete defect. Prefer ordinary Fusion Loader / Merge / mask connections and readable Flow structure. Do not add a new abstraction layer merely because a proof gate is pending.\n\nDo not start `PARITY-005`, `PARITY-006`, or a broad compiler/planner redesign before the first P4-09 baseline unless the current graph cannot load/render and the blocker is already localized to that architecture boundary.\n\n## Current recipe\n\nCanonical grouped/default `clbl=true` candidate:\n\n```text\nbase Loader\n  -> fixed base matte reused by every member\n  -> one ClipIn Merge (`Operator=In`) per member\n  -> local ClipStack Merge per member (`ProcessAlpha=0`)\n  -> one outer chain Merge with base blend/overall opacity\n```\n\nThe direct Effect Mask candidate was rejected for partial base alpha because ordinary source-over would expand coverage without an additional alpha-preserving stage.\n\n## P4-01 \\u2014 Simplest 1:1 clipping recipe\n\nStatus: `STRUCTURAL_COMPLETE / HOST_PIXEL_PENDING`\n\nSelected candidate: explicit fixed-matte `Operator=In` lowering.\n\nStructural evidence proves one base + one member lowers with no outer backdrop inside the local clipping operation. Pixel truth remains subject to P4-HOST-PIXEL.\n\nEvidence: `scripts/parity/p4_01.py`, `tests/test_parity004_p401_graph.py` and committed P4-01 evidence.\n\n## P4-02 \\u2014 Multiple clipped members share one base matte\n\nStatus: `STRUCTURAL_COMPLETE / HOST_PIXEL_PENDING`\n\nAll members reuse the exact same base coverage. Member order follows PSD bottom-to-top order. The progressively composited local result is never used as the next member matte.\n\nEvidence:\n\n- `scripts/parity/p4_02.py`;\n- `psd2fusion/fusion_comp.py` strict contiguous-span handling;\n- `tests/test_parity004_p402_graph.py`.\n\n## P4-03 \\u2014 Member blend and opacity placement\n\nStatus: `STRUCTURAL_COMPLETE / HOST_PIXEL_PENDING`\n\nMember `ApplyMode` and `Blend` controls live on each local ClipStack Merge. The fixed ClipIn remains `Operator=In`, Normal, Blend 1. Structural fixtures cover Normal, Multiply, Linear Dodge, Overlay and 25/50/75/100% member opacity.\n\nEvidence: `scripts/parity/p4_03.py`, `tests/test_parity004_p403_graph.py`.\n\n## P4-04 \\u2014 Base blend and opacity boundary\n\nStatus: `STRUCTURAL_COMPLETE / HOST_PIXEL_PENDING`\n\nThe completed local stack enters exactly one outer chain Merge. That Merge owns the base blend and overall opacity once.\n\nEvidence: `scripts/parity/p4_04.py`, `tests/test_parity004_p404_graph.py`.\n\n## P4-05 \\u2014 Groups and nesting\n\nStatus: `STRUCTURAL_COMPLETE / HOST_PIXEL_PENDING`\n\nThe same clipping recipe is structurally covered inside isolated and Pass Through groups, nested isolated groups, and clipping spans adjacent to group boundaries. Existing GroupOperator stream attachment remains unchanged.\n\nEvidence: `scripts/parity/p4_05.py`, `tests/test_parity004_p405_graph.py`.\n\n## P4-06 \\u2014 Fusion Flow layout\n\nStatus: `COMPLETE`\n\nClipping member Loaders use deterministic rows above the base; ClipIn/ClipStack pairs are clustered; the fixed matte connection is visible; one outer Merge exits the cluster; GroupOperator boundaries remain visually distinct.\n\nEvidence: `scripts/parity/p4_06.py`, `tests/test_parity004_p406_layout.py`.\n\n## P4-07 \\u2014 Apply the recipe to the real PSD\n\nStatus: `STRUCTURAL_COMPLETE / HOST_PIXEL_PENDING`\n\nThe read-only `D:\\Downloads\\a.psd` currently expands to:\n\n- 23 default/true clipping chains;\n- 59 clipped members;\n- 34 groups;\n- 363 generated Fusion tools.\n\nAll chains pass structural fixed-matte, `Operator=In`, `ProcessAlpha=0`, member-control and one-outer-boundary checks. Representative chains span one-to-six members and nesting depths 2-4.\n\nEvidence: `scripts/parity/p4_07.py`, committed P4-07/P4-03-through-P4-07 evidence, with full outputs kept under ignored `.local/`.\n\n## P4-08 \\u2014 Ordinary Fusion load/readback sanity\n\nStatus: `PENDING \\u2014 NEXT`\n\nUse a new Resolve/Fusion launch and new project when practical; a known disposable test project is also acceptable.\n\nRequired checks:\n\n- `.comp` loads;\n- Loader paths resolve;\n- MediaOut receives the final stream;\n- representative GroupOperator and clipping connections survive;\n- `ApplyMode`, `Blend`, `Operator=In`, `ProcessAlpha=0`, and Loader `PostMultiply` survive readback/reload;\n- no missing/invalid tools are introduced;\n- record exact candidate commit and Resolve/Fusion version.\n\nP4-08 may establish `host_loaded`. It cannot establish `pixel_verified`.\n\n## P4-HOST-PIXEL \\u2014 Minimum actual-Fusion pixel gate\n\nStatus: `PENDING \\u2014 REQUIRED BEFORE REAL P4-09 INTERPRETATION`\n\nRender deterministic micro fixtures in actual Fusion before diagnosing the full real PSD. At minimum cover:\n\n- Loader straight/premult and `PostMultiply` boundary;\n- `Operator=In` with fractional base/member alpha;\n- `ProcessAlpha=0` fixed-alpha invariant;\n- Normal / Multiply / Linear Dodge / Overlay member modes;\n- 25/50/75/100% member opacity;\n- base opacity and at least one non-Normal base mode;\n- transparent / black / white / colored outer backdrops.\n\nUse the existing comparator. Record actual rendered artifact hashes and RGBA/alpha metrics. Graph text or host readback alone is not pixel evidence.\n\nFull procedure: `docs/PARITY_004_HOST_PIXEL_GATE.md`.\n\n## P4-09 \\u2014 Real Fusion render / golden-reference baseline\n\nStatus: `PENDING`\n\nAfter P4-08 and a usable micro pixel gate, render the current real graph and compare it directly with `D:\\Downloads\\20260812.png`.\n\nThe first run is a diagnostic baseline, not a requirement to pass immediately. Classify material differences before editing compositor math. Possible categories include color/profile, alpha/premult edge, blend family, one clipping chain, isolated/Pass Through group scope, placement/canvas, asset materialization, or unsupported semantics.\n\nFor a material failure:\n\n1. reduce it to the smallest deterministic fixture;\n2. repair the smallest responsible boundary;\n3. rerun that focused fixture;\n4. rerun the real comparison;\n5. retain before/after metrics.\n\nDo not fit the reference by threshold relaxation, global grade, resize, blur, flatten, or whole-image correction.\n\n## Known architecture debt \\u2014 observe, do not preemptively redesign\n\nTwo known debts remain visible:\n\n1. Evaluation IR / capability decisions currently do not drive backend selection before graph compilation;\n2. asset materialization still needs an explicitly verified ICC / straight-premult / transparent-RGB contract.\n\nDo not ignore these. Also do not perform a broad rewrite before the first host/pixel baseline merely because they exist. Use actual Fusion evidence to determine whether either is causal. Before adding multiple backends, custom operations, verified bake paths or broader PSD feature support, capability planning must be connected to lowering so strict mode cannot silently emit an unverified backend.\n\n## Out of scope until PARITY-004 closes\n\n- explicit `clbl=false` semantics (`PARITY-005`);\n- broad real-PSD convergence work before the first P4-09 baseline (`PARITY-006`);\n- new PSD importer mechanism;\n- Photoshop automation as a dependency;\n- blind reference fitting;\n- unrelated PSD feature expansion.\n\n## Immediate next action\n\nRun P4-08 on the published current candidate. If it loads, run the minimum actual-Fusion pixel gate. Then take the first P4-09 real baseline. Keep `PARITY-004` `in_progress` until required host/pixel evidence is complete and a fresh verifier permits state transition.",
+    "parity_todo_path": ".control/PARITY-004_TODO.md",
+    "program_id": "PSD2FUSION-COMPOSITING-PARITY",
+    "read_only_reference_inputs": {
+      "psd": "read-only external PSD; never materialize to a Worker",
+      "reference_png": "read-only external reference PNG; never materialize to a Worker"
+    },
+    "validation": {
+      "offline_check": {
+        "bytes": 844,
+        "path": "scripts/check.ps1",
+        "present": true,
+        "sha256": "86173798dff87f4248451d76a2c9f958a993254e9d7c1e6935b864badc4edafe"
+      },
+      "remote_completion_guard": {
+        "bytes": 521,
+        "path": "scripts/remote_completion_guard.ps1",
+        "present": true,
+        "sha256": "81b7b1a30adb8712248ca62b48b30d03678a2b7ec50fa9511adcbafe57ba2f73"
+      },
+      "remote_completion_guard_python": {
+        "bytes": 4608,
+        "path": "scripts/remote_completion_guard.py",
+        "present": true,
+        "sha256": "f08c2a4fd268101b5c881adb63a170a31dd53aefe38b3ea1dca4328e1a10af26"
+      }
+    }
+  },
+  "isolation": {
+    "manager-locate": {
+      "allowed_workspace_read": true,
+      "allowed_workspace_write": false,
+      "backend": "codex-split-filesystem-profile",
+      "canonical_external_read": "DENIED",
+      "codex_executable": "C:\\Users\\shiro\\AppData\\Local\\OpenAI\\Codex\\bin\\b99306303521e97e\\codex.exe",
+      "command_exit_code": 0,
+      "exact_write": "DENIED",
+      "forbidden_external_read": "DENIED",
+      "legacy_sandbox_mode_used": false,
+      "outside_write": "DENIED",
+      "platform": "win32",
+      "probe_mode": "codex-exec",
+      "profile_name": "ceh_manager_locate_e087df4db30f",
+      "readonly_write": "DENIED",
+      "runtime_executable": "C:\\Users\\shiro\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\python\\python.exe",
+      "status": "PROVEN",
+      "stderr_bytes": 158,
+      "stderr_sha256": "b9d2b021e64295fbfefec298e4b8800b3907ede56e3a6b9a59a4228f2351d5ae",
+      "stdout_bytes": 2044,
+      "stdout_sha256": "ad56aea238aab82b57b8974420c0ff630515e55532e7731d53b95947433c06cc",
+      "wall_time_ms": 20469,
+      "workspace_access": "read",
+      "write_path_read": "PASS"
+    },
+    "manager-plan": {
+      "allowed_workspace_read": true,
+      "allowed_workspace_write": false,
+      "backend": "codex-split-filesystem-profile",
+      "canonical_external_read": "DENIED",
+      "codex_executable": "C:\\Users\\shiro\\AppData\\Local\\OpenAI\\Codex\\bin\\b99306303521e97e\\codex.exe",
+      "command_exit_code": 0,
+      "exact_write": "DENIED",
+      "forbidden_external_read": "DENIED",
+      "legacy_sandbox_mode_used": false,
+      "outside_write": "DENIED",
+      "platform": "win32",
+      "probe_mode": "codex-exec",
+      "profile_name": "ceh_manager_plan_21cb4b7c193a",
+      "readonly_write": "DENIED",
+      "runtime_executable": "C:\\Users\\shiro\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\python\\python.exe",
+      "status": "PROVEN",
+      "stderr_bytes": 158,
+      "stderr_sha256": "f0ef39be701daf83e774331c054bf8624c52d2be312cbbc80e34b86c705b1cf9",
+      "stdout_bytes": 2045,
+      "stdout_sha256": "3404d843c30f141c2edcd6a9eb48a2cb291436f258298f569a9ef618c4689ad7",
+      "wall_time_ms": 18063,
+      "workspace_access": "read",
+      "write_path_read": "PASS"
+    }
+  },
+  "materialized": {
+    "bytes": 180048,
+    "files": 8
+  },
+  "metrics": {
+    "cached_input_tokens": 311040,
+    "input_tokens": 409394,
+    "model_visible_bytes": 180048,
+    "model_visible_file_count": 8,
+    "output_tokens": 14353,
+    "uncached_input_tokens": 98354,
+    "wall_time_ms": 303453
+  },
+  "patch": null,
+  "project": "psd2fusion-parity-004",
+  "project_summary": {
+    "active_task_id": "PARITY-004",
+    "active_task_status": "in_progress",
+    "active_task_verification": "pending",
+    "adapter": "psd2fusion-parity-004",
+    "canonical_state_mutation_by_adapter": "none",
+    "harness_current_cycle": {
+      "phase": "START",
+      "run_id": "p4-harness-1788436679-001-5e5e6079",
+      "status": "IN_PROGRESS",
+      "updated_at": "2026-09-03T11:57:59.677681Z"
+    },
+    "program_id": "PSD2FUSION-COMPOSITING-PARITY"
+  },
+  "roles": {
+    "manager-locate": {
+      "cached_input_tokens": 89344,
+      "ephemeral": true,
+      "exit_code": 0,
+      "input_tokens": 129958,
+      "isolation": {
+        "allowed_workspace_read": true,
+        "allowed_workspace_write": false,
+        "backend": "codex-split-filesystem-profile",
+        "canonical_external_read": "DENIED",
+        "codex_executable": "C:\\Users\\shiro\\AppData\\Local\\OpenAI\\Codex\\bin\\b99306303521e97e\\codex.exe",
+        "command_exit_code": 0,
+        "exact_write": "DENIED",
+        "forbidden_external_read": "DENIED",
+        "legacy_sandbox_mode_used": false,
+        "outside_write": "DENIED",
+        "platform": "win32",
+        "probe_mode": "codex-exec",
+        "profile_name": "ceh_manager_locate_e087df4db30f",
+        "readonly_write": "DENIED",
+        "runtime_executable": "C:\\Users\\shiro\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\python\\python.exe",
+        "status": "PROVEN",
+        "stderr_bytes": 158,
+        "stderr_sha256": "b9d2b021e64295fbfefec298e4b8800b3907ede56e3a6b9a59a4228f2351d5ae",
+        "stdout_bytes": 2044,
+        "stdout_sha256": "ad56aea238aab82b57b8974420c0ff630515e55532e7731d53b95947433c06cc",
+        "wall_time_ms": 20469,
+        "workspace_access": "read",
+        "write_path_read": "PASS"
+      },
+      "isolation_profile": "ceh_manager_locate_e087df4db30f",
+      "isolation_status": "PROVEN",
+      "model_visible_bytes": 93863,
+      "model_visible_file_count": 4,
+      "output_tokens": 2966,
+      "protocol_errors": [],
+      "result": {
+        "goal_item_id": "PARITY-004",
+        "requests": [
+          {
+            "kind": "EXACT_FILE",
+            "max_bytes": 10000,
+            "max_results": 1,
+            "path_scopes": [
+              ".control/PARITY-004_TODO.md"
+            ],
+            "query": ".control/PARITY-004_TODO.md",
+            "reason": "Read the ordered PARITY-004 procedure and scope."
+          },
+          {
+            "kind": "EXACT_FILE",
+            "max_bytes": 20000,
+            "max_results": 1,
+            "path_scopes": [
+              "docs/PARITY_004_HOST_PIXEL_GATE.md"
+            ],
+            "query": "docs/PARITY_004_HOST_PIXEL_GATE.md",
+            "reason": "Read host/pixel gate requirements."
+          },
+          {
+            "kind": "EXACT_FILE",
+            "max_bytes": 5000,
+            "max_results": 1,
+            "path_scopes": [
+              ".control/evidence/PARITY-004/20260903-group-operator-contract/decision.md"
+            ],
+            "query": ".control/evidence/PARITY-004/20260903-group-operator-contract/decision.md",
+            "reason": "Read the GroupOperator proxy/render-source contract."
+          },
+          {
+            "kind": "EXACT_FILE",
+            "max_bytes": 7000,
+            "max_results": 1,
+            "path_scopes": [
+              ".control/evidence/PARITY-004/harness/p4-harness-1788433139-001-1f426efc/runner-tests.json"
+            ],
+            "query": ".control/evidence/PARITY-004/harness/p4-harness-1788433139-001-1f426efc/runner-tests.json",
+            "reason": "Read details of the latest failing runner tests for localized repair planning."
+          }
+        ],
+        "status": "DISCOVERY_REQUESTED",
+        "summary": "Selected PARITY-004 and requested four bounded files needed to plan the GroupOperator split and address the latest failed runner."
+      },
+      "role": "manager-locate",
+      "run_id": "p4-harness-1788436679-001-5e5e6079",
+      "schema": "codex-ephemeral-harness.role-evidence.v1",
+      "schema_version": 1,
+      "status": "DISCOVERY_REQUESTED",
+      "stderr_bytes": 158,
+      "stderr_sha256": "837cae6d65a727d2bdbcc3eb2bc463112c7dc75705c209319b0e57465dd06ccf",
+      "stdout_bytes": 129511,
+      "stdout_sha256": "5efe210a669b62fe3d5921825e226e1c52d08a0d84f069188cf43452c5f764ea",
+      "thread_id": "01a06722-5ee4-7462-8106-68dbbae61b9f",
+      "timestamp": "2026-09-03T11:59:31.135921Z",
+      "transcripts_forwarded": false,
+      "uncached_input_tokens": 40614,
+      "wall_time_ms": 70391
+    },
+    "manager-plan": {
+      "cached_input_tokens": 221696,
+      "ephemeral": true,
+      "exit_code": 0,
+      "input_tokens": 279436,
+      "isolation": {
+        "allowed_workspace_read": true,
+        "allowed_workspace_write": false,
+        "backend": "codex-split-filesystem-profile",
+        "canonical_external_read": "DENIED",
+        "codex_executable": "C:\\Users\\shiro\\AppData\\Local\\OpenAI\\Codex\\bin\\b99306303521e97e\\codex.exe",
+        "command_exit_code": 0,
+        "exact_write": "DENIED",
+        "forbidden_external_read": "DENIED",
+        "legacy_sandbox_mode_used": false,
+        "outside_write": "DENIED",
+        "platform": "win32",
+        "probe_mode": "codex-exec",
+        "profile_name": "ceh_manager_plan_21cb4b7c193a",
+        "readonly_write": "DENIED",
+        "runtime_executable": "C:\\Users\\shiro\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\python\\python.exe",
+        "status": "PROVEN",
+        "stderr_bytes": 158,
+        "stderr_sha256": "f0ef39be701daf83e774331c054bf8624c52d2be312cbbc80e34b86c705b1cf9",
+        "stdout_bytes": 2045,
+        "stdout_sha256": "3404d843c30f141c2edcd6a9eb48a2cb291436f258298f569a9ef618c4689ad7",
+        "wall_time_ms": 18063,
+        "workspace_access": "read",
+        "write_path_read": "PASS"
+      },
+      "isolation_profile": "ceh_manager_plan_21cb4b7c193a",
+      "isolation_status": "PROVEN",
+      "model_visible_bytes": 86185,
+      "model_visible_file_count": 4,
+      "output_tokens": 11387,
+      "protocol_errors": [],
+      "result": {
+        "run_id": "p4-harness-1788436679-001-5e5e6079",
+        "schema": "codex-ephemeral-harness.task.v2",
+        "selected_by": "manager",
+        "task": {
+          "acceptance": [
+            "Implement the localized GroupOperator proxy/render-source split without regressing the published PARITY-004 clipping-island candidate.",
+            "Keep PARITY-004 awaiting verification; do not claim host or pixel completion in this tranche."
+          ],
+          "completion_scope": "TRANCHE",
+          "constraints": [
+            "Modify only the declared write paths and preserve unrelated user changes.",
+            "Keep GroupOperator and exposed proxy ports for editability, but never use GroupOperator outputs as ordinary render sources.",
+            "For isolated groups, return nested internal output and matte to parent consumers.",
+            "For Pass Through groups, pass the actual parent backdrop into the internal sequence, preserve consumed_backdrop semantics, and avoid double compositing.",
+            "Do not change the fixed matte, Operator=In, ProcessAlpha=0, member order, clipping controls, PARITY-005, PARITY-006, or broad compiler architecture.",
+            "Do not materialize or modify the external PSD or reference PNG."
+          ],
+          "context_budget": {
+            "max_discovery_rounds": 0,
+            "max_files": 18,
+            "max_handoff_files": 2,
+            "max_total_bytes": 250000
+          },
+          "evidence_required": [
+            "Fresh Runner evidence for the focused P4-05 graph tests.",
+            "Fresh Runner evidence for the P4-07 structural regression.",
+            "Fresh Runner evidence from scripts/check.ps1.",
+            "No host_loaded or pixel_verified claim until the ordered Fusion gates produce actual evidence."
+          ],
+          "goal_done_when": [
+            "The GroupOperator boundary repair is implemented in the three declared write paths and is ready for fresh verification.",
+            "PARITY-004 remains in_progress until P4-08, the actual-Fusion micro pixel gate, P4-09, and fresh verifier approval are complete."
+          ],
+          "goal_item_id": "PARITY-004",
+          "handoff_refs": [
+            {
+              "path": ".control/evidence/PARITY-004/20260903-group-operator-contract/decision.md",
+              "reason": "Immutable implementation-ready GroupOperator proxy/render-source contract.",
+              "sha256": "75c81de553d1167c6166e99b902e2134596280ec41f6dc87589471cbf9746f71"
+            },
+            {
+              "path": ".control/evidence/PARITY-004/harness/p4-harness-1788433139-001-1f426efc/runner-tests.json",
+              "reason": "Immutable latest Runner evidence identifying the two failing P4-05 checks and the passing P4-07 regression.",
+              "sha256": "2c7d658fbf733c02fb9d01270dbe305f6540859b0b7e8d14c6ddc3bccd40bc16"
+            }
+          ],
+          "id": "PARITY-004-groupoperator-proxy-render-source-split",
+          "non_goals": [
+            "P4-08 ordinary Fusion load/readback.",
+            "P4-HOST-PIXEL deterministic actual-Fusion renders.",
+            "P4-09 real PSD render/reference comparison.",
+            "Explicit clbl=false semantics, PARITY-005, PARITY-006, new importer mechanisms, and broad backend/compiler redesign."
+          ],
+          "objective": "Repair the localized PARITY-004 GroupOperator boundary after the published clipping-island candidate. Make GroupOperator ports UI/display proxies only: isolated and nested group render consumers must use internal terminal sources, while Pass Through lowering must consume the actual parent backdrop and return the nested internal output. Address the currently failing P4-05 proxy/render-split and group-boundary checks; preserve the already passing P4-07 candidate behavior.",
+          "read_paths": [
+            {
+              "path": "AGENTS.md",
+              "reason": "Repository-local implementation and verification instructions."
+            },
+            {
+              "path": ".control/current.json",
+              "reason": "Current canonical task state and active PARITY-004 candidate metadata."
+            },
+            {
+              "path": ".control/CURRENT_GOAL.md",
+              "reason": "Authoritative PARITY-004 task contract."
+            },
+            {
+              "path": ".control/PARITY-004_TODO.md",
+              "reason": "Ordered PARITY-004 procedure, scope, and preserved clipping recipe."
+            },
+            {
+              "path": "docs/PARITY_004_HOST_PIXEL_GATE.md",
+              "reason": "Host/pixel gate requirements and boundaries for later verification."
+            },
+            {
+              "path": ".control/evidence/PARITY-004/20260903-group-operator-contract/decision.md",
+              "reason": "Immutable semantic decision governing GroupOperator proxies versus render sources."
+            },
+            {
+              "path": ".control/evidence/PARITY-004/harness/p4-harness-1788433139-001-1f426efc/runner-tests.json",
+              "reason": "Latest failing Runner details for localized P4-05 repair."
+            },
+            {
+              "path": "scripts/check.ps1",
+              "reason": "Repository-supported full verification command and test environment."
+            }
+          ],
+          "runner_acceptance": [
+            "The focused P4-05 unittest exits 0 and reports that ordinary render inputs use internal terminals, nested isolated wiring is correct, Pass Through receives the actual parent stream, and GroupOperator proxy ports remain present.",
+            "The focused P4-07 unittest exits 0.",
+            "scripts/check.ps1 exits 0 with no unrelated regressions.",
+            "Runner records host/pixel gates as still pending rather than promoting structural or readback evidence to pixel verification."
+          ],
+          "test_env": {
+            "PYTHONIOENCODING": "utf-8",
+            "assets": "External PSD and reference PNG are read-only and must not be materialized to the Worker.",
+            "fusion": "Actual Fusion is not required for this implementation tranche; P4-08, P4-HOST-PIXEL, and P4-09 remain pending.",
+            "runner": "Run from the repository root; Runner owns execution and verification evidence."
+          },
+          "tests": [
+            "python -m unittest discover -s tests -p \"test_parity004_p405_graph.py\"",
+            "python -m unittest discover -s tests -p \"test_parity004_p407.py\"",
+            "pwsh -NoProfile -File scripts/check.ps1"
+          ],
+          "title": "Implement PARITY-004 GroupOperator proxy/render-source split",
+          "worker_acceptance": [
+            "In psd2fusion/fusion_comp.py, retain _group_operator and InstanceOutput proxies while returning nested internal output and matte for isolated groups; no ordinary render Input references a GroupOperator output.",
+            "In psd2fusion/fusion_comp.py, pass the actual parent backdrop into Pass Through internal lowering, retain lowering-only first-backdrop-consumer metadata for the InstanceInput proxy, return nested.output, preserve consumed_backdrop=True, and avoid adding a parent Normal Merge.",
+            "In scripts/parity/p4_05.py and tests/test_parity004_p405_graph.py, encode the nested isolated and Pass Through proxy/render-source invariants and the required regression cases.",
+            "Keep changes limited to the three declared write paths and leave the existing clipping-island semantics intact."
+          ],
+          "write_paths": [
+            {
+              "path": "psd2fusion/fusion_comp.py",
+              "reason": "Implement the GroupOperator proxy/render-source boundary split."
+            },
+            {
+              "path": "scripts/parity/p4_05.py",
+              "reason": "Update the P4-05 structural fixture/report for nested group boundary invariants."
+            },
+            {
+              "path": "tests/test_parity004_p405_graph.py",
+              "reason": "Add or repair focused regression assertions for the GroupOperator split."
+            }
+          ]
+        }
+      },
+      "role": "manager-plan",
+      "run_id": "p4-harness-1788436679-001-5e5e6079",
+      "schema": "codex-ephemeral-harness.role-evidence.v1",
+      "schema_version": 1,
+      "status": "COMPLETED",
+      "stderr_bytes": 158,
+      "stderr_sha256": "b2aa84b095ecbf595e141303b5d1b6751f19c34b0ac10c7c40c63357e2fb8df0",
+      "stdout_bytes": 191723,
+      "stdout_sha256": "6b9431f18a77a1980c6f9bd4fb5c4ea864c10f6bc00fe615d659ed4325691044",
+      "thread_id": "01a06723-b983-7bc3-9995-97cfe8b31579",
+      "timestamp": "2026-09-03T12:03:42.606763Z",
+      "transcripts_forwarded": false,
+      "uncached_input_tokens": 57740,
+      "wall_time_ms": 233062
+    }
+  },
+  "run_id": "p4-harness-1788436679-001-5e5e6079",
+  "runner_tests": null,
+  "runtime": {
+    "harness": "0.1.0",
+    "implementation": "CPython",
+    "platform": "Windows-11-10.0.26200-SP0",
+    "python": "3.12.10"
+  },
+  "schema": "codex-ephemeral-harness.cycle-evidence.v1",
+  "schema_version": 1,
+  "second_cycle": "NOT_RUN",
+  "source_hashes": {},
+  "state_summary": {
+    "active_task": {
+      "branch": "codex/parity-004",
+      "commit": "a65339563dce878f0e3ddf438f811d00c50109a5",
+      "evidence": [
+        ".control/evidence/PARITY-004/20260902-170000/summary.json",
+        ".control/evidence/PARITY-004/20260902-174500/verifier.json",
+        ".control/evidence/PARITY-004/20260902-182424/summary.json",
+        ".control/evidence/PARITY-004/20260902-182424/verifier.json",
+        ".control/evidence/PARITY-004/20260902-192107/summary.json",
+        ".control/evidence/PARITY-004/20260902-192107/verifier.json",
+        ".control/evidence/PARITY-004/20260902-p401/summary.json",
+        ".control/evidence/PARITY-004/20260902-p401/verifier.json",
+        ".control/evidence/PARITY-004/20260902-p402/summary.json",
+        ".control/evidence/PARITY-004/20260902-p402/verifier.json",
+        ".control/evidence/PARITY-004/20260902-p407/summary.json",
+        ".control/evidence/PARITY-004/20260902-p403-p407/summary.json",
+        ".control/evidence/PARITY-004/20260902-p403-p407/verifier.json",
+        ".control/evidence/PARITY-004/20260902-p408/summary.json",
+        ".control/evidence/PARITY-004/20260902-p408/verifier.json"
+      ],
+      "id": "PARITY-004",
+      "requires": [
+        "PARITY-003"
+      ],
+      "status": "in_progress",
+      "verification": "pending"
+    },
+    "canonical": {
+      "$schema": "./state.schema.json",
+      "active_task_id": "PARITY-004",
+      "baseline": {
+        "claim": "FIRST_USABLE structure exists; Fusion/reference pixel parity is unverified",
+        "default_branch": "main",
+        "repository": "46slv/PSD2Fusion",
+        "starting_head": "3ee00bfdb52f7f15a644c98a43bf9de723374d45"
+      },
+      "program_id": "PSD2FUSION-COMPOSITING-PARITY",
+      "reference_case": {
+        "case_id": "REAL-A-20260812",
+        "commit_inputs_or_full_renders": false,
+        "identity_status": "verified",
+        "normalization_status": "verified",
+        "psd_path_windows": "D:\\Downloads\\a.psd",
+        "psd_sha256": "574d8a6511b2aabe744835d81ed76c8fc8ffd0c9c5678f3359e8eda10f9174db",
+        "read_only": true,
+        "reference_png_path_windows": "D:\\Downloads\\20260812.png",
+        "reference_png_sha256": "91ff8daef941b3d9052497190fdc8aa6f4d56ba524c8d912cf011b6818535f54"
+      },
+      "schema_version": 1,
+      "status": "active",
+      "task_contract": ".control/CURRENT_GOAL.md",
+      "tasks": [
+        {
+          "branch": "codex/parity-001",
+          "commit": "20e4bd0df77bd2d1fe2c041f70bdf27471738f29",
+          "evidence": [
+            ".control/evidence/PARITY-001/20260902-132200/summary.json"
+          ],
+          "id": "PARITY-001",
+          "requires": [],
+          "status": "done",
+          "verification": "pass"
+        },
+        {
+          "branch": "codex/parity-002",
+          "commit": "542ef549056259f73310dc062d502de05d13d038",
+          "evidence": [
+            ".control/evidence/PARITY-002/20260902-140000/summary.json"
+          ],
+          "id": "PARITY-002",
+          "requires": [
+            "PARITY-001"
+          ],
+          "status": "done",
+          "verification": "pass"
+        },
+        {
+          "branch": "codex/parity-003",
+          "commit": "2979e657959fe0b7bf7f271cf7d3d09d1a8e369a",
+          "evidence": [
+            ".control/evidence/PARITY-003/20260902-161254/summary.json"
+          ],
+          "id": "PARITY-003",
+          "requires": [
+            "PARITY-002"
+          ],
+          "status": "done",
+          "verification": "pass"
+        },
+        {
+          "branch": "codex/parity-004",
+          "commit": "a65339563dce878f0e3ddf438f811d00c50109a5",
+          "evidence": [
+            ".control/evidence/PARITY-004/20260902-170000/summary.json",
+            ".control/evidence/PARITY-004/20260902-174500/verifier.json",
+            ".control/evidence/PARITY-004/20260902-182424/summary.json",
+            ".control/evidence/PARITY-004/20260902-182424/verifier.json",
+            ".control/evidence/PARITY-004/20260902-192107/summary.json",
+            ".control/evidence/PARITY-004/20260902-192107/verifier.json",
+            ".control/evidence/PARITY-004/20260902-p401/summary.json",
+            ".control/evidence/PARITY-004/20260902-p401/verifier.json",
+            ".control/evidence/PARITY-004/20260902-p402/summary.json",
+            ".control/evidence/PARITY-004/20260902-p402/verifier.json",
+            ".control/evidence/PARITY-004/20260902-p407/summary.json",
+            ".control/evidence/PARITY-004/20260902-p403-p407/summary.json",
+            ".control/evidence/PARITY-004/20260902-p403-p407/verifier.json",
+            ".control/evidence/PARITY-004/20260902-p408/summary.json",
+            ".control/evidence/PARITY-004/20260902-p408/verifier.json"
+          ],
+          "id": "PARITY-004",
+          "requires": [
+            "PARITY-003"
+          ],
+          "status": "in_progress",
+          "verification": "pending"
+        },
+        {
+          "branch": null,
+          "commit": null,
+          "evidence": [],
+          "id": "PARITY-005",
+          "requires": [
+            "PARITY-004"
+          ],
+          "status": "blocked",
+          "verification": "pending"
+        },
+        {
+          "branch": null,
+          "commit": null,
+          "evidence": [],
+          "id": "PARITY-006",
+          "requires": [
+            "PARITY-004"
+          ],
+          "status": "blocked",
+          "verification": "pending"
+        },
+        {
+          "branch": null,
+          "commit": null,
+          "evidence": [],
+          "id": "PARITY-007",
+          "requires": [
+            "PARITY-005",
+            "PARITY-006"
+          ],
+          "status": "blocked",
+          "verification": "pending"
+        }
+      ],
+      "transition_rule": "Worker submits awaiting_verification; a fresh verifier PASS is required before done or advancing active_task_id.",
+      "updated_date": "2026-09-02"
+    },
+    "latest_evidence": [
+      {
+        "bytes": 278,
+        "data": {
+          "adapter": "psd2fusion-parity-004",
+          "phase": "START",
+          "repo_identity": "ee28cee08a380e2c",
+          "run_id": "p4-harness-1788436679-001-5e5e6079",
+          "schema": "codex-ephemeral-harness.cycle-state.v1",
+          "status": "IN_PROGRESS",
+          "updated_at": "2026-09-03T11:57:59.677681Z"
+        },
+        "path": ".control/evidence/PARITY-004/harness/current.json",
+        "sha256": "1a5168648214e5c1923caa37429ebcc1a345bdc1355f8a290f86d0ffef93a084"
+      },
+      {
+        "bytes": 564,
+        "data": {
+          "adapter": "psd2fusion-parity-004",
+          "checkpoint": null,
+          "created_at": "2026-09-03T11:57:59.677681Z",
+          "discovery_round": 0,
+          "error": null,
+          "expansion_count": 0,
+          "patch_applied": false,
+          "phase": "START",
+          "plan_attempt": 0,
+          "recovered": false,
+          "repo_identity": "ee28cee08a380e2c",
+          "run_id": "p4-harness-1788436679-001-5e5e6079",
+          "schema": "codex-ephemeral-harness.cycle-state.v1",
+          "second_cycle": "NOT_RUN",
+          "status": "IN_PROGRESS",
+          "transition_applied": false,
+          "updated_at": "2026-09-03T11:57:59.677681Z",
+          "worker_attempt": 0
+        },
+        "path": ".control/evidence/PARITY-004/harness/p4-harness-1788436679-001-5e5e6079/cycle.json",
+        "sha256": "fc6870213c140b2690a2a809e8c53656badfe67f67d84f088b440f34bd1ef88c"
+      },
+      {
+        "bytes": 734,
+        "data": {
+          "attempted_at": "2026-09-03T11:55:07Z",
+          "decision": "RECOVERY_NOT_REUSABLE",
+          "error": "duplicate role evidence conflicts with retained record: manager-plan.json",
+          "error_type": "duplicate_role_evidence_conflict",
+          "harness_failure_fingerprint": "retained-role-evidence-conflict-on-same-run-id",
+          "observed_phase": "MANAGER_PLAN",
+          "observed_status": "BLOCKED",
+          "operator_action": "Do not retry the same run_id again; preserve its timeout and recovery evidence and start a fresh generic cycle so fresh role evidence has a new run namespace.",
+          "project_failure": false,
+          "run_id": "p4-harness-1788434512-001-34a2e904",
+          "schema": "psd2fusion-parity-004.harness-recovery-attempt.v1"
+        },
+        "path": ".control/evidence/PARITY-004/harness/p4-harness-1788434512-001-34a2e904/recovery-attempt.json",
+        "sha256": "b938eb41676cfdfb0a86e3f0b99e5217dd70b3eee5d3dd9ecfff2a982a5368de"
+      },
+      {
+        "bytes": 540,
+        "data": {
+          "cycle_count": 1,
+          "devexec_task_id": "devexec-psd2fusion-p004-20260903",
+          "fingerprints": {},
+          "last_decision": "NEXT_CYCLE_LOCALIZED",
+          "last_run_id": "p4-harness-1788434512-001-34a2e904",
+          "last_status": "BLOCKED",
+          "model": "gpt-5.6-luna",
+          "next_cycle_input": "fresh adapter reload of canonical state/evidence only",
+          "project_task": "PARITY-004",
+          "reasoning_effort": "max",
+          "schema": "psd2fusion-parity-004.supervisor-state.v1",
+          "supervisor_target": "knotfield-harness-supervisor"
+        },
+        "path": ".control/evidence/PARITY-004/harness/supervisor-state.json",
+        "sha256": "cb422ddca7fdd20da0dfe33c02612aec29ec40564d0ced6feb15f4fda726f668"
+      },
+      {
+        "bytes": 4600,
+        "data": {
+          "adapter": "psd2fusion-parity-004",
+          "canonical_state_mutation": "adapter marker only; .control/current.json unchanged",
+          "cycle_evidence_hash": "5aed23c8ba55ec16f167e77ebc6a9b26c049dd7a8948c06d13a1a6839bb8f087",
+          "decision": "NEXT_CYCLE_LOCALIZED",
+          "decision_detail": "bounded failure is eligible for a fresh Manager cycle",
+          "devexec_task_id": "devexec-psd2fusion-p004-20260903",
+          "evidence_relpath": ".control/evidence/PARITY-004/harness/p4-harness-1788434512-001-34a2e904/cycle-evidence.json",
+          "fingerprint_count": 0,
+          "materialized_read_sets": {
+            "manager-locate": {
+              "files": [
+                ".harness/MANAGER_LOCATE.md",
+                ".harness/goal.json",
+                ".harness/state.json",
+                ".harness/repo-map.json",
+                ".harness/context-manifest.json"
+              ],
+              "source": "generic-bundle-contract"
+            },
+            "manager-plan": {
+              "files": [
+                ".harness/MANAGER_PLAN.md",
+                ".harness/goal.json",
+                ".harness/state.json",
+                ".harness/discovery.json",
+                ".harness/context-manifest.json"
+              ],
+              "source": "generic-bundle-contract"
+            },
+            "verifier": {
+              "files": [
+                ".harness/VERIFIER.md",
+                ".harness/verifier-bundle.json",
+                ".harness/context-manifest.json"
+              ],
+              "source": "generic-bundle-contract"
+            },
+            "worker": {
+              "files": [
+                ".harness/context-manifest.json",
+                ".harness/task.json"
+              ],
+              "source": "Task Packet exact read/handoff paths"
+            }
+          },
+          "metrics": {
+            "cached_input_tokens": 308992,
+            "input_tokens": 414823,
+            "model_visible_bytes": 192815,
+            "model_visible_file_count": 8,
+            "output_tokens": 23546,
+            "uncached_input_tokens": 105831,
+            "wall_time_ms": 468109
+          },
+          "patch": null,
+          "phase": "MANAGER_PLAN",
+          "preflight_context_firewall": {
+            "probes": [
+              {
+                "id": 1,
+                "name": "worker_allowed_read",
+                "status": "PASS"
+              },
+              {
+                "id": 2,
+                "name": "canonical_read_denied",
+                "status": "PASS"
+              },
+              {
+                "id": 3,
+                "name": "unrelated_sentinel_read_denied",
+                "status": "PASS"
+              },
+              {
+                "id": 4,
+                "name": "worker_exact_write",
+                "status": "PASS"
+              },
+              {
+                "id": 5,
+                "name": "worker_readonly_write_denied",
+                "status": "PASS"
+              },
+              {
+                "id": 6,
+                "name": "verifier_canonical_read_denied",
+                "status": "PASS"
+              }
+            ],
+            "production_roles_launched": false,
+            "status": "PASS"
+          },
+          "project_task": "PARITY-004",
+          "reasoning_effort": "max",
+          "repo_head_at_reload": "ref: refs/heads/codex/parity-004",
+          "role_model": "gpt-5.6-luna",
+          "roles": {
+            "manager-locate": {
+              "cached_input_tokens": 126976,
+              "ephemeral": true,
+              "external_read_denial": {
+                "canonical": "DENIED",
+                "forbidden": "DENIED",
+                "outside_write": "DENIED",
+                "readonly_write": "DENIED",
+                "status": "PROVEN"
+              },
+              "input_tokens": 169459,
+              "model": "gpt-5.6-luna",
+              "model_visible_bytes": 101892,
+              "model_visible_file_count": 4,
+              "output_tokens": 7978,
+              "present": true,
+              "reasoning_effort": "max",
+              "role": "manager-locate",
+              "thread_id": "01a06701-4013-7280-84a4-2792f733f848",
+              "uncached_input_tokens": 42483,
+              "wall_time_ms": 163875
+            },
+            "manager-plan": {
+              "cached_input_tokens": 182016,
+              "ephemeral": true,
+              "external_read_denial": {
+                "canonical": "DENIED",
+                "forbidden": "DENIED",
+                "outside_write": "DENIED",
+                "readonly_write": "DENIED",
+                "status": "PROVEN"
+              },
+              "input_tokens": 245364,
+              "model": "gpt-5.6-luna",
+              "model_visible_bytes": 90923,
+              "model_visible_file_count": 4,
+              "output_tokens": 15568,
+              "present": true,
+              "reasoning_effort": "max",
+              "role": "manager-plan",
+              "thread_id": "01a06704-064b-71d2-8052-1a7839faed1d",
+              "uncached_input_tokens": 63348,
+              "wall_time_ms": 304234
+            },
+            "verifier": {
+              "present": false
+            },
+            "worker": {
+              "present": false
+            }
+          },
+          "run_id": "p4-harness-1788434512-001-34a2e904",
+          "schema": "psd2fusion-parity-004.supervisor-cycle.v1",
+          "sol_escalation": {
+            "reason": null,
+            "requested": false
+          },
+          "status": "BLOCKED",
+          "supervisor_target": "knotfield-harness-supervisor",
+          "task_packet": {
+            "bytes": 0,
+            "files": 0,
+            "present": false
+          },
+          "tests": null,
+          "verdict": {
+            "failure_fingerprint": null,
+            "item_complete": null,
+            "summary": "",
+            "verifier": null
+          }
+        },
+        "path": ".control/evidence/PARITY-004/harness/p4-harness-1788434512-001-34a2e904/supervisor-cycle.json",
+        "sha256": "cce5b90305d994beea9807aa21b9b2a7e756b6af9f1b7d34da6e5cb36178f6ea"
+      },
+      {
+        "bytes": 82799,
+        "data": {
+          "bounded": true,
+          "run_id": "p4-harness-1788434512-001-34a2e904",
+          "schema": "codex-ephemeral-harness.cycle-evidence.v1",
+          "schema_version": 1,
+          "status": "BLOCKED",
+          "task": null
+        },
+        "path": ".control/evidence/PARITY-004/harness/p4-harness-1788434512-001-34a2e904/cycle-evidence.json",
+        "sha256": "5aed23c8ba55ec16f167e77ebc6a9b26c049dd7a8948c06d13a1a6839bb8f087"
+      },
+      {
+        "bytes": 9502,
+        "data": {
+          "bounded": true,
+          "phase": "MANAGER_PLAN",
+          "run_id": "p4-harness-1788434512-001-34a2e904",
+          "schema": "codex-ephemeral-harness.cycle-state.v1",
+          "status": "BLOCKED"
+        },
+        "path": ".control/evidence/PARITY-004/harness/p4-harness-1788434512-001-34a2e904/cycle.json",
+        "sha256": "7a751adcaf85113e2edf754d3c0ce1b20eb21636cf62a4e256e58e2d2dfd1ac3"
+      },
+      {
+        "bytes": 23274,
+        "data": {
+          "bounded": true,
+          "schema": "codex-ephemeral-harness.discovery-packet.v2"
+        },
+        "path": ".control/evidence/PARITY-004/harness/p4-harness-1788434512-001-34a2e904/discovery-0002.json",
+        "sha256": "8d610d2db57ed1dc429a5bbc63dd815b46183b299dfb915f1bb4bde4515cbf83"
+      },
+      {
+        "bytes": 1349,
+        "data": {
+          "decision": "SAFE_TO_RESUME_SAME_RUN_ID",
+          "next_action": "Resume the retained generic cycle journal after this review; re-materialize a fresh Luna Max Worker context and let Runner own P4-05, P4-07, and scripts/check.ps1.",
+          "observations": [
+            "Context Firewall six-probe status was PASS and production_roles_launched was false in preflight.",
+            "Manager Locate, discovery, and Manager Plan artifacts are present for this run.",
+            "The Worker process exited through the generic timeout path after 1200 seconds; no worker role evidence, worker patch, runner-tests, or verifier result was produced.",
+            "The PSD2Fusion working tree still contains the pre-existing GroupOperator candidate changes and no change attributable to this timed-out Worker was applied.",
+            "The defect is classified as codex-ephemeral-harness role-process timeout, project_failure=false, and is independent of P4-05/P4-07 test behavior.",
+            "Recovery will use the existing explicit --resume-in-progress path with the same run_id; no blind duplicate Worker launch is authorized."
+          ],
+          "reviewed_at": "2026-09-03T11:52:09Z",
+          "run_id": "p4-harness-1788434512-001-34a2e904",
+          "schema": "psd2fusion-parity-004.harness-recovery-review.v1",
+          "scope": "Harness recovery only; no PSD2Fusion implementation verdict inferred"
+        },
+        "path": ".control/evidence/PARITY-004/harness/p4-harness-1788434512-001-34a2e904/operator-review.json",
+        "sha256": "139694db3d870d3fce15489fee269c4cfc309cd1a715fbb26fad3dac7f1c2347"
+      },
+      {
+        "bytes": 4581,
+        "data": {
+          "component": "codex-ephemeral-harness",
+          "error": "Command '['C:\\\\Users\\\\shiro\\\\AppData\\\\Local\\\\OpenAI\\\\Codex\\\\bin\\\\b99306303521e97e\\\\codex.exe', '-m', 'gpt-5.6-luna', '-c', 'model_reasoning_effort=\"max\"', '-c', 'default_permissions=\"ceh_worker_fad8e974109f\"', '-c', 'approval_policy=\"never\"', '-c', 'permissions.ceh_worker_fad8e974109f.filesystem={\":minimal\"=\"none\",\"C:\\\\\\\\Users\\\\\\\\shiro\\\\\\\\AppData\\\\\\\\Local\\\\\\\\Temp\\\\\\\\ceh-p4-harness-1788434512-001-34a2e904-worker-lpc_654c\"=\"read\",\"C:\\\\\\\\Users\\\\\\\\shiro\\\\\\\\AppData\\\\\\\\Local\\\\\\\\Temp\\\\\\\\ceh-p4-harness-1788434512-001-34a2e904-worker-lpc_654c\\\\\\\\.control\\\\\\\\current.json\"=\"read\",\"C:\\\\\\\\Users\\\\\\\\shiro\\\\\\\\AppData\\\\\\\\Local\\\\\\\\Temp\\\\\\\\ceh-p4-harness-1788434512-001-34a2e904-worker-lpc_654c\\\\\\\\.control\\\\\\\\CURRENT_GOAL.md\"=\"read\",\"C:\\\\\\\\Users\\\\\\\\shiro\\\\\\\\AppData\\\\\\\\Local\\\\\\\\Temp\\\\\\\\ceh-p4-harness-1788434512-001-34a2e904-worker-lpc_654c\\\\\\\\.control\\\\\\\\evidence\\\\\\\\PARITY-004\\\\\\\\20260903-group-operator-contract\\\\\\\\decision.md\"=\"read\",\"C:\\\\\\\\Users\\\\\\\\shiro\\\\\\\\AppData\\\\\\\\Local\\\\\\\\Temp\\\\\\\\ceh-p4-harness-1788434512-001-34a2e904-worker-lpc_654c\\\\\\\\.control\\\\\\\\evidence\\\\\\\\PARITY-004\\\\\\\\harness\\\\\\\\p4-harness-1788433139-001-1f426efc\\\\\\\\runner-tests.json\"=\"read\",\"C:\\\\\\\\Users\\\\\\\\shiro\\\\\\\\AppData\\\\\\\\Local\\\\\\\\Temp\\\\\\\\ceh-p4-harness-1788434512-001-34a2e904-worker-lpc_654c\\\\\\\\.control\\\\\\\\PARITY-004_TODO.md\"=\"read\",\"C:\\\\\\\\Users\\\\\\\\shiro\\\\\\\\AppData\\\\\\\\Local\\\\\\\\Temp\\\\\\\\ceh-p4-harness-1788434512-001-34a2e904-worker-lpc_654c\\\\\\\\.harness\\\\\\\\.isolation-allowed.txt\"=\"read\",\"C:\\\\\\\\Users\\\\\\\\shiro\\\\\\\\AppData\\\\\\\\Local\\\\\\\\Temp\\\\\\\\ceh-p4-harness-1788434512-001-34a2e904-worker-lpc_654c\\\\\\\\.harness\\\\\\\\.isolation-probe.py\"=\"read\",\"C:\\\\\\\\Users\\\\\\\\shiro\\\\\\\\AppData\\\\\\\\Local\\\\\\\\Temp\\\\\\\\ceh-p4-harness-1788434512-001-34a2e904-worker-lpc_654c\\\\\\\\AGENTS.md\"=\"read\",\"C:\\\\\\\\Users\\\\\\\\shiro\\\\\\\\AppData\\\\\\\\Local\\\\\\\\Temp\\\\\\\\ceh-p4-harness-1788434512-001-34a2e904-worker-lpc_654c\\\\\\\\docs\\\\\\\\PARITY_004_HOST_PIXEL_GATE.md\"=\"read\",\"C:\\\\\\\\Users\\\\\\\\shiro\\\\\\\\AppData\\\\\\\\Local\\\\\\\\Temp\\\\\\\\ceh-p4-harness-1788434512-001-34a2e904-worker-lpc_654c\\\\\\\\psd2fusion\\\\\\\\fusion_comp.py\"=\"write\",\"C:\\\\\\\\Users\\\\\\\\shiro\\\\\\\\AppData\\\\\\\\Local\\\\\\\\Temp\\\\\\\\ceh-p4-harness-1788434512-001-34a2e904-worker-lpc_654c\\\\\\\\scripts\\\\\\\\check.ps1\"=\"read\",\"C:\\\\\\\\Users\\\\\\\\shiro\\\\\\\\AppData\\\\\\\\Local\\\\\\\\Temp\\\\\\\\ceh-p4-harness-1788434512-001-34a2e904-worker-lpc_654c\\\\\\\\scripts\\\\\\\\parity\\\\\\\\p4_05.py\"=\"write\",\"C:\\\\\\\\Users\\\\\\\\shiro\\\\\\\\AppData\\\\\\\\Local\\\\\\\\Temp\\\\\\\\ceh-p4-harness-1788434512-001-34a2e904-worker-lpc_654c\\\\\\\\tests\\\\\\\\test_parity004_p405_graph.py\"=\"write\",\"D:\\\\\\\\Documents\\\\\\\\PSD2Fusion\"=\"none\",\"D:\\\\\\\\Documents\\\\\\\\PSD2Fusion\\\\\\\\README.md\"=\"none\"}', '-c', 'permissions.ceh_worker_fad8e974109f.network.enabled=false', '-c', 'windows.sandbox=\"elevated\"', 'exec', '--strict-config', '--ephemeral', '--ignore-user-config', '--ignore-rules', '--json', '--skip-git-repo-check', '-C', 'C:\\\\Users\\\\shiro\\\\AppData\\\\Local\\\\Temp\\\\ceh-p4-harness-1788434512-001-34a2e904-worker-lpc_654c', '--output-schema', 'C:\\\\Users\\\\shiro\\\\AppData\\\\Local\\\\Temp\\\\ceh-p4-harness-1788434512-001-34a2e904-worker-lpc_654c\\\\.harness\\\\.runtime\\\\worker-output-schema.json', '--output-last-message', 'C:\\\\Users\\\\shiro\\\\AppData\\\\Local\\\\Temp\\\\ceh-p4-harness-1788434512-001-34a2e904-worker-lpc_654c\\\\.harness\\\\.runtime\\\\worker-last-message.json', 'Read the isolated Worker task and implement only the exact write paths.\\n\\nWorker result evidence paths are contract fields: emit only repository-relative POSIX paths exactly matching task.write_paths (for example psd2fusion/fusion_comp.py). Never emit an absolute path, Windows drive path, or isolated Temp workspace path.']' timed out after 1200 seconds",
+          "error_type": "TimeoutExpired",
+          "project_failure": false,
+          "recovery": "re-run the same run_id only after operator review; no blind duplicate role launch",
+          "run_id": "p4-harness-1788434512-001-34a2e904",
+          "schema": "psd2fusion-parity-004.harness-defect.v1",
+          "status": "OBSERVED"
+        },
+        "path": ".control/evidence/PARITY-004/harness/p4-harness-1788434512-001-34a2e904/harness-defect.json",
+        "sha256": "be91440b5f387f55a8764691be1f8279f979da05313421f0350963be479abede"
+      },
+      {
+        "bytes": 3539,
+        "data": {
+          "kind": "SOL_DECISION",
+          "text": "# PARITY-004 GroupOperator lowering decision\r\n\r\nStatus: implementation-ready semantic decision from focused actual-Fusion probes.\r\n\r\n## Failure\r\n\r\nThe first broken boundary is a parent Merge consuming `GroupOperator.MainOutput1`. The internal terminal renders correctly, but actual-Fusion readback reports the parent Merge input connection as nil. The same failure repeats across nested groups; bypassing the GroupOperator restores pixels.\r\n\r\n## Fusion canonical topology\r\n\r\n`GroupOperator` is an editable Flow/container and InstanceInput/InstanceOutput proxy boundary. It is not the runtime render source that parent consumers should reference.\r\n\r\nWrong:\r\n\r\n```text\r\ninternal terminal\r\n  -> GroupOperator.MainOutput1\r\n  -> parent Merge.Foreground\r\n```\r\n\r\nCorrect:\r\n\r\n```text\r\ninternal terminal -----------------> parent Merge.Foreground / sibling / MediaOut\r\n       \\\r\n        -> Group InstanceOutput     # UI/proxy only\r\n```\r\n\r\nFusion save/readback normalizes direct Group output wiring to the internal terminal source.\r\n\r\n## Isolated group lowering\r\n\r\n```text\r\ntransparent GroupCanvas\r\n  -> internal child sequence\r\n  -> internal terminal ------------> parent Merge.Foreground\r\n          \\\r\n           -> Group InstanceOutput\r\n```\r\n\r\nThe parent Merge owns group blend and opacity exactly once.\r\n\r\nImplementation contract:\r\n\r\n- keep `_group_operator(...)` and InstanceOutput for editability/readability;\r\n- `_ItemResult.output` and matte must return `nested.output`, not `_Source(group_name, \"MainOutput1\")`;\r\n- ordinary parent/sibling/MediaOut render inputs must never consume a GroupOperator output.\r\n\r\n## Pass Through group lowering\r\n\r\n```text\r\nparent current --------------------> first internal consumer Background\r\n                                     -> child sequence\r\ninternal terminal -----------------> next parent consumer / MediaOut\r\n\r\nGroup InstanceInput  -> display proxy for the first internal consumer\r\nGroup InstanceOutput -> display proxy for the terminal\r\n```\r\n\r\nImplementation contract:\r\n\r\n- pass the actual parent `backdrop` into the internal sequence instead of `_Source(\"\", \"Output\")`;\r\n- retain lowering-only metadata identifying the first internal backdrop consumer for InstanceInput proxy declaration;\r\n- return `nested.output` as the actual output;\r\n- preserve `consumed_backdrop=True`;\r\n- do not add a parent Normal Merge that double-composites the pass-through result.\r\n\r\n## Scope\r\n\r\nNo Semantic IR change is expected. Existing `children`, `pass_through`, `isolated`, and parent relationships are sufficient.\r\n\r\nDo not change:\r\n\r\n- straight/opaque clipping island;\r\n- fixed ClipIn matte;\r\n- clipping member order;\r\n- `Operator=In` coverage;\r\n- final local `ClipStack = Normal / member opacity / ProcessAlpha=0`;\r\n- PARITY-005/006.\r\n\r\n## Required regression proof\r\n\r\n- no ordinary render `Input { SourceOp=... }` references a GroupOperator;\r\n- nested isolated parent Merge Foreground references the internal terminal;\r\n- Pass Through internal entry Background directly references the actual parent stream;\r\n- GroupOperator and exposed proxy ports still exist;\r\n- actual-Fusion readback inputs are non-nil;\r\n- minimal nested isolated render PASS;\r\n- minimal Pass Through render PASS;\r\n- existing clipping micro gate remains within its proven quantization tolerance;\r\n- real `a.psd` P4-09 is regenerated and rerendered after the group boundary fix.\r\n\r\nIf corrected group wiring still leaves multiple plausible group semantic models, stop and escalate to Sol. Mechanical wiring/test failures remain Luna work.\r\n"
+        },
+        "path": ".control/evidence/PARITY-004/20260903-group-operator-contract/decision.md",
+        "sha256": "75c81de553d1167c6166e99b902e2134596280ec41f6dc87589471cbf9746f71"
+      }
+    ],
+    "latest_runner_feedback": {
+      "current_run_id": "p4-harness-1788436679-001-5e5e6079",
+      "cycle_status": "IN_PROGRESS",
+      "failed": 2,
+      "passed": 1,
+      "phase": "START",
+      "results": [
+        {
+          "command": "python -m unittest discover -s tests -p \"test_parity004_p405_graph.py\"",
+          "exit_code": 1,
+          "status": "FAIL"
+        },
+        {
+          "command": "python -m unittest discover -s tests -p \"test_parity004_p407.py\"",
+          "exit_code": 0,
+          "status": "PASS"
+        },
+        {
+          "command": "pwsh -NoProfile -File scripts/check.ps1",
+          "exit_code": 1,
+          "status": "FAIL"
+        }
+      ],
+      "run_id": "p4-harness-1788433139-001-1f426efc",
+      "runner_status": "FAIL",
+      "runner_tests": {
+        "bytes": 6163,
+        "path": ".control/evidence/PARITY-004/harness/p4-harness-1788433139-001-1f426efc/runner-tests.json",
+        "present": true,
+        "sha256": "2c7d658fbf733c02fb9d01270dbe305f6540859b0b7e8d14c6ddc3bccd40bc16"
+      },
+      "runner_tests_path": ".control/evidence/PARITY-004/harness/p4-harness-1788433139-001-1f426efc/runner-tests.json"
+    },
+    "orchestration": {
+      "blocked_until_parity004_closure": [
+        "PARITY-005",
+        "PARITY-006"
+      ],
+      "coordinator_selection": {
+        "goal_item_id": "PARITY-004",
+        "immutable_read_paths": [
+          ".control/PARITY-004_TODO.md",
+          "docs/PARITY_004_HOST_PIXEL_GATE.md",
+          ".control/evidence/PARITY-004/20260903-group-operator-contract/decision.md"
+        ],
+        "implementation_write_paths": [
+          "psd2fusion/fusion_comp.py",
+          "scripts/parity/p4_05.py",
+          "tests/test_parity004_p405_graph.py"
+        ],
+        "minimum_worker_context_files": 10,
+        "workload": "GroupOperator proxy/render-source split"
+      },
+      "gate_order": [
+        "P4-08",
+        "P4-HOST-PIXEL",
+        "P4-09",
+        "localized_repair"
+      ],
+      "latest_evidence_count": 11,
+      "latest_runner_feedback": {
+        "current_run_id": "p4-harness-1788436679-001-5e5e6079",
+        "cycle_status": "IN_PROGRESS",
+        "failed": 2,
+        "passed": 1,
+        "phase": "START",
+        "results": [
+          {
+            "command": "python -m unittest discover -s tests -p \"test_parity004_p405_graph.py\"",
+            "exit_code": 1,
+            "status": "FAIL"
+          },
+          {
+            "command": "python -m unittest discover -s tests -p \"test_parity004_p407.py\"",
+            "exit_code": 0,
+            "status": "PASS"
+          },
+          {
+            "command": "pwsh -NoProfile -File scripts/check.ps1",
+            "exit_code": 1,
+            "status": "FAIL"
+          }
+        ],
+        "run_id": "p4-harness-1788433139-001-1f426efc",
+        "runner_status": "FAIL",
+        "runner_tests": {
+          "bytes": 6163,
+          "path": ".control/evidence/PARITY-004/harness/p4-harness-1788433139-001-1f426efc/runner-tests.json",
+          "present": true,
+          "sha256": "2c7d658fbf733c02fb9d01270dbe305f6540859b0b7e8d14c6ddc3bccd40bc16"
+        },
+        "runner_tests_path": ".control/evidence/PARITY-004/harness/p4-harness-1788433139-001-1f426efc/runner-tests.json"
+      },
+      "manager_locate_guard": "EXACT_FILE requests must use the complete repository-relative filename (for example AGENTS.md, not AGENTS); every query must be non-empty and every path scope must exist in the repo map.",
+      "manager_packet_guard": "Every exact path belongs to exactly one of read_paths or write_paths; put only files intended to change in write_paths and use handoff_refs for immutable evidence. Include .control/evidence/PARITY-004/20260903-group-operator-contract/decision.md as an immutable read path when implementing the GroupOperator split. If latest_runner_feedback.runner_status is FAIL, include its runner_tests_path as an immutable handoff/read path and plan a localized repair; do not return a no-op implementation while the declared Runner tests fail. Worker context_budget.max_files must cover all exact read/write/handoff files plus the generated WORKER.md, task.json, and context-manifest.json (at least that total). Worker evidence.path values are contract fields: emit only repository-relative POSIX paths exactly matching task.write_paths, never isolated-temp absolute paths or Windows drive paths. Use repository-supported unittest/check.ps1 commands rather than assuming pytest is installed.",
+      "next_workload": "GroupOperator proxy/render-source split implementation after the published clipping-island candidate",
+      "sequence": [
+        "preserve_and_publish_candidate",
+        "groupoperator_proxy_render_source_split",
+        "nested_group_actual_fusion_micro_proof",
+        "clipping_regression",
+        "p4_09_real_fusion_reference_baseline",
+        "difference_classification",
+        "smallest_evidence_driven_repair"
+      ],
+      "source": "repo-local canonical state plus current user workload instruction"
+    },
+    "todo": "# PARITY-004 Fusion-first implementation TODO\n\nPurpose: finish grouped/default PSD clipping as a readable Fusion graph, then verify that the exact graph produces the required pixels in actual Fusion. Graph structure is a prerequisite, not pixel proof.\n\nDetailed remaining host/pixel procedure: `docs/PARITY_004_HOST_PIXEL_GATE.md`.\n\n## Working rule\n\nWork the remaining gates in order. Preserve the already-published P4-03 through P4-07 structural candidate unless host/pixel evidence identifies a concrete defect. Prefer ordinary Fusion Loader / Merge / mask connections and readable Flow structure. Do not add a new abstraction layer merely because a proof gate is pending.\n\nDo not start `PARITY-005`, `PARITY-006`, or a broad compiler/planner redesign before the first P4-09 baseline unless the current graph cannot load/render and the blocker is already localized to that architecture boundary.\n\n## Current recipe\n\nCanonical grouped/default `clbl=true` candidate:\n\n```text\nbase Loader\n  -> fixed base matte reused by every member\n  -> one ClipIn Merge (`Operator=In`) per member\n  -> local ClipStack Merge per member (`ProcessAlpha=0`)\n  -> one outer chain Merge with base blend/overall opacity\n```\n\nThe direct Effect Mask candidate was rejected for partial base alpha because ordinary source-over would expand coverage without an additional alpha-preserving stage.\n\n## P4-01 \\u2014 Simplest 1:1 clipping recipe\n\nStatus: `STRUCTURAL_COMPLETE / HOST_PIXEL_PENDING`\n\nSelected candidate: explicit fixed-matte `Operator=In` lowering.\n\nStructural evidence proves one base + one member lowers with no outer backdrop inside the local clipping operation. Pixel truth remains subject to P4-HOST-PIXEL.\n\nEvidence: `scripts/parity/p4_01.py`, `tests/test_parity004_p401_graph.py` and committed P4-01 evidence.\n\n## P4-02 \\u2014 Multiple clipped members share one base matte\n\nStatus: `STRUCTURAL_COMPLETE / HOST_PIXEL_PENDING`\n\nAll members reuse the exact same base coverage. Member order follows PSD bottom-to-top order. The progressively composited local result is never used as the next member matte.\n\nEvidence:\n\n- `scripts/parity/p4_02.py`;\n- `psd2fusion/fusion_comp.py` strict contiguous-span handling;\n- `tests/test_parity004_p402_graph.py`.\n\n## P4-03 \\u2014 Member blend and opacity placement\n\nStatus: `STRUCTURAL_COMPLETE / HOST_PIXEL_PENDING`\n\nMember `ApplyMode` and `Blend` controls live on each local ClipStack Merge. The fixed ClipIn remains `Operator=In`, Normal, Blend 1. Structural fixtures cover Normal, Multiply, Linear Dodge, Overlay and 25/50/75/100% member opacity.\n\nEvidence: `scripts/parity/p4_03.py`, `tests/test_parity004_p403_graph.py`.\n\n## P4-04 \\u2014 Base blend and opacity boundary\n\nStatus: `STRUCTURAL_COMPLETE / HOST_PIXEL_PENDING`\n\nThe completed local stack enters exactly one outer chain Merge. That Merge owns the base blend and overall opacity once.\n\nEvidence: `scripts/parity/p4_04.py`, `tests/test_parity004_p404_graph.py`.\n\n## P4-05 \\u2014 Groups and nesting\n\nStatus: `STRUCTURAL_COMPLETE / HOST_PIXEL_PENDING`\n\nThe same clipping recipe is structurally covered inside isolated and Pass Through groups, nested isolated groups, and clipping spans adjacent to group boundaries. Existing GroupOperator stream attachment remains unchanged.\n\nEvidence: `scripts/parity/p4_05.py`, `tests/test_parity004_p405_graph.py`.\n\n## P4-06 \\u2014 Fusion Flow layout\n\nStatus: `COMPLETE`\n\nClipping member Loaders use deterministic rows above the base; ClipIn/ClipStack pairs are clustered; the fixed matte connection is visible; one outer Merge exits the cluster; GroupOperator boundaries remain visually distinct.\n\nEvidence: `scripts/parity/p4_06.py`, `tests/test_parity004_p406_layout.py`.\n\n## P4-07 \\u2014 Apply the recipe to the real PSD\n\nStatus: `STRUCTURAL_COMPLETE / HOST_PIXEL_PENDING`\n\nThe read-only `D:\\Downloads\\a.psd` currently expands to:\n\n- 23 default/true clipping chains;\n- 59 clipped members;\n- 34 groups;\n- 363 generated Fusion tools.\n\nAll chains pass structural fixed-matte, `Operator=In`, `ProcessAlpha=0`, member-control and one-outer-boundary checks. Representative chains span one-to-six members and nesting depths 2-4.\n\nEvidence: `scripts/parity/p4_07.py`, committed P4-07/P4-03-through-P4-07 evidence, with full outputs kept under ignored `.local/`.\n\n## P4-08 \\u2014 Ordinary Fusion load/readback sanity\n\nStatus: `PENDING \\u2014 NEXT`\n\nUse a new Resolve/Fusion launch and new project when practical; a known disposable test project is also acceptable.\n\nRequired checks:\n\n- `.comp` loads;\n- Loader paths resolve;\n- MediaOut receives the final stream;\n- representative GroupOperator and clipping connections survive;\n- `ApplyMode`, `Blend`, `Operator=In`, `ProcessAlpha=0`, and Loader `PostMultiply` survive readback/reload;\n- no missing/invalid tools are introduced;\n- record exact candidate commit and Resolve/Fusion version.\n\nP4-08 may establish `host_loaded`. It cannot establish `pixel_verified`.\n\n## P4-HOST-PIXEL \\u2014 Minimum actual-Fusion pixel gate\n\nStatus: `PENDING \\u2014 REQUIRED BEFORE REAL P4-09 INTERPRETATION`\n\nRender deterministic micro fixtures in actual Fusion before diagnosing the full real PSD. At minimum cover:\n\n- Loader straight/premult and `PostMultiply` boundary;\n- `Operator=In` with fractional base/member alpha;\n- `ProcessAlpha=0` fixed-alpha invariant;\n- Normal / Multiply / Linear Dodge / Overlay member modes;\n- 25/50/75/100% member opacity;\n- base opacity and at least one non-Normal base mode;\n- transparent / black / white / colored outer backdrops.\n\nUse the existing comparator. Record actual rendered artifact hashes and RGBA/alpha metrics. Graph text or host readback alone is not pixel evidence.\n\nFull procedure: `docs/PARITY_004_HOST_PIXEL_GATE.md`.\n\n## P4-09 \\u2014 Real Fusion render / golden-reference baseline\n\nStatus: `PENDING`\n\nAfter P4-08 and a usable micro pixel gate, render the current real graph and compare it directly with `D:\\Downloads\\20260812.png`.\n\nThe first run is a diagnostic baseline, not a requirement to pass immediately. Classify material differences before editing compositor math. Possible categories include color/profile, alpha/premult edge, blend family, one clipping chain, isolated/Pass Through group scope, placement/canvas, asset materialization, or unsupported semantics.\n\nFor a material failure:\n\n1. reduce it to the smallest deterministic fixture;\n2. repair the smallest responsible boundary;\n3. rerun that focused fixture;\n4. rerun the real comparison;\n5. retain before/after metrics.\n\nDo not fit the reference by threshold relaxation, global grade, resize, blur, flatten, or whole-image correction.\n\n## Known architecture debt \\u2014 observe, do not preemptively redesign\n\nTwo known debts remain visible:\n\n1. Evaluation IR / capability decisions currently do not drive backend selection before graph compilation;\n2. asset materialization still needs an explicitly verified ICC / straight-premult / transparent-RGB contract.\n\nDo not ignore these. Also do not perform a broad rewrite before the first host/pixel baseline merely because they exist. Use actual Fusion evidence to determine whether either is causal. Before adding multiple backends, custom operations, verified bake paths or broader PSD feature support, capability planning must be connected to lowering so strict mode cannot silently emit an unverified backend.\n\n## Out of scope until PARITY-004 closes\n\n- explicit `clbl=false` semantics (`PARITY-005`);\n- broad real-PSD convergence work before the first P4-09 baseline (`PARITY-006`);\n- new PSD importer mechanism;\n- Photoshop automation as a dependency;\n- blind reference fitting;\n- unrelated PSD feature expansion.\n\n## Immediate next action\n\nRun P4-08 on the published current candidate. If it loads, run the minimum actual-Fusion pixel gate. Then take the first P4-09 real baseline. Keep `PARITY-004` `in_progress` until required host/pixel evidence is complete and a fresh verifier permits state transition.",
+    "validation": {
+      "offline_check": {
+        "bytes": 844,
+        "path": "scripts/check.ps1",
+        "present": true,
+        "sha256": "86173798dff87f4248451d76a2c9f958a993254e9d7c1e6935b864badc4edafe"
+      },
+      "remote_completion_guard": {
+        "bytes": 521,
+        "path": "scripts/remote_completion_guard.ps1",
+        "present": true,
+        "sha256": "81b7b1a30adb8712248ca62b48b30d03678a2b7ec50fa9511adcbafe57ba2f73"
+      },
+      "remote_completion_guard_python": {
+        "bytes": 4608,
+        "path": "scripts/remote_completion_guard.py",
+        "present": true,
+        "sha256": "f08c2a4fd268101b5c881adb63a170a31dd53aefe38b3ea1dca4328e1a10af26"
+      }
+    }
+  },
+  "status": "BLOCKED",
+  "task": null,
+  "thread_ids": {
+    "manager-locate": "01a06722-5ee4-7462-8106-68dbbae61b9f",
+    "manager-plan": "01a06723-b983-7bc3-9995-97cfe8b31579"
+  },
+  "tool_versions": {
+    "harness": "0.1.0",
+    "implementation": "CPython",
+    "platform": "Windows-11-10.0.26200-SP0",
+    "python": "3.12.10"
+  },
+  "transition": null,
+  "verifier": null
+}

@@ -1,0 +1,10 @@
+{
+  "component": "codex-ephemeral-harness",
+  "error": "cannot access local variable 'repo' where it is not associated with a value",
+  "error_type": "UnboundLocalError",
+  "project_failure": false,
+  "recovery": "re-run the same run_id only after operator review; no blind duplicate role launch",
+  "run_id": "p4-harness-1788440083-001-92972569",
+  "schema": "psd2fusion-parity-004.harness-defect.v1",
+  "status": "OBSERVED"
+}

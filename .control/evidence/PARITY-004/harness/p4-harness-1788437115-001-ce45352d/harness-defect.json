@@ -1,0 +1,17 @@
+{
+  "schema": "psd2fusion-parity-004.harness-defect.v1",
+  "run_id": "p4-harness-1788437115-001-ce45352d",
+  "component": "codex-ephemeral-harness",
+  "kind": "WORKER_PATCH_APPLICATION_BYTE_MISMATCH",
+  "status": "OBSERVED",
+  "project_failure": false,
+  "fingerprint": "worker-slice-canonical-byte-mismatch-after-git-apply-windows-line-endings",
+  "details": [
+    "Worker returned DONE with a material 14558-byte patch over the three declared write paths.",
+    "Context Firewall six-probe status was PASS and Worker isolation status was PROVEN.",
+    "generic apply_worker_patch restored the canonical files after reporting byte mismatches for all three changed paths; Runner and Verifier were not reached.",
+    "The canonical worktree contains CRLF/mixed line endings while the isolated Git baseline is created without an explicit core.autocrlf policy, so byte equality after git apply is not established on this Windows checkout."
+  ],
+  "recovery": "Keep the generic validator unchanged; rerun a fresh cycle with a process-local Git core.autocrlf=false override for slice creation, Worker invocation, and patch application.",
+  "transcript_forwarded": false
+}

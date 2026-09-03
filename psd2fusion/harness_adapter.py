@@ -332,6 +332,53 @@ def _orchestration_hint(
 ) -> dict[str, Any]:
     """A bounded sequence hint; it is not a substitute for host evidence."""
 
+    # Keep the Coordinator's next-workload projection aligned with the
+    # evidence gates.  The first production cycle intentionally selected the
+    # GroupOperator repair from a failing Runner artifact; once that artifact
+    # is PASS, a fresh cycle must not silently re-plan the same implementation
+    # tranche.  Host-gate evidence is descriptive here: the generic harness
+    # still owns role isolation and never receives a broad write scope for a
+    # host-only blocker.
+    evidence_by_item: dict[str, dict[str, Any]] = {}
+    for entry in latest:
+        if not isinstance(entry, Mapping):
+            continue
+        data = entry.get("data")
+        if not isinstance(data, Mapping):
+            continue
+        item = data.get("item")
+        if isinstance(item, str) and item not in evidence_by_item:
+            evidence_by_item[item] = dict(data)
+    runner_status = (
+        runner_feedback.get("runner_status")
+        if isinstance(runner_feedback, Mapping)
+        else None
+    )
+    p408_status = evidence_by_item.get("P4-08", {}).get("status")
+    host_pixel = evidence_by_item.get("P4-HOST-PIXEL", {})
+    host_pixel_status = host_pixel.get("status")
+    host_pixel_fingerprint = host_pixel.get("fingerprint")
+    if runner_status == "FAIL":
+        next_workload = "GroupOperator proxy/render-source split localized repair"
+        coordinator_workload = "GroupOperator proxy/render-source split"
+        implementation_write_paths: list[str] = [
+            "psd2fusion/fusion_comp.py",
+            "scripts/parity/p4_05.py",
+            "tests/test_parity004_p405_graph.py",
+        ]
+    elif p408_status != "PASS":
+        next_workload = "P4-08 ordinary Fusion load/readback"
+        coordinator_workload = next_workload
+        implementation_write_paths = []
+    elif host_pixel_status == "BLOCKED":
+        next_workload = "P4-HOST-PIXEL host artifact recovery; no compositor change"
+        coordinator_workload = next_workload
+        implementation_write_paths = []
+    else:
+        next_workload = "P4-HOST-PIXEL deterministic actual-Fusion micro renders"
+        coordinator_workload = next_workload
+        implementation_write_paths = []
+
     return {
         "sequence": [
             "preserve_and_publish_candidate",
@@ -342,25 +389,27 @@ def _orchestration_hint(
             "difference_classification",
             "smallest_evidence_driven_repair",
         ],
-        "next_workload": "GroupOperator proxy/render-source split implementation after the published clipping-island candidate",
+        "next_workload": next_workload,
         "gate_order": ["P4-08", "P4-HOST-PIXEL", "P4-09", "localized_repair"],
         "blocked_until_parity004_closure": ["PARITY-005", "PARITY-006"],
         "manager_packet_guard": "Every exact path belongs to exactly one of read_paths or write_paths; put only files intended to change in write_paths and use handoff_refs for immutable evidence. Include .control/evidence/PARITY-004/20260903-group-operator-contract/decision.md as an immutable read path when implementing the GroupOperator split. If latest_runner_feedback.runner_status is FAIL, include its runner_tests_path as an immutable handoff/read path and plan a localized repair; do not return a no-op implementation while the declared Runner tests fail. Worker context_budget.max_files must cover all exact read/write/handoff files plus the generated WORKER.md, task.json, and context-manifest.json (at least that total). Worker evidence.path values are contract fields: emit only repository-relative POSIX paths exactly matching task.write_paths, never isolated-temp absolute paths or Windows drive paths. Use repository-supported unittest/check.ps1 commands rather than assuming pytest is installed.",
         "manager_locate_guard": "EXACT_FILE requests must use the complete repository-relative filename (for example AGENTS.md, not AGENTS); every query must be non-empty and every path scope must exist in the repo map.",
         "coordinator_selection": {
             "goal_item_id": "PARITY-004",
-            "workload": "GroupOperator proxy/render-source split",
+            "workload": coordinator_workload,
             "immutable_read_paths": [
                 ".control/PARITY-004_TODO.md",
                 "docs/PARITY_004_HOST_PIXEL_GATE.md",
                 ".control/evidence/PARITY-004/20260903-group-operator-contract/decision.md",
             ],
-            "implementation_write_paths": [
-                "psd2fusion/fusion_comp.py",
-                "scripts/parity/p4_05.py",
-                "tests/test_parity004_p405_graph.py",
-            ],
+            "implementation_write_paths": implementation_write_paths,
             "minimum_worker_context_files": 10,
+        },
+        "host_gate_projection": {
+            "p4_08_status": p408_status or "PENDING",
+            "p4_host_pixel_status": host_pixel_status or "PENDING",
+            "p4_host_pixel_fingerprint": host_pixel_fingerprint,
+            "host_blocker_is_not_compositor_failure": host_pixel_fingerprint == "HOST_SAVER_NO_ARTIFACT_AFTER_ACCEPTED_RENDER",
         },
         "latest_evidence_count": len(latest),
         "latest_runner_feedback": dict(runner_feedback or {"status": "NONE"}),

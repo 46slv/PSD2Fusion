@@ -184,6 +184,33 @@ class PSD2FusionAdapterTests(unittest.TestCase):
         )
         self.assertNotIn(str(root), json.dumps(feedback, ensure_ascii=False))
 
+    def test_orchestration_advances_past_groupoperator_after_p408_and_preserves_host_blocker(self) -> None:
+        root = self._repo()
+        evidence = root / ".control" / "evidence" / "PARITY-004"
+        (evidence / "p408" / "summary.json").parent.mkdir(parents=True)
+        (evidence / "p408" / "summary.json").write_text(
+            json.dumps({"item": "P4-08", "status": "PASS"}), encoding="utf-8"
+        )
+        (evidence / "host-blocker" / "summary.json").parent.mkdir(parents=True)
+        (evidence / "host-blocker" / "summary.json").write_text(
+            json.dumps(
+                {
+                    "item": "P4-HOST-PIXEL",
+                    "status": "BLOCKED",
+                    "fingerprint": "HOST_SAVER_NO_ARTIFACT_AFTER_ACCEPTED_RENDER",
+                }
+            ),
+            encoding="utf-8",
+        )
+        value = PSD2FusionAdapter().load_goal_state(root)
+        orchestration = value["state"]["orchestration"]
+        self.assertEqual(
+            "P4-HOST-PIXEL host artifact recovery; no compositor change",
+            orchestration["next_workload"],
+        )
+        self.assertEqual([], orchestration["coordinator_selection"]["implementation_write_paths"])
+        self.assertTrue(orchestration["host_gate_projection"]["host_blocker_is_not_compositor_failure"])
+
 
 if __name__ == "__main__":
     unittest.main()

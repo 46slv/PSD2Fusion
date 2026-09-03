@@ -1,0 +1,139 @@
+{
+  "schema_version": 1,
+  "schema": "psd2fusion-parity-004.p4-08.v1",
+  "task": "PARITY-004",
+  "item": "P4-08",
+  "evidence_id": "p4-08-96112d5-20260903",
+  "status": "PASS",
+  "verification": "live_davinci_mcp_signed_bridge",
+  "candidate_commit": "96112d57ec52645a1d9797323d3551bf45538f27",
+  "adapter_fix_commit": "730cb0e22a7602204bbfdd4239f80a39ae9c88ba",
+  "branch": "codex/parity-004",
+  "host": {
+    "application": "DaVinci Resolve Studio",
+    "version": "21.0.3.7",
+    "project": "PSD2Fusion P4-08 96112d5",
+    "page": "fusion",
+    "bridge": "signed localhost Resolve bridge",
+    "bridge_endpoint": "127.0.0.1:49632",
+    "operations": [
+      "resolve_control.get_version",
+      "resolve_control.open_page(fusion)",
+      "script_plugin.run_inline(py)",
+      "script_plugin.run_inline(lua)"
+    ]
+  },
+  "input_artifacts": {
+    "psd": {
+      "path": "D:\\Downloads\\a.psd",
+      "bytes": 63385140,
+      "sha256": "574d8a6511b2aabe744835d81ed76c8fc8ffd0c9c5678f3359e8eda10f9174db",
+      "read_only": true
+    },
+    "reference_png": {
+      "path": "D:\\Downloads\\20260812.png",
+      "bytes": 2725322,
+      "sha256": "91ff8daef941b3d9052497190fdc8aa6f4d56ba524c8d912cf011b6818535f54",
+      "read_only": true,
+      "used_by_gate": false
+    },
+    "composition": {
+      "path": ".local/p4-08-96112d5/PSD2Fusion.comp",
+      "bytes": 635996,
+      "sha256": "7f740766a9d31928f7688fb7946b9c5f49afca0e02815807583b3a01773c2067",
+      "generated_from_candidate": true
+    }
+  },
+  "load_readback": {
+    "load_1": "PASS",
+    "load_2": "PASS",
+    "reload_signature_equal": true,
+    "tool_count": 894,
+    "type_counts": {
+      "AlphaDivide": 118,
+      "AlphaMultiply": 59,
+      "Background": 35,
+      "BrightnessContrast": 59,
+      "ChannelBoolean": 236,
+      "GroupOperator": 34,
+      "Loader": 100,
+      "MediaOut": 1,
+      "Merge": 252
+    },
+    "loader_paths_resolved": "100/100",
+    "loader_postmultiply": {
+      "readback_count": 100,
+      "explicit_values": 0,
+      "absent_or_default_values": 100
+    },
+    "mediaout": {
+      "count": 1,
+      "name": "MediaOut1",
+      "input_source": "MergeR_48d6509e64",
+      "connected": true
+    },
+    "groups": {
+      "count": 34,
+      "with_children": 34,
+      "direct_child_total": 886
+    },
+    "clipping": {
+      "clipin_count": 59,
+      "clipin_complete": 59,
+      "clipin_operator_in": 59,
+      "clipstack_count": 59,
+      "clipstack_complete": 59,
+      "clipstack_process_alpha_zero": 59,
+      "fixed_matte_connections_complete": 59
+    },
+    "blend_function": {
+      "count": 59,
+      "connections_complete": 59,
+      "apply_mode_distribution": {
+        "Normal": 43,
+        "Multiply": 12,
+        "LinearDodge": 3,
+        "Overlay": 1
+      }
+    },
+    "invalid_or_unknown_tools": 0
+  },
+  "current_comp_paste_probe": {
+    "paste": "PASS",
+    "reported_before_tools": 0,
+    "reported_added_tools": 894,
+    "reported_after_tools": 894,
+    "post_probe_tools": 895,
+    "post_probe_mediaouts": 2,
+    "post_probe_connections": {
+      "MediaOut2": "MergeR_48d6509e64",
+      "MediaOut1": "MediaOut2"
+    },
+    "existing_tools_preserved": true,
+    "note": "Current-comp paste readback exposed a pre-existing/default MediaOut collision in the disposable Resolve comp. The independently loaded composition remained one MediaOut; this collision is retained as host-probe context and is not treated as a PSD2Fusion compositor failure."
+  },
+  "mcp_probe_note": {
+    "fusion_comp_probe": "readback-shape error after paste: resolve.Fusion.GetCurrentComp.GetToolList.GetInputList has no attribute GetAttrs on this Resolve build",
+    "classification": "DaVinci MCP probe limitation; direct Lua/Python readback passed",
+    "generic_harness_failure": false,
+    "psd2fusion_compositor_failure": false
+  },
+  "scope": {
+    "host_loaded": true,
+    "pixel_verified": false,
+    "p4_host_pixel": "NOT_RUN_BY_THIS_GATE",
+    "p4_09": "NOT_RUN",
+    "parity_005": "NOT_STARTED",
+    "parity_006": "NOT_STARTED",
+    "render": "NOT_RUN",
+    "real_inputs_modified": false,
+    "transcript_forwarded": false
+  },
+  "correlation": {
+    "devexec_task_id": "devexec-psd2fusion-p004-20260903",
+    "harness_run_id": "p4-harness-1788440083-001-92972569",
+    "supervisor_target": "knotfield-harness-supervisor",
+    "harness_cycle_evidence": ".control/evidence/PARITY-004/harness/p4-harness-1788440083-001-92972569/cycle-evidence.json",
+    "fresh_luna_verifier": ".control/evidence/PARITY-004/harness/p4-harness-1788440083-001-92972569/verifier-result.json"
+  }
+}

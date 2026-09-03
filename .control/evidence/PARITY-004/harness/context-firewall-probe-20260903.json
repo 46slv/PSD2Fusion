@@ -1,0 +1,44 @@
+{
+  "schema": "psd2fusion-parity-004.context-firewall-probe.v1",
+  "status": "PASS",
+  "mode": "probe",
+  "model": "gpt-5.6-luna",
+  "reasoning_effort": "max",
+  "production_roles_launched": false,
+  "runtime": "codex-split-filesystem-profile",
+  "probes": [
+    {"id": 1, "name": "worker_allowed_read", "status": "PASS"},
+    {"id": 2, "name": "canonical_read_denied", "status": "PASS"},
+    {"id": 3, "name": "unrelated_sentinel_read_denied", "status": "PASS"},
+    {"id": 4, "name": "worker_exact_write", "status": "PASS"},
+    {"id": 5, "name": "worker_readonly_write_denied", "status": "PASS"},
+    {"id": 6, "name": "verifier_canonical_read_denied", "status": "PASS"}
+  ],
+  "worker_proof": {
+    "profile_name": "ceh_worker_probe_38b9b0c2fa6d",
+    "status": "PROVEN",
+    "canonical_external_read": "DENIED",
+    "forbidden_external_read": "DENIED",
+    "outside_write": "DENIED",
+    "readonly_write": "DENIED",
+    "exact_write": "PASS",
+    "wall_time_ms": 18734
+  },
+  "verifier_proof": {
+    "profile_name": "ceh_verifier_probe_75ed088cb964",
+    "status": "PROVEN",
+    "canonical_external_read": "DENIED",
+    "forbidden_external_read": "DENIED",
+    "outside_write": "DENIED",
+    "readonly_write": "DENIED",
+    "exact_write": "DENIED",
+    "wall_time_ms": 17063
+  },
+  "correlation": {
+    "devexec_task_id": "devexec-psd2fusion-p004-20260903",
+    "harness_run_id": "p4-harness-1788440083-001-92972569",
+    "supervisor_target": "knotfield-harness-supervisor"
+  },
+  "transcript_forwarded": false,
+  "sentinel_cleanup": "completed"
+}

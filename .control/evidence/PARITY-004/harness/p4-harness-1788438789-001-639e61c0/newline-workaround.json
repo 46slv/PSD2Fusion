@@ -1,0 +1,24 @@
+{
+  "schema": "psd2fusion-parity-004.harness-workaround.v1",
+  "run_id": "p4-harness-1788438789-001-639e61c0",
+  "applied_at": "2026-09-03T12:53:10Z",
+  "reason": "The previous Worker material diff was valid but generic git apply could not establish exact bytes on the Windows CRLF/mixed worktree.",
+  "scope": [
+    "psd2fusion/fusion_comp.py",
+    "scripts/parity/p4_05.py",
+    "tests/test_parity004_p405_graph.py"
+  ],
+  "operation": "Convert CRLF and mixed line endings to LF in the three declared Worker write paths only; preserve textual content and do not change Git/user configuration.",
+  "before": {
+    "psd2fusion/fusion_comp.py": {"sha256": "dd373462612cc034f58b212ca9ff7f7e2d82fcf919b5aab7916989ac8013cdf6", "bytes": 49412, "line_endings": "CRLF"},
+    "scripts/parity/p4_05.py": {"sha256": "f5cfdc64b7ec1d9a005d5592c2956bee11d38a27592d2279ef3e29d60b3be504", "bytes": 25811, "line_endings": "mixed-CRLF"},
+    "tests/test_parity004_p405_graph.py": {"sha256": "7608c12c5bcf15cba0d063cf4ebcdde89ae4db7375f15561cce93e3e3f25de0d", "bytes": 4408, "line_endings": "CRLF"}
+  },
+  "after": {
+    "psd2fusion/fusion_comp.py": {"sha256": "9478c4c9c7775dbe59bec716e2b50a6b07b747c20f0076aced90c39db13c362a", "bytes": 48099, "line_endings": "LF"},
+    "scripts/parity/p4_05.py": {"sha256": "ed72f3eff885624ae06046fbeabdec839256fe8022f62d6d5d629381743e2438", "bytes": 25187, "line_endings": "LF"},
+    "tests/test_parity004_p405_graph.py": {"sha256": "2b1a11c72c7240259d67dedc969e2d9ea0c1197d682bbbb93844d314994b7de8", "bytes": 4308, "line_endings": "LF"}
+  },
+  "semantic_validation": "git diff --check and focused P4-05/P4-07/check.ps1 passed before the next production cycle.",
+  "transcript_forwarded": false
+}

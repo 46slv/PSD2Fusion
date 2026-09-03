@@ -1,0 +1,169 @@
+{
+  "schema": "psd2fusion-parity-004.harness-operator-review.v1",
+  "run_id": "p4-harness-1788440083-001-92972569",
+  "devexec_task_id": "devexec-psd2fusion-p004-20260903",
+  "supervisor_target": "knotfield-harness-supervisor",
+  "project_task": "PARITY-004",
+  "role_model": "gpt-5.6-luna",
+  "reasoning_effort": "max",
+  "outer_result": {
+    "status": "HARNESS_EXCEPTION",
+    "phase": "ROLE_PROCESS",
+    "decision": "HARNESS_FAIL_CLOSED",
+    "recorded_defect": ".control/evidence/PARITY-004/harness/p4-harness-1788440083-001-92972569/harness-defect.json",
+    "cause": "PSD2Fusion adapter reconciliation referenced repo after deleting the local variable",
+    "error_type": "UnboundLocalError",
+    "project_failure": false,
+    "generic_harness_core_failure": false,
+    "recovery": "adapter fixed in 730cb0e; regression covered; no same-run role resend or blind takeover"
+  },
+  "luna_gate_result": {
+    "worker": "DONE",
+    "runner_p4_05": "PASS",
+    "runner_p4_07": "PASS",
+    "runner_check_ps1": "PASS",
+    "fresh_verifier": "PASS",
+    "verifier_item_complete": true,
+    "p4_05_failure_fingerprint": null,
+    "p4_05_branch_taken": "PASS -> fresh verifier -> P4-08",
+    "sol_escalation": false,
+    "sol_reason": null
+  },
+  "task_packet": {
+    "task_id": "PARITY-004-groupoperator-proxy-render-source-split",
+    "goal_item_id": "PARITY-004",
+    "bytes": 6299,
+    "declared_files": 7,
+    "read_paths": 3,
+    "write_paths": 3,
+    "handoff_refs": 1,
+    "write_paths_exact": [
+      "psd2fusion/fusion_comp.py",
+      "scripts/parity/p4_05.py",
+      "tests/test_parity004_p405_graph.py"
+    ],
+    "handoff_refs_exact": [
+      ".control/evidence/PARITY-004/harness/p4-harness-1788433139-001-1f426efc/runner-tests.json"
+    ]
+  },
+  "roles": {
+    "manager-locate": {
+      "thread_id": "01a06756-c2bc-7530-8720-cfaa4b5b756d",
+      "status": "DISCOVERY_REQUESTED",
+      "input_tokens": 337249,
+      "cached_input_tokens": 272384,
+      "uncached_input_tokens": 64865,
+      "output_tokens": 7478,
+      "wall_time_ms": 202265,
+      "task_packet_bytes": 0,
+      "model_visible_bytes": 110328,
+      "model_visible_files": 4,
+      "isolation": "PROVEN",
+      "external_read_denial": {
+        "canonical": "DENIED",
+        "forbidden": "DENIED",
+        "outside_write": "DENIED",
+        "readonly_write": "DENIED"
+      }
+    },
+    "manager-plan": {
+      "thread_id": "01a0675a-1e73-7b43-9322-1c78dfe1e5d0",
+      "status": "COMPLETED",
+      "input_tokens": 311042,
+      "cached_input_tokens": 252416,
+      "uncached_input_tokens": 58626,
+      "output_tokens": 6462,
+      "wall_time_ms": 148468,
+      "task_packet_bytes": 6299,
+      "model_visible_bytes": 104702,
+      "model_visible_files": 4,
+      "isolation": "PROVEN",
+      "external_read_denial": {
+        "canonical": "DENIED",
+        "forbidden": "DENIED",
+        "outside_write": "DENIED",
+        "readonly_write": "DENIED"
+      }
+    },
+    "worker": {
+      "thread_id": "01a0675c-cb70-78b0-8d05-71876597b47b",
+      "status": "DONE",
+      "input_tokens": 3661319,
+      "cached_input_tokens": 3500800,
+      "uncached_input_tokens": 160519,
+      "output_tokens": 47902,
+      "wall_time_ms": 1058328,
+      "task_packet_bytes": 6299,
+      "model_visible_bytes": 109189,
+      "model_visible_files": 9,
+      "isolation": "PROVEN",
+      "external_read_denial": {
+        "canonical": "DENIED",
+        "forbidden": "DENIED",
+        "outside_write": "DENIED",
+        "readonly_write": "DENIED"
+      }
+    },
+    "verifier": {
+      "thread_id": "01a0676d-67bf-7d21-a6c6-2cf057926f48",
+      "status": "PASS",
+      "input_tokens": 131152,
+      "cached_input_tokens": 89344,
+      "uncached_input_tokens": 41808,
+      "output_tokens": 2556,
+      "wall_time_ms": 62031,
+      "task_packet_bytes": 0,
+      "model_visible_bytes": 39846,
+      "model_visible_files": 2,
+      "isolation": "PROVEN",
+      "external_read_denial": {
+        "canonical": "DENIED",
+        "forbidden": "DENIED",
+        "outside_write": "DENIED",
+        "readonly_write": "DENIED"
+      }
+    }
+  },
+  "worker_diff": {
+    "applied": true,
+    "patch_bytes": 11073,
+    "patch_sha256": "0bf020984044c793a0f9e5b7af0e5e220ebc3e2d35910003fd828715d21d8c88",
+    "changed_paths": [
+      "psd2fusion/fusion_comp.py",
+      "scripts/parity/p4_05.py",
+      "tests/test_parity004_p405_graph.py"
+    ],
+    "candidate_commit": "96112d57ec52645a1d9797323d3551bf45538f27"
+  },
+  "runner": {
+    "status": "PASS",
+    "passed": 3,
+    "failed": 0,
+    "wall_time_ms": 8157,
+    "commands": [
+      "python -m unittest discover -s tests -p \"test_parity004_p405_graph.py\"",
+      "python -m unittest discover -s tests -p \"test_parity004_p407.py\"",
+      "pwsh -NoProfile -File scripts/check.ps1"
+    ],
+    "evidence": ".control/evidence/PARITY-004/harness/p4-harness-1788440083-001-92972569/runner-tests.json"
+  },
+  "verifier": {
+    "verdict": "PASS",
+    "item_complete": true,
+    "evidence": ".control/evidence/PARITY-004/harness/p4-harness-1788440083-001-92972569/verifier-result.json"
+  },
+  "next_gate": {
+    "p4_08": ".control/evidence/PARITY-004/20260903-p408-96112d5/summary.json",
+    "saver_artifact_blocker": ".control/evidence/PARITY-004/20260903-saver-artifact-blocker/summary.json",
+    "p4_host_pixel": "blocked by HOST_SAVER_NO_ARTIFACT_AFTER_ACCEPTED_RENDER",
+    "p4_09": "NOT_RUN",
+    "parity_005": "NOT_STARTED",
+    "parity_006": "NOT_STARTED"
+  },
+  "firewall": {
+    "transcript_forwarded": false,
+    "fresh_role_isolation": "PROVEN",
+    "canonical_external_read_denials": "all role records DENIED",
+    "worker_verifier_materialized_read_sets": "exact Task Packet and generic role bundles only"
+  }
+}

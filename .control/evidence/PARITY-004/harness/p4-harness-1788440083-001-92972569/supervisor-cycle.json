@@ -1,0 +1,134 @@
+{
+  "adapter": "psd2fusion-parity-004",
+  "canonical_state_mutation": "adapter marker only; .control/current.json unchanged",
+  "cycle_evidence_hash": null,
+  "decision": "HARNESS_FAIL_CLOSED",
+  "decision_detail": "generic Context Firewall/role process failed; recovery is required",
+  "devexec_task_id": "devexec-psd2fusion-p004-20260903",
+  "evidence_relpath": ".control/evidence/PARITY-004/harness/p4-harness-1788440083-001-92972569/cycle-evidence.json",
+  "fingerprint_count": 0,
+  "harness_defect": {
+    "component": "codex-ephemeral-harness",
+    "error": "cannot access local variable 'repo' where it is not associated with a value",
+    "error_type": "UnboundLocalError",
+    "project_failure": false,
+    "recovery": "re-run the same run_id only after operator review; no blind duplicate role launch",
+    "run_id": "p4-harness-1788440083-001-92972569",
+    "schema": "psd2fusion-parity-004.harness-defect.v1",
+    "status": "OBSERVED"
+  },
+  "materialized_read_sets": {
+    "manager-locate": {
+      "files": [
+        ".harness/MANAGER_LOCATE.md",
+        ".harness/goal.json",
+        ".harness/state.json",
+        ".harness/repo-map.json",
+        ".harness/context-manifest.json"
+      ],
+      "source": "generic-bundle-contract"
+    },
+    "manager-plan": {
+      "files": [
+        ".harness/MANAGER_PLAN.md",
+        ".harness/goal.json",
+        ".harness/state.json",
+        ".harness/discovery.json",
+        ".harness/context-manifest.json"
+      ],
+      "source": "generic-bundle-contract"
+    },
+    "verifier": {
+      "files": [
+        ".harness/VERIFIER.md",
+        ".harness/verifier-bundle.json",
+        ".harness/context-manifest.json"
+      ],
+      "source": "generic-bundle-contract"
+    },
+    "worker": {
+      "files": [
+        ".harness/context-manifest.json",
+        ".harness/task.json"
+      ],
+      "source": "Task Packet exact read/handoff paths"
+    }
+  },
+  "metrics": {},
+  "patch": null,
+  "phase": "ROLE_PROCESS",
+  "preflight_context_firewall": {
+    "probes": [
+      {
+        "id": 1,
+        "name": "worker_allowed_read",
+        "status": "PASS"
+      },
+      {
+        "id": 2,
+        "name": "canonical_read_denied",
+        "status": "PASS"
+      },
+      {
+        "id": 3,
+        "name": "unrelated_sentinel_read_denied",
+        "status": "PASS"
+      },
+      {
+        "id": 4,
+        "name": "worker_exact_write",
+        "status": "PASS"
+      },
+      {
+        "id": 5,
+        "name": "worker_readonly_write_denied",
+        "status": "PASS"
+      },
+      {
+        "id": 6,
+        "name": "verifier_canonical_read_denied",
+        "status": "PASS"
+      }
+    ],
+    "production_roles_launched": false,
+    "status": "PASS"
+  },
+  "project_task": "PARITY-004",
+  "reasoning_effort": "max",
+  "repo_head_at_reload": "ref: refs/heads/codex/parity-004",
+  "role_model": "gpt-5.6-luna",
+  "roles": {
+    "manager-locate": {
+      "present": false
+    },
+    "manager-plan": {
+      "present": false
+    },
+    "verifier": {
+      "present": false
+    },
+    "worker": {
+      "present": false
+    }
+  },
+  "run_id": "p4-harness-1788440083-001-92972569",
+  "schema": "psd2fusion-parity-004.supervisor-cycle.v1",
+  "sol_escalation": {
+    "reason": null,
+    "requested": false
+  },
+  "status": "HARNESS_EXCEPTION",
+  "supervisor_target": "knotfield-harness-supervisor",
+  "task_packet": {
+    "bytes": 0,
+    "files": 0,
+    "present": false
+  },
+  "tests": null,
+  "verdict": {
+    "failure_fingerprint": null,
+    "item_complete": null,
+    "summary": "",
+    "verifier": null
+  }
+}
