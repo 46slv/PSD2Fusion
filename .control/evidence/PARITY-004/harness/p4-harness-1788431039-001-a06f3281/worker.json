@@ -1,0 +1,80 @@
+{
+  "cached_input_tokens": 992256,
+  "ephemeral": true,
+  "exit_code": 0,
+  "input_tokens": 1098565,
+  "isolation": {
+    "allowed_workspace_read": true,
+    "allowed_workspace_write": true,
+    "backend": "codex-split-filesystem-profile",
+    "canonical_external_read": "DENIED",
+    "codex_executable": "C:\\Users\\shiro\\AppData\\Local\\OpenAI\\Codex\\bin\\b99306303521e97e\\codex.exe",
+    "command_exit_code": 0,
+    "exact_write": "PASS",
+    "forbidden_external_read": "DENIED",
+    "legacy_sandbox_mode_used": false,
+    "outside_write": "DENIED",
+    "platform": "win32",
+    "probe_mode": "codex-exec",
+    "profile_name": "ceh_worker_48d03d88f3bc",
+    "readonly_write": "DENIED",
+    "runtime_executable": "C:\\Users\\shiro\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\python\\python.exe",
+    "status": "PROVEN",
+    "stderr_bytes": 158,
+    "stderr_sha256": "4d13c31ded801c6ec5b41eeef3d5d2cf403e74e01368d2638e8f555c869ce620",
+    "stdout_bytes": 2016,
+    "stdout_sha256": "b9b9c6f0fdc4cde984e722cf0b938f4bb64e1061aa4c92ce2deab974e97a32bd",
+    "wall_time_ms": 18718,
+    "workspace_access": "write",
+    "write_path_read": "PASS"
+  },
+  "isolation_profile": "ceh_worker_48d03d88f3bc",
+  "isolation_status": "PROVEN",
+  "model_visible_bytes": 118776,
+  "model_visible_file_count": 13,
+  "output_tokens": 19000,
+  "protocol_errors": [],
+  "result": {
+    "canonical_patch_applied": false,
+    "evidence": [
+      {
+        "kind": "implementation",
+        "path": "psd2fusion/fusion_comp.py",
+        "summary": "Made internal group render sources explicit while retaining GroupOperator proxy outputs."
+      },
+      {
+        "kind": "fixture",
+        "path": "scripts/parity/p4_05.py",
+        "summary": "Added direct root-stream coverage and deterministic five-case group-boundary checks."
+      },
+      {
+        "kind": "tests",
+        "path": "tests/test_parity004_p405_graph.py",
+        "summary": "Added direct-case regression coverage for absence of group proxies."
+      }
+    ],
+    "notes": [
+      "git diff --check passed.",
+      "Only the three declared write paths are modified.",
+      "Runner-owned tests and scripts/check.ps1 were not run, per the isolated Worker contract.",
+      "PARITY-004 host/pixel claims remain unresolved."
+    ],
+    "requested_context": [],
+    "status": "DONE",
+    "summary": "Implemented the scoped GroupOperator proxy/render-source split and expanded P4-05 structural coverage, ready for Runner verification."
+  },
+  "role": "worker",
+  "run_id": "p4-harness-1788431039-001-a06f3281",
+  "schema": "codex-ephemeral-harness.role-evidence.v1",
+  "schema_version": 1,
+  "status": "DONE",
+  "stderr_bytes": 158,
+  "stderr_sha256": "da6994687d9367364673035122de4bb60fa6d055c52c57f2b478685409d93bbc",
+  "stdout_bytes": 339576,
+  "stdout_sha256": "f62e795966f92e26cccfc990455cf806f0723ce966f2437db2798e7ad1fc34c3",
+  "thread_id": "01a066d2-67f4-7031-bb93-3a61cfb9fc53",
+  "timestamp": "2026-09-03T10:37:52.254573Z",
+  "transcripts_forwarded": false,
+  "uncached_input_tokens": 106309,
+  "wall_time_ms": 412094
+}

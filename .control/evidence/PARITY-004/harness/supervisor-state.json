@@ -3,7 +3,7 @@
   "devexec_task_id": "devexec-psd2fusion-p004-20260903",
   "fingerprints": {},
   "last_decision": "NEXT_CYCLE_LOCALIZED",
-  "last_run_id": "p4-harness-1788429243-001-acb4f3ee",
+  "last_run_id": "p4-harness-1788431039-001-a06f3281",
   "last_status": "TEST_FAILED",
   "model": "gpt-5.6-luna",
   "next_cycle_input": "fresh adapter reload of canonical state/evidence only",

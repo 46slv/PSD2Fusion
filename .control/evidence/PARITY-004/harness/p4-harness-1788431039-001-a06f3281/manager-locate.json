@@ -1,0 +1,148 @@
+{
+  "cached_input_tokens": 92416,
+  "ephemeral": true,
+  "exit_code": 0,
+  "input_tokens": 143330,
+  "isolation": {
+    "allowed_workspace_read": true,
+    "allowed_workspace_write": false,
+    "backend": "codex-split-filesystem-profile",
+    "canonical_external_read": "DENIED",
+    "codex_executable": "C:\\Users\\shiro\\AppData\\Local\\OpenAI\\Codex\\bin\\b99306303521e97e\\codex.exe",
+    "command_exit_code": 0,
+    "exact_write": "DENIED",
+    "forbidden_external_read": "DENIED",
+    "legacy_sandbox_mode_used": false,
+    "outside_write": "DENIED",
+    "platform": "win32",
+    "probe_mode": "codex-exec",
+    "profile_name": "ceh_manager_locate_fddd56969148",
+    "readonly_write": "DENIED",
+    "runtime_executable": "C:\\Users\\shiro\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\python\\python.exe",
+    "status": "PROVEN",
+    "stderr_bytes": 158,
+    "stderr_sha256": "bc35d290bdb53fe50113ce297e3630f9ee472fc07a9b85655ff22e3fba0fce8a",
+    "stdout_bytes": 2040,
+    "stdout_sha256": "818e9cad2e0427d23ead35d972a19aabc41e4550bc3461c8fdaa36a72a24f206",
+    "wall_time_ms": 16703,
+    "workspace_access": "read",
+    "write_path_read": "PASS"
+  },
+  "isolation_profile": "ceh_manager_locate_fddd56969148",
+  "isolation_status": "PROVEN",
+  "model_visible_bytes": 93689,
+  "model_visible_file_count": 4,
+  "output_tokens": 6860,
+  "protocol_errors": [],
+  "result": {
+    "goal_item_id": "PARITY-004",
+    "requests": [
+      {
+        "kind": "EXACT_FILE",
+        "max_bytes": 12000,
+        "max_results": 1,
+        "path_scopes": [
+          "AGENTS.md"
+        ],
+        "query": "AGENTS.md",
+        "reason": "Read repository-specific instructions and validation constraints."
+      },
+      {
+        "kind": "EXACT_FILE",
+        "max_bytes": 10000,
+        "max_results": 1,
+        "path_scopes": [
+          ".control/PARITY-004_TODO.md"
+        ],
+        "query": ".control/PARITY-004_TODO.md",
+        "reason": "Read the authoritative PARITY-004 gate order and task boundaries."
+      },
+      {
+        "kind": "EXACT_FILE",
+        "max_bytes": 16000,
+        "max_results": 1,
+        "path_scopes": [
+          "docs/PARITY_004_HOST_PIXEL_GATE.md"
+        ],
+        "query": "docs/PARITY_004_HOST_PIXEL_GATE.md",
+        "reason": "Read host/pixel sequencing and structural-evidence boundaries."
+      },
+      {
+        "kind": "EXACT_FILE",
+        "max_bytes": 6000,
+        "max_results": 1,
+        "path_scopes": [
+          ".control/evidence/PARITY-004/20260903-group-operator-contract/decision.md"
+        ],
+        "query": ".control/evidence/PARITY-004/20260903-group-operator-contract/decision.md",
+        "reason": "Read the immutable GroupOperator proxy/render-source contract."
+      },
+      {
+        "kind": "EXACT_FILE",
+        "max_bytes": 12000,
+        "max_results": 1,
+        "path_scopes": [
+          "scripts/check.ps1"
+        ],
+        "query": "scripts/check.ps1",
+        "reason": "Read the repository-supported offline validation command."
+      },
+      {
+        "kind": "EXACT_FILE",
+        "max_bytes": 12000,
+        "max_results": 1,
+        "path_scopes": [
+          "tests/test_parity004_p407.py"
+        ],
+        "query": "tests/test_parity004_p407.py",
+        "reason": "Preserve the real-PSD representative-selection regression."
+      },
+      {
+        "kind": "EXACT_FILE",
+        "max_bytes": 40000,
+        "max_results": 1,
+        "path_scopes": [
+          "psd2fusion/fusion_comp.py"
+        ],
+        "query": "psd2fusion/fusion_comp.py",
+        "reason": "Inspect the GroupOperator stream-attachment implementation."
+      },
+      {
+        "kind": "EXACT_FILE",
+        "max_bytes": 18000,
+        "max_results": 1,
+        "path_scopes": [
+          "scripts/parity/p4_05.py"
+        ],
+        "query": "scripts/parity/p4_05.py",
+        "reason": "Inspect the deterministic P4-05 structural fixture."
+      },
+      {
+        "kind": "EXACT_FILE",
+        "max_bytes": 18000,
+        "max_results": 1,
+        "path_scopes": [
+          "tests/test_parity004_p405_graph.py"
+        ],
+        "query": "tests/test_parity004_p405_graph.py",
+        "reason": "Inspect focused GroupOperator regression expectations."
+      }
+    ],
+    "status": "DISCOVERY_REQUESTED",
+    "summary": "Selected PARITY-004 and bounded the next task to the localized GroupOperator proxy/render-source repair with focused P4-05 and P4-07 checks."
+  },
+  "role": "manager-locate",
+  "run_id": "p4-harness-1788431039-001-a06f3281",
+  "schema": "codex-ephemeral-harness.role-evidence.v1",
+  "schema_version": 1,
+  "status": "DISCOVERY_REQUESTED",
+  "stderr_bytes": 158,
+  "stderr_sha256": "ec5911d261f95cccdee6dfc5e45e53d718baec4dae5316389b2ea75653705e9d",
+  "stdout_bytes": 183995,
+  "stdout_sha256": "71c06a0996c4395781054e0b400e84e237bbcb449823b42a116427cea1f66b52",
+  "thread_id": "01a066cc-3f58-7772-804b-5a2224df2191",
+  "timestamp": "2026-09-03T10:26:35.115899Z",
+  "transcripts_forwarded": false,
+  "uncached_input_tokens": 50914,
+  "wall_time_ms": 138500
+}

@@ -1,0 +1,18 @@
+{
+  "after_sha256": {
+    "psd2fusion/fusion_comp.py": "e784ab2e918e473f487bc1ea2b7a9e46406a9c8cc9bd9c26623f2afdc92852c0",
+    "scripts/parity/p4_05.py": "c4e097b2d4574910dc2695539e972ce8e14de6a802b87498a1677af17fd7b73c",
+    "tests/test_parity004_p405_graph.py": "550aca8348ef3f213ad1ca5198e1d2b3d2eba432cb084ad8048c2b4919e4c45b"
+  },
+  "applied": true,
+  "before_sha256": {
+    "psd2fusion/fusion_comp.py": "1f4d20ab9dde750106cfe6f1f35eb76154b758fb07e79cf069c27417a58ba7de",
+    "scripts/parity/p4_05.py": "a5268d07294cb2d5d67c7eceabd5d61ca75f166454e290d5879e3fc276f1fc1d",
+    "tests/test_parity004_p405_graph.py": "05a3b8fc832fd309bcaddd7aefedb92c721cd925df7ff1c90e87e0ceaeff7efb"
+  },
+  "changed_paths": [
+    "psd2fusion/fusion_comp.py",
+    "scripts/parity/p4_05.py",
+    "tests/test_parity004_p405_graph.py"
+  ]
+}
