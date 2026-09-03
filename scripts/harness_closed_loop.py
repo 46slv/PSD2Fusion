@@ -19,6 +19,7 @@ import sys
 import tempfile
 import time
 import uuid
+from contextlib import contextmanager
 from collections.abc import Mapping
 from pathlib import Path
 from typing import Any
@@ -43,6 +44,46 @@ _MANAGER_PLAN_PATH_CONTRACT = (
     "limited to the three declared implementation files. The generic validator rejects any "
     "duplicate across these arrays."
 )
+
+
+def _with_git_autocrlf_disabled(env: Mapping[str, str]) -> dict[str, str]:
+    """Overlay a process-local Git newline policy without changing user config."""
+
+    result = dict(env)
+    try:
+        count = max(0, int(result.get("GIT_CONFIG_COUNT", "0")))
+    except (TypeError, ValueError):
+        count = 0
+    # Preserve any caller-supplied command-scope Git entries by shifting them.
+    for index in range(count - 1, -1, -1):
+        for suffix in ("KEY", "VALUE"):
+            source = f"GIT_CONFIG_{suffix}_{index}"
+            target = f"GIT_CONFIG_{suffix}_{index + 1}"
+            if source in result:
+                result[target] = result[source]
+    result["GIT_CONFIG_COUNT"] = str(count + 1)
+    result["GIT_CONFIG_KEY_0"] = "core.autocrlf"
+    result["GIT_CONFIG_VALUE_0"] = "false"
+    return result
+
+
+@contextmanager
+def _git_autocrlf_scope(env: Mapping[str, str]):
+    """Make generic parent-side Git calls match the isolated Worker bytes."""
+
+    overlay = _with_git_autocrlf_disabled(env)
+    touched = {key for key in overlay if key.startswith("GIT_CONFIG_")}
+    previous = {key: os.environ.get(key) for key in touched}
+    for key in touched:
+        os.environ[key] = overlay[key]
+    try:
+        yield overlay
+    finally:
+        for key, value in previous.items():
+            if value is None:
+                os.environ.pop(key, None)
+            else:
+                os.environ[key] = value
 
 
 class _PSD2FusionInvoker:
@@ -655,27 +696,33 @@ def _run_production(root: Path, harness_root: Path, args: argparse.Namespace) ->
             else f"p4-harness-{int(time.time())}-{index:03d}-{uuid.uuid4().hex[:8]}"
         )
         resume_run_id = None
+        cycle_env = _with_git_autocrlf_disabled(base_env)
         invoker = _PSD2FusionInvoker(harness["CodexExecInvoker"](
             codex_command=command,
-            base_env=base_env,
+            base_env=cycle_env,
             evidence_store=harness["DurableRoleEvidenceStore"](evidence_root),
         ))
         harness_defect: dict[str, Any] | None = None
         try:
-            result = harness["run_production_cycle"](
-                root,
-                adapter,
-                invoker=invoker,
-                options=harness["CycleOptions"](
-                    evidence_root=evidence_root,
-                    run_id=run_id,
-                    mode="production",
-                    timeout_seconds=args.timeout,
-                    max_discovery_rounds=args.max_discovery_rounds,
-                    max_retries=args.max_retries,
-                    base_env=base_env,
-                ),
-            )
+            # The generic Worker slice and canonical checkout must preserve
+            # their actual Windows bytes for its exact post-apply comparison.
+            # Keep this policy process-local; user/global Git configuration is
+            # never edited and the generic harness remains unchanged.
+            with _git_autocrlf_scope(base_env):
+                result = harness["run_production_cycle"](
+                    root,
+                    adapter,
+                    invoker=invoker,
+                    options=harness["CycleOptions"](
+                        evidence_root=evidence_root,
+                        run_id=run_id,
+                        mode="production",
+                        timeout_seconds=args.timeout,
+                        max_discovery_rounds=args.max_discovery_rounds,
+                        max_retries=args.max_retries,
+                        base_env=cycle_env,
+                    ),
+                )
         except Exception as exc:
             # Current CEH releases let a subprocess TimeoutExpired escape the
             # one-cycle wrapper. Preserve that defect separately and stop
