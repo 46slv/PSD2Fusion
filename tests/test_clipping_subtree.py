@@ -88,6 +88,8 @@ class ClippingCompilerTests(unittest.TestCase):
         self.assertIn("Blend = Input { Value = 0.500000, }", text)
         self.assertEqual(1, text.count("PSD clipping chain merge"))
         self.assertNotIn("PSD clipped layer merge", text)
+        self.assertIn("StartFrame = -1,", text)
+        self.assertNotIn("Length = 0,", text)
 
         base_loader = text.index("PSD layer: partial alpha base")
         first_member = text.index("PSD clipping subtree member (base=base000000000001): normal clip")

@@ -151,6 +151,30 @@ Initial strict target: 8-bit RGB with recorded profile. Compare in one named spa
 
 Record source/profile provenance, every ICC transform, straight/premult state, transparent-RGB policy and the exact pre/post-multiplication boundary. No hidden ICC conversion, alpha discard or double pre/post-multiply. `topil()` is a candidate raster source, not an assumed raw-channel oracle.
 
+### Fusion 21.0.3.7 PNG boundary
+
+For an unprofiled straight-RGBA PNG with color `C` and alpha `A`, actual-Fusion
+probes establish this contract:
+
+| Loader `PostMultiply` | Fusion image color | Saver `PreDivide=0` | Saver `PreDivide=1` |
+| --- | --- | --- | --- |
+| `0` | `C` (straight) | writes `C` | writes `clamp(C / A)` |
+| `1` | `C * A` (premultiplied) | writes `C * A` | writes approximately `C` after divide/quantization |
+
+Alpha is unchanged in all four cases. At `A=0`, `PostMultiply=1` and
+`PreDivide=1` both canonicalize RGB to zero, so hidden transparent RGB is not
+round-trippable through the premultiplied path. The normal PNG compositing path
+is therefore Loader `PostMultiply=1`, premultiplied Fusion processing, then
+Saver `PreDivide=1`. The documented purpose of Loader Post Multiply is to
+convert non-premultiplied input to premultiplied/additive representation; the
+observed 2x2 results agree with the
+[Fusion Tool Reference](https://documents.blackmagicdesign.com/UserManuals/Fusion9_Tool_Reference.pdf?_v=1501601400000).
+
+Static still-image Loaders must also use Fusion's still-frame clip declaration:
+`StartFrame = -1` with no `Length = 0`. Omitting `StartFrame` makes Fusion treat
+the path as an image sequence; retaining `Length = 0` produces a zero-length
+clip. This loader-dialect failure is independent of the alpha contract.
+
 ## Structural invariants
 
 - raw order and normalized compositing order are distinct and deterministic;

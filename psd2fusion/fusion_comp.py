@@ -144,7 +144,7 @@ def _loader(
         "\t\t\tID = \"Clip1\",",
         "\t\t\tFilename = %s," % _quote(filename),
         "\t\t\tFormatID = \"PNGFormat\",",
-        "\t\t\tLength = 0,",
+        "\t\t\tStartFrame = -1,",
         "\t\t\tLengthSetManually = true,",
         "\t\t\tGlobalStart = 0,",
         "\t\t\tGlobalEnd = 0",
