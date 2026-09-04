@@ -1,0 +1,51 @@
+{
+  "schema": "psd2fusion-parity-004.ld-clamp-experiment.v1",
+  "observed_at": "2026-09-04T11:06:00+09:00",
+  "task": "PARITY-004",
+  "gate": "P4-09-localized-diagnostic",
+  "status": "HYPOTHESIS_UNRESOLVED",
+  "candidate_commit": "96112d57ec52645a1d9797323d3551bf45538f27",
+  "host": {
+    "application": "DaVinci Resolve Studio",
+    "version": "21.0.3.7",
+    "route": "current composition paste, Saver on pasted MediaOut output, undo",
+    "paste_undo_restored": true
+  },
+  "experiment": {
+    "kind": "localized_connection_bypass",
+    "scope": "real PSD layer cdf6d2a0822170c0 / clipped member febb790170a7d45e (Linear Dodge)",
+    "baseline_composition": ".local/p4-09-real-fusion-20260904/PSD2Fusion.comp",
+    "variant_composition": ".local/p4-09-real-ld-unclamped-20260904/PSD2Fusion.comp",
+    "variant_sha256": "05d64454e919c915642dee9e560bff927f298081dc409b232a5ea9d96974d88f",
+    "change": "BlendCoverageRIIII_febb790170 Background source changed from BlendClampRIIII_febb790170 to BlendFunctionRIIII_febb790170; no production file changed",
+    "render_stdout": ".local/p4-09-real-ld-unclamped-20260904/fusion.stdout.txt",
+    "render_ok": true
+  },
+  "render": {
+    "variant": ".local/p4-09-real-ld-unclamped-20260904/PSD2Fusion.comp.host0000.png",
+    "bytes": 4026183,
+    "sha256": "ff341997d8f7ebbea6a8a153a1ce437b7546c0cad2f874d2e3f0580786b299be",
+    "baseline_sha256": "ff341997d8f7ebbea6a8a153a1ce437b7546c0cad2f874d2e3f0580786b299be",
+    "byte_identical_to_baseline": true,
+    "dimensions": [2304, 1296],
+    "alpha_min": 255,
+    "alpha_max": 255
+  },
+  "comparison": {
+    "path": ".local/p4-09-real-ld-unclamped-20260904/comparison.json",
+    "status": "FAIL",
+    "profile_status": "unverified",
+    "rgb_max": 45,
+    "rgb_mean": 1.577986687135631,
+    "rgb_p99": 30.0,
+    "outlier_guard": {"threshold": 32, "count": 22977},
+    "threshold_exceeding": {"threshold": 0.0, "count": 954946, "ratio": 0.3198094832390261},
+    "alpha_max": 0,
+    "identical_metrics_to_baseline": true
+  },
+  "interpretation": {
+    "supported": "The localized early-clamp hypothesis is consistent with the R-only residual, but bypassing the explicit BrightnessContrast clamp produced no render change because the native LinearDodge Merge output is already saturated/clamped or the bypass is render-equivalent.",
+    "not_proven": "No production repair or custom/additive operation is justified by this experiment; formula-only expectations remain diagnostic and non-authoritative.",
+    "next_action": "Fresh Verifier should classify PARITY-004 as still in progress/pending and stop unless a new Fusion boundary/custom-operation authority becomes available. Do not advance PARITY-005/006."
+  }
+}

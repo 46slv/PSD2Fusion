@@ -1,0 +1,40 @@
+{
+  "schema": "psd2fusion-parity-004.fusion-boundary-diagnostic.v1",
+  "observed_at": "2026-09-04T10:44:09+09:00",
+  "task": "PARITY-004",
+  "gate": "P4-HOST-PIXEL",
+  "status": "PASS_READY_FOR_P4_09",
+  "candidate_commit": "96112d57ec52645a1d9797323d3551bf45538f27",
+  "host": {
+    "application": "DaVinci Resolve Studio",
+    "version": "21.0.3.7",
+    "project": "PSD2Fusion P4-08 20260902",
+    "route": "current composition paste, per-boundary Saver, undo"
+  },
+  "fixture": {
+    "manifest": ".local/p4-fusion-boundary-offline-20260904/manifest.json",
+    "manifest_sha256": "c8a516e6fb46b11aec12a3be0905d056916b618bf744c9718a253570396d007f",
+    "records": ".local/p4-fusion-boundary-host-20260904/records-all.tsv",
+    "records_sha256": "1a98e0c5716be7238e14d5ddaa8a2051e338701aa2cf3c34418875c0ee21f18e",
+    "summary": ".local/p4-fusion-boundary-host-20260904/summary.json",
+    "summary_sha256": "605b15032932872cb23547bc294bb6a758db0d8df2cc6d608be985e3c99cfcf8",
+    "cases": 8,
+    "boundaries_per_scope": {"ungrouped": 10, "isolated": 12},
+    "required_artifacts": 88,
+    "artifact_status": "88/88 ARTIFACT_READY",
+    "pixel_claim": "none",
+    "formula_oracle": "not used"
+  },
+  "observations": {
+    "ungrouped_vs_isolated_internal": "base_loader, member_loader, ClipIn, all four ChannelBoolean taps, BlendFunction and ClipStack match byte-for-byte for Normal, Multiply, Linear Dodge and Overlay",
+    "scope_mapping": "isolated group_internal_terminal matches ungrouped parent_merge; isolated group_parent_merge matches ungrouped final parent_merge",
+    "state": "all cases PASTE=true and RESTORED=true",
+    "causal_read": "No GroupOperator placement or source-propagation defect is supported by this bounded diagnostic; non-Normal lowering remains the only retained micro-level uncertainty"
+  },
+  "notes": [
+    "The analyzer's same-label parent_merge comparison is not semantically comparable across scopes; the explicit scope mapping above is the valid comparison.",
+    "The only code change for this run is CR trimming in the host task reader; compositor lowering is unchanged.",
+    "Photoshop was not used. Formula-only expectations are not treated as truth."
+  ],
+  "next_action": "Proceed to the current real graph P4-09 baseline and classify the golden-reference difference before any repair."
+}

@@ -1,0 +1,56 @@
+{
+  "schema": "psd2fusion-parity-004.p4-09-real-baseline.v1",
+  "observed_at": "2026-09-04T10:32:07+09:00",
+  "task": "PARITY-004",
+  "gate": "P4-09",
+  "status": "BASELINE_RECORDED",
+  "candidate_commit": "96112d57ec52645a1d9797323d3551bf45538f27",
+  "host": {
+    "application": "DaVinci Resolve Studio",
+    "version": "21.0.3.7",
+    "project": "PSD2Fusion P4-08 20260902",
+    "route": "current composition paste, Saver on pasted MediaOut output, undo",
+    "render_return": true,
+    "paste_undo_restored": true
+  },
+  "composition": {
+    "path": ".local/p4-09-real-fusion-20260904/PSD2Fusion.comp",
+    "bytes": 637396,
+    "sha256": "1e6a408167bf53c41d0a492888b1c6d3c940d63a3ee9620c3065ca19f8144a8a"
+  },
+  "render": {
+    "path": ".local/p4-09-real-fusion-20260904/PSD2Fusion.comp.host0000.png",
+    "bytes": 4026183,
+    "sha256": "ff341997d8f7ebbea6a8a153a1ce437b7546c0cad2f874d2e3f0580786b299be",
+    "format": "PNG RGBA",
+    "dimensions": [2304, 1296],
+    "alpha": {"min": 255, "max": 255, "max_error_vs_reference": 0}
+  },
+  "reference": {
+    "path": "D:\\Downloads\\20260812.png",
+    "sha256": "91ff8daef941b3d9052497190fdc8aa6f4d56ba524c8d912cf011b6818535f54",
+    "read_only": true,
+    "dimensions": [2304, 1296],
+    "icc_profile": "present on reference; candidate artifact has no embedded ICC; comparator reports profile_status=unverified"
+  },
+  "comparison": {
+    "path": ".local/p4-09-real-fusion-20260904/comparison.json",
+    "sha256": "f625454222c33dbbe212191c4ba13cf53ebb7b947a98292b404c76bcfa693c34",
+    "status": "FAIL",
+    "rgb_max": 45,
+    "rgb_mean": 1.577986687135631,
+    "rgb_p99": 30.0,
+    "pixels_over_32": 22977,
+    "threshold_exceeding_ratio": 0.3198094832390261,
+    "difference_bbox": [0, 0, 2304, 1296],
+    "high_difference_bbox_over_32": [0, 879, 994, 1101]
+  },
+  "classification": {
+    "alpha_or_canvas": "not causal: dimensions and alpha are exact",
+    "global_profile": "not proven: candidate ICC is absent and reference ICC is present",
+    "localized_candidate": "all >32-level pixels lie inside layer-cdf6d2a0822170c0 (レイヤー14) base alpha and layer-febb790170a7d45e (レイヤー52, Linear Dodge) alpha",
+    "causal_hypothesis": "localized Linear Dodge clipping chain (レイヤー14 base / レイヤー52 member) is the smallest remaining suspect; GroupOperator is not supported as causal by the eight-case boundary equivalence",
+    "repair_authority": "none yet; do not fit by grade, resize, blur, flatten or threshold relaxation"
+  },
+  "next_action": "Select one localized Linear Dodge boundary experiment; delegate any production repair only to a fresh Luna Max worker, then rerun focused test, check.ps1, Fusion micro proof and P4-09."
+}
