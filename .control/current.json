@@ -57,13 +57,13 @@
     },
     {
       "id": "PARITY-004",
-      "status": "in_progress",
+      "status": "awaiting_verification",
       "requires": [
         "PARITY-003"
       ],
       "verification": "pending",
       "branch": "codex/parity-004",
-      "commit": "b4f621194313528b20607bf6bcd4f108d0041cd7",
+      "commit": "fa2fb2f3ed1ad9ed9a45f44720fe1edd18798033",
       "evidence": [
         ".control/evidence/PARITY-004/20260902-170000/summary.json",
         ".control/evidence/PARITY-004/20260902-174500/verifier.json",
@@ -94,7 +94,8 @@
         ".control/evidence/PARITY-004/20260904-fusion-boundary-diagnostic/summary.json",
         ".control/evidence/PARITY-004/20260904-p409-real-baseline/summary.json",
         ".control/evidence/PARITY-004/20260904-ld-clamp-experiment/summary.json",
-        ".control/evidence/PARITY-004/20260904-fresh-verifier/verifier.json"
+        ".control/evidence/PARITY-004/20260904-fresh-verifier/verifier.json",
+        ".control/evidence/PARITY-004/20260904-ld-late-clamp/summary.json"
       ]
     },
     {
