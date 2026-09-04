@@ -103,14 +103,28 @@
     },
     {
       "id": "PARITY-005",
-      "status": "in_progress",
+      "status": "awaiting_verification",
       "requires": [
         "PARITY-004"
       ],
       "verification": "pending",
       "branch": "codex/parity-005",
-      "commit": "80297c2b864b951630720f1b18b9d6258046b992",
-      "evidence": []
+      "commit": "d382a1ab606b7aa9d4c90bafa13e1d2850e0add5",
+      "evidence": [
+        ".control/evidence/PARITY-005/20260905-p500-p502-s0/summary.json",
+        ".control/evidence/PARITY-005/20260905-p503-p517-s1/summary.json",
+        ".control/evidence/PARITY-005/20260905-p504-matrix/summary.json",
+        ".control/evidence/PARITY-005/20260905-p504-matrix/p504_matrix.json",
+        ".control/evidence/PARITY-005/20260905-p505-discrimination/summary.json",
+        ".control/evidence/PARITY-005/20260905-p506-control/summary.json",
+        ".control/evidence/PARITY-005/20260905-p507-p509-fallback/summary.json",
+        ".control/evidence/PARITY-005/20260905-p510-p511-order-alpha/summary.json",
+        ".control/evidence/PARITY-005/20260905-p512-p513-groups/summary.json",
+        ".control/evidence/PARITY-005/20260905-p514-p516-nested-groupbase/summary.json",
+        ".control/evidence/PARITY-005/20260905-p518-decision/decision.md",
+        ".control/evidence/PARITY-005/20260905-p519-p521-failclosed/summary.json",
+        ".control/evidence/PARITY-005/20260905-p522-verifier/verifier.json"
+      ]
     },
     {
       "id": "PARITY-006",
