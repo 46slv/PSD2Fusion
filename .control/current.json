@@ -63,7 +63,7 @@
       ],
       "verification": "pending",
       "branch": "codex/parity-004",
-      "commit": "96112d57ec52645a1d9797323d3551bf45538f27",
+      "commit": "eea5d721732932767b70133ba593b1fa5dd3dad6",
       "evidence": [
         ".control/evidence/PARITY-004/20260902-170000/summary.json",
         ".control/evidence/PARITY-004/20260902-174500/verifier.json",
@@ -90,7 +90,10 @@
         ".control/evidence/PARITY-004/20260904-photoshop-oracle-unavailable/summary.json",
         ".control/evidence/PARITY-004/20260904-operator-pixel-contract/decision.json",
         ".control/evidence/PARITY-004/20260904-p409-offline-prep/summary.json",
-        ".control/evidence/PARITY-004/20260904-offline-prep-verifier/verifier.json"
+        ".control/evidence/PARITY-004/20260904-offline-prep-verifier/verifier.json",
+        ".control/evidence/PARITY-004/20260904-fusion-boundary-diagnostic/summary.json",
+        ".control/evidence/PARITY-004/20260904-p409-real-baseline/summary.json",
+        ".control/evidence/PARITY-004/20260904-ld-clamp-experiment/summary.json"
       ]
     },
     {
