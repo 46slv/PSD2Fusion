@@ -15,8 +15,6 @@ Keep the Fusion production graph on its 32-bit float processing path. Do not add
 
 ## Acceptance classification
 
-Classify differences into two separate classes:
-
 ### Non-material quantization residual
 
 A residual may be accepted as non-blocking when all of the following hold:
@@ -59,6 +57,14 @@ After that work completes:
 ## Float-pipeline rule
 
 Production lowering should preserve the established float32 materialization/compositing path unless evidence shows a semantic defect that requires a different verified boundary. An 8-bit deterministic oracle may model source/reference semantics and stage behavior for diagnosis, but it does not by itself authorize inserting an 8-bit quantization stage into the production graph.
+
+## Linear Dodge repair authority
+
+A temp-only actual-Fusion investigation has now produced evidence strong enough to authorize a bounded production implementation attempt for clipped `Linear Dodge` members, provided the implementation preserves the float32 path and is generalized by blend semantics rather than by the real-case L52 layer identity.
+
+The candidate behavior to implement is the smallest native-only float boundary that reproduces the verified temp host variant: member RGB contribution is attenuated by member alpha and opacity before the additive/saturating blend boundary, the fixed base coverage remains the clipping-span alpha, and the existing ClipIn / ClipStack / outer / group structure remains intact. Do not introduce uint8 quantization or per-pixel fitting.
+
+This is implementation authority, not completion evidence. After implementation, focused host fixtures and a fresh full `a.psd` Fusion render/reference comparison are still required. A fresh verifier must classify the remaining real-image residuals under this acceptance policy before PARITY-004 can close.
 
 ## State transition
 
