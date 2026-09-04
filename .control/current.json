@@ -3,7 +3,7 @@
   "schema_version": 1,
   "program_id": "PSD2FUSION-COMPOSITING-PARITY",
   "status": "active",
-  "updated_date": "2026-09-04",
+  "updated_date": "2026-09-05",
   "baseline": {
     "repository": "46slv/PSD2Fusion",
     "default_branch": "main",
@@ -103,13 +103,13 @@
     },
     {
       "id": "PARITY-005",
-      "status": "ready",
+      "status": "in_progress",
       "requires": [
         "PARITY-004"
       ],
       "verification": "pending",
-      "branch": null,
-      "commit": null,
+      "branch": "codex/parity-005",
+      "commit": "80297c2b864b951630720f1b18b9d6258046b992",
       "evidence": []
     },
     {
