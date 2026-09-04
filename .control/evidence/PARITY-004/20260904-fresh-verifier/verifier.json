@@ -1,0 +1,54 @@
+{
+  "schema": "psd2fusion-parity-004.verifier.v1",
+  "verified_at": "2026-09-04T11:14:00+09:00",
+  "task": "PARITY-004",
+  "verdict": "BLOCKED",
+  "closure": "not reached",
+  "evaluated_candidate_commit": "b4f621194313528b20607bf6bcd4f108d0041cd7",
+  "post_verification_state_commit": "72462d0c9c6267fd7034156f09b2b4e41edf697b",
+  "branch": "codex/parity-004",
+  "checks": {
+    "scripts_check_ps1": {"status": "PASS", "tests": 74},
+    "fusion_boundary": {
+      "status": "PASS_EVIDENCE_READY",
+      "cases": 8,
+      "required_artifacts": 88,
+      "artifacts_ready": 88,
+      "valid_rgba_pngs": true,
+      "pixel_claim": "none",
+      "internal_equivalence": "9 boundaries across 4 modes match byte-for-byte with valid group-scope mapping"
+    },
+    "p4_09": {
+      "status": "FAIL",
+      "dimensions": [2304, 1296],
+      "alpha_exact": true,
+      "rgb_max": 45,
+      "rgb_mean": 1.577986687135631,
+      "rgb_p99": 30.0,
+      "outlier_guard_count_over_32": 22977,
+      "profile_status": "unverified",
+      "reference_icc_bytes": 3144,
+      "candidate_icc": "absent"
+    },
+    "localized_ld_experiment": {
+      "status": "HYPOTHESIS_UNRESOLVED",
+      "variant_change": "BlendCoverage Linear Dodge member background changed from BlendClamp to BlendFunction",
+      "render_byte_identical_to_baseline": true,
+      "render_sha256": "ff341997d8f7ebbea6a8a153a1ce437b7546c0cad2f874d2e3f0580786b299be",
+      "production_diff": "none"
+    }
+  },
+  "false_pass_risks": [
+    "Boundary artifacts do not claim formula or pixel truth.",
+    "P4-09 mismatch remains localized to the Linear Dodge clipping region; no global correction was applied.",
+    "Reference ICC and candidate profile absence remain unverified.",
+    "No causally proven repair exists; pixel_verified is forbidden."
+  ],
+  "permitted_state": {
+    "task_status": "in_progress",
+    "verification": "pending",
+    "active_task_id": "PARITY-004",
+    "do_not_advance": ["PARITY-005", "PARITY-006"],
+    "stop_reason": "Fusion boundary plus P4-09 evidence did not resolve competing implementations; new Fusion boundary/custom-operation authority would be required."
+  }
+}

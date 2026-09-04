@@ -93,7 +93,8 @@
         ".control/evidence/PARITY-004/20260904-offline-prep-verifier/verifier.json",
         ".control/evidence/PARITY-004/20260904-fusion-boundary-diagnostic/summary.json",
         ".control/evidence/PARITY-004/20260904-p409-real-baseline/summary.json",
-        ".control/evidence/PARITY-004/20260904-ld-clamp-experiment/summary.json"
+        ".control/evidence/PARITY-004/20260904-ld-clamp-experiment/summary.json",
+        ".control/evidence/PARITY-004/20260904-fresh-verifier/verifier.json"
       ]
     },
     {
