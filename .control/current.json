@@ -21,7 +21,7 @@
     "psd_sha256": "574d8a6511b2aabe744835d81ed76c8fc8ffd0c9c5678f3359e8eda10f9174db",
     "reference_png_sha256": "91ff8daef941b3d9052497190fdc8aa6f4d56ba524c8d912cf011b6818535f54"
   },
-  "active_task_id": "PARITY-004",
+  "active_task_id": "PARITY-005",
   "task_contract": ".control/CURRENT_GOAL.md",
   "tasks": [
     {
@@ -57,13 +57,13 @@
     },
     {
       "id": "PARITY-004",
-      "status": "in_progress",
+      "status": "done",
       "requires": [
         "PARITY-003"
       ],
-      "verification": "pending",
+      "verification": "pass",
       "branch": "codex/parity-004",
-      "commit": "180bb15ed6e78830e9fa2437fd0f1b893c1ace61",
+      "commit": "2f398be9f867e0bf048faf1ebe3bb65fe532aad7",
       "evidence": [
         ".control/evidence/PARITY-004/20260902-170000/summary.json",
         ".control/evidence/PARITY-004/20260902-174500/verifier.json",
@@ -97,12 +97,13 @@
         ".control/evidence/PARITY-004/20260904-fresh-verifier/verifier.json",
         ".control/evidence/PARITY-004/20260904-ld-late-clamp/summary.json",
         ".control/evidence/PARITY-004/20260904-ld-late-clamp/verifier.json",
-        ".control/evidence/PARITY-004/20260904-integrated-ldlate/summary.json"
+        ".control/evidence/PARITY-004/20260904-integrated-ldlate/summary.json",
+        ".control/evidence/PARITY-004/20260904-parity004-closure/verifier.json"
       ]
     },
     {
       "id": "PARITY-005",
-      "status": "blocked",
+      "status": "ready",
       "requires": [
         "PARITY-004"
       ],
