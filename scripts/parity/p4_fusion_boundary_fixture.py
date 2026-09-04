@@ -7,6 +7,9 @@ the same fractional RGBA inputs in eight compositions:
 * Normal, Multiply, Linear Dodge and Overlay member controls; and
 * an ungrouped and an isolated ``GroupOperator`` scope for every control.
 
+The shared fractional bytes make Linear Dodge overflow before member opacity
+is applied, so its native early-clamp behavior is visible at the local taps.
+
 The generated manifest contains only paths relative to the caller-provided
 output directory.  This keeps the machine contract stable while the comp
 files themselves retain the absolute asset paths required by Fusion Loader.
@@ -32,10 +35,10 @@ if str(ROOT) not in sys.path:
 
 from psd2fusion.fusion_comp import FUSION_BLEND_IDS, compile_comp
 from psd2fusion.semantic import ClippingChain, SemanticDocument, SemanticLayer
-from scripts.validate_clipping_subtrees import parse_tools
+from scripts.validate_clipping_subtrees import materialization_for, parse_tools
 
 
-SCHEMA = "psd2fusion-parity-004-fusion-boundary-fixture.v1"
+SCHEMA = "psd2fusion-parity-004-fusion-boundary-fixture.v2"
 MODES: Tuple[str, ...] = ("Normal", "Multiply", "Linear Dodge", "Overlay")
 SCOPES: Tuple[str, ...] = ("ungrouped", "isolated")
 CASES: Tuple[str, ...] = tuple(
@@ -49,11 +52,13 @@ HEIGHT = 8
 MEMBER_OPACITY = 0.625
 
 # These values are intentionally fractional and are kept as 8-bit RGBA input
-# facts.  The same bytes are used for every mode and scope.
+# facts. The same bytes are used for every mode and scope. Linear Dodge's red
+# channel overflows at its named blend function, making the clamp stage
+# observable without changing the production graph.
 INPUT_RGBA8: Mapping[str, Tuple[int, int, int, int]] = {
     "outer": (41, 109, 181, 89),
-    "base": (207, 58, 23, 173),
-    "member": (34, 189, 107, 127),
+    "base": (170, 146, 101, 173),
+    "member": (179, 89, 89, 230),
 }
 ASSET_PATHS: Mapping[str, str] = {
     "outer": "assets/p4fb-outer.png",
@@ -67,7 +72,7 @@ OUTER_ID = "p4fb_outer01"
 BASE_ID = "p4fb_base01"
 MEMBER_ID = "p4fb_member01"
 GROUP_ID = "p4fb_group01"
-SOURCE_HASH = hashlib.sha256(b"psd2fusion-p4-fusion-boundary-fixture-v1").hexdigest()
+SOURCE_HASH = hashlib.sha256(b"psd2fusion-p4-fusion-boundary-fixture-v2").hexdigest()
 
 
 def _slug(mode: str) -> str:
@@ -328,6 +333,8 @@ def _case_boundaries(
     tools = [dict(tool) for tool in parse_tools(comp_path)]
     base_loader = _one(_role(tools, "Loader", BASE_ID), "base_loader")
     member_loader = _one(_role(tools, "Loader", MEMBER_ID), "member_loader")
+    base_materialization = materialization_for(tools, BASE_ID)
+    member_materialization = materialization_for(tools, MEMBER_ID)
     clip_in = _one(
         [tool for tool in _role(tools, "ClipIn", MEMBER_ID) if tool.get("type") == "Merge"],
         "clip_in",
@@ -402,8 +409,8 @@ def _case_boundaries(
             "ordinary_render_inputs_avoid_group_proxy": not group_proxy_consumers,
         }
 
-    base_name = base_loader["name"] if base_loader else None
-    member_name = member_loader["name"] if member_loader else None
+    base_name = base_materialization["source"]
+    member_name = member_materialization["source"]
     clip_name = clip_in["name"] if clip_in else None
     stack_name = clip_stack["name"] if clip_stack else None
     channel_names = {
@@ -412,8 +419,9 @@ def _case_boundaries(
     }
     expected_mode = 'FuID { "%s" }' % FUSION_BLEND_IDS[mode]
     checks = {
-        "one_base_loader": base_loader is not None,
-        "one_member_loader": member_loader is not None,
+        "one_base_loader": base_loader is not None and base_materialization["valid"],
+        "one_member_loader": member_loader is not None
+        and member_materialization["valid"],
         "clip_in_is_fixed_matte_operator_in": bool(
             clip_in
             and clip_in.get("background") == base_name
@@ -486,6 +494,8 @@ def _case_boundaries(
         "boundaries": {
             "base_loader": base_name,
             "member_loader": member_name,
+            "base_raw_loader": base_loader["name"] if base_loader else None,
+            "member_raw_loader": member_loader["name"] if member_loader else None,
             "clip_in": clip_name,
             "channel_boolean": channel_names,
             "blend_function": blend_function["name"] if blend_function else None,

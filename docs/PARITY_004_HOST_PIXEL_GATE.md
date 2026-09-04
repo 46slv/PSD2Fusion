@@ -2,6 +2,21 @@
 
 Status: active execution contract for the remaining host/pixel portion of `PARITY-004`.
 
+## Active production acceptance override
+
+The operator policy in `.control/PARITY-004_ACCEPTANCE.md` is authoritative for PARITY-004 production acceptance as of 2026-09-04. It changes acceptance policy without deleting or weakening strict diagnostic evidence.
+
+In particular:
+
+- keep `strict RGBA threshold=0` comparisons as diagnostic/regression evidence;
+- preserve the Fusion production graph's 32-bit float pipeline;
+- do not add quantization, rounding, depth-reduction, or equivalent nodes solely to reproduce Photoshop-style 8-bit intermediate rounding;
+- a residual around one 8-bit LSB is not by itself a production blocker when alpha, structure, group/clipping scope, blend/opacity semantics and visual behavior are otherwise correct;
+- material alpha/semantic defects, large deltas, coherent localized outliers and visible real-image differences remain blockers;
+- do not relax comparator thresholds to hide a material failure: record the strict metrics, then classify the residual separately for production acceptance.
+
+Complete any already-running micro/strict diagnostic before applying this acceptance classification to closeout. Do not interrupt an in-progress diagnostic merely because its strict result will no longer be an automatic blocker.
+
 ## Active pixel truth contract
 
 Operator instruction on 2026-09-04 supersedes any earlier evidence or decision that made a Photoshop actual micro oracle a prerequisite. Do not use Photoshop in this Goal, and do not treat its absence as a blocker or stop condition. Retain the historical evidence rather than deleting it.
@@ -35,14 +50,17 @@ The real `a.psd` structural audit covers 23 clipping chains, 59 clipped members,
 Run the remaining work in this order:
 
 ```text
-P4-08 ordinary Fusion load/readback
--> P4-HOST-PIXEL micro fixtures
--> P4-09 real PSD render/reference comparison
--> smallest evidence-driven repair, if needed
--> rerun micro fixture then real comparison
+complete any already-running micro/strict diagnostic
+-> P4-08 ordinary Fusion load/readback (reuse existing verified evidence when still current)
+-> P4-HOST-PIXEL micro fixtures / localized diagnostics
+-> regenerate latest candidate from real a.psd
+-> P4-09 fresh real PSD Fusion render/reference comparison
+-> classify strict residuals as quantization-scale versus material visual/semantic differences
+-> smallest evidence-driven repair only for material differences, if needed
+-> rerun focused micro fixture then real comparison
 ```
 
-Do not start `PARITY-005`, `PARITY-006`, or a broad compiler/planner redesign before the first P4-09 baseline unless the current graph cannot load/render at all and the blocker is already localized to such a boundary.
+Do not enter a repair loop whose only purpose is closing +/-1 LSB byte differences. Do not start `PARITY-005`, `PARITY-006`, or a broad compiler/planner redesign before the required PARITY-004 real render/reference classification is complete unless the current graph cannot load/render at all and the blocker is already localized to such a boundary.
 
 ## P4-08 — ordinary Fusion load/readback
 
@@ -105,16 +123,19 @@ Minimum cases:
 - at least one non-Normal base mode;
 - transparent, black, white, and colored outer backdrops.
 
-For every rendered fixture record candidate commit, host/version, project/color settings, render format, artifact path/hash, RGBA/alpha metrics, and whether the case passed. Graph text/readback is not a substitute for rendered pixels.
+For every rendered fixture record candidate commit, host/version, project/color settings, render format, artifact path/hash, RGBA/alpha metrics, and whether the strict comparator passed. Graph text/readback is not a substitute for rendered pixels.
 
-## P4-09 — real PSD baseline
+A threshold-zero failure must be retained in evidence. For production acceptance, additionally classify whether the failure is only quantization-scale under `.control/PARITY-004_ACCEPTANCE.md` or indicates a material semantic/visual defect.
 
-After the micro pixel gate is usable, render the current real 422-tool graph from the same candidate family and compare it directly with the qualified `D:\Downloads\20260812.png` reference.
+## P4-09 — real PSD baseline and acceptance comparison
 
-The first P4-09 run is a diagnostic baseline, not a requirement to pass immediately. Partition the difference before changing compositor math.
+After the micro pixel gate is usable, regenerate `D:\Downloads\a.psd` from the latest candidate family, render that fresh graph in actual Fusion, and compare it directly with the qualified `D:\Downloads\20260812.png` reference.
 
-Classify material differences into the smallest useful category, for example:
+Partition the difference before changing compositor math. Report strict metrics even when the final production acceptance treats a small quantization residual as non-blocking.
 
+Classify differences into the smallest useful category, for example:
+
+- non-material host/export/quantization residual;
 - global/profile/working-space difference;
 - alpha/premultiply edge difference;
 - one blend mode family;
@@ -125,19 +146,22 @@ Classify material differences into the smallest useful category, for example:
 - asset materialization difference;
 - unsupported PSD semantics.
 
+Prioritize material real-image differences: large pixel deltas, coherent localized regions, visible anomalies, alpha errors and semantic-scope failures. Linear Dodge and any previously localized high-difference regions receive priority over byte-exact closure of 1-LSB fixture residuals.
+
 Do not fit the reference by changing thresholds, grading, resizing, blurring, flattening, or applying a whole-image correction.
 
 ## Evidence-driven repair rule
 
 When a material failure is localized:
 
-1. reduce it to the smallest deterministic fixture;
-2. repair the smallest responsible boundary;
-3. rerun the focused micro fixture;
-4. rerun the real P4-09 comparison;
-5. retain before/after metrics.
+1. reduce it to the smallest deterministic fixture or bounded real-image diagnostic;
+2. repair the smallest responsible semantic/render boundary;
+3. preserve the float32 production path unless the repair itself requires a separately verified representation boundary;
+4. rerun the focused micro fixture;
+5. rerun the real P4-09 comparison;
+6. retain before/after strict metrics and acceptance classification.
 
-Do not redesign unrelated architecture around a failure that has not been localized.
+Do not redesign unrelated architecture around a failure that has not been localized. Do not add quantization/rounding/depth-reduction nodes solely to remove a +/-1 LSB residual.
 
 ## Deferred architecture work
 
@@ -153,11 +177,11 @@ Use host/pixel evidence to decide whether either debt is causal. Before adding m
 Stop and report instead of advancing only when:
 
 - actual Fusion artifacts cannot be acquired through multiple reasonable routes;
-- actual Fusion internal-boundary evidence plus P4-09 still leaves multiple implementation hypotheses unresolved by the Orchestrator;
+- actual Fusion internal-boundary evidence plus P4-09 still leaves multiple material implementation hypotheses unresolved by the Orchestrator;
 - credentials, additional authority, or a destructive human action is required;
 - the deterministic execution path fails closed;
-- PARITY-004 reaches verified closure.
+- PARITY-004 reaches verified closure under `.control/PARITY-004_ACCEPTANCE.md`.
 
-Photoshop absence is not a stop condition. Ordinary test, fixture, or localized implementation failures require a changed diagnostic or localized repair rather than stopping.
+Photoshop absence is not a stop condition. A strict threshold-zero mismatch that is only a qualified quantization-scale residual is not by itself a stop condition. Ordinary test, fixture, or localized material implementation failures require a changed diagnostic or localized repair rather than stopping.
 
-`PARITY-004` remains `in_progress` until the required host/pixel evidence is complete and fresh verification permits the canonical state transition.
+`PARITY-004` remains `in_progress` until the required host/pixel evidence is complete, residuals are classified under the active acceptance policy, and fresh verification permits the canonical state transition.

@@ -54,7 +54,7 @@ Preserve the raw four-byte PSD key, including trailing spaces, plus a canonical 
 Initial verification order:
 
 ```text
-Normal -> Multiply -> Linear Dodge -> Overlay
+Normal -> Multiply -> Screen -> Linear Dodge -> Overlay
 ```
 
 The existence of a same-named Fusion ApplyMode is capability evidence, not parity evidence.
@@ -134,6 +134,16 @@ attenuation for Normal and opacity/base-opacity controls, while Multiply,
 Linear Dodge and Overlay still show distinct premultiplied-mode RGB residuals;
 the fixture evidence does not justify a single generic mode-independent RGB
 lowering.
+
+The same straight/opaque separation is required at an ordinary layer or
+isolated-group non-Normal boundary: Loaders and completed subtrees are
+premultiplied, while a separable blend function consumes straight source and
+backdrop RGB. The lowering therefore evaluates the named mode only on opaque
+straight inputs, forms `T=(1-D)S+D*B(C_D,S)`, restores source coverage
+`q=A_s*opacity`, and performs the final source-over with a Normal Merge. This
+is an offline algebra/structure claim only. In particular, Linear Dodge
+over-range/clamp behavior and all Fusion quantization remain `unverified`
+until a new host render is tied to the exact implementation commit.
 
 ### P4-01 Fusion recipe decision
 

@@ -3,7 +3,7 @@ import unittest
 from pathlib import Path
 
 from scripts.parity.p4_01 import compare_candidates
-from scripts.validate_clipping_subtrees import parse_tools
+from scripts.validate_clipping_subtrees import materialization_for, parse_tools
 
 
 class P401GraphRecipeTests(unittest.TestCase):
@@ -31,8 +31,12 @@ class P401GraphRecipeTests(unittest.TestCase):
         clips = [tool for tool in tools if tool["operator"] == 'FuID { "In" }']
         self.assertEqual(1, len(clips))
         clip = clips[0]
-        self.assertEqual("LoaderR_p401base00", clip["background"])
-        self.assertEqual("LoaderR_p401member", clip["foreground"])
+        base_source = materialization_for(tools, "p401base00")["source"]
+        member_source = materialization_for(tools, "p401member")["source"]
+        self.assertEqual("MaterializePremultR_p401base00", base_source)
+        self.assertEqual("MaterializePremultR_p401member", member_source)
+        self.assertEqual(base_source, clip["background"])
+        self.assertEqual(member_source, clip["foreground"])
         self.assertIn("P4-01 fixed matte via Operator=In", clip["comments"])
 
         base_straight = [tool for tool in tools if tool["name"].startswith("BlendBaseStraight")]
@@ -63,7 +67,7 @@ class P401GraphRecipeTests(unittest.TestCase):
         self.assertEqual(clamps[0]["name"], coverages[0]["background"])
         self.assertEqual(coverages[0]["name"], premults[0]["input"])
         self.assertEqual(premults[0]["name"], restores[0]["background"])
-        self.assertEqual("LoaderR_p401member", restores[0]["foreground"])
+        self.assertEqual(member_source, restores[0]["foreground"])
         self.assertEqual("3", restores[0]["to_alpha"])
 
         stacks = [tool for tool in tools if "P4-01 local Merge" in tool["comments"]]

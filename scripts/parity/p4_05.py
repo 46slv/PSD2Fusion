@@ -21,7 +21,7 @@ if str(ROOT) not in sys.path:
 
 from psd2fusion.fusion_comp import compile_comp
 from psd2fusion.semantic import ClippingChain, SemanticDocument, SemanticLayer
-from scripts.validate_clipping_subtrees import parse_tools
+from scripts.validate_clipping_subtrees import materialization_for, parse_tools
 
 
 SOURCE_HASH = "p405" + "0" * 60
@@ -208,7 +208,7 @@ def _role(tools: Sequence[Dict[str, Any]], prefix: str, layer_id: str) -> List[D
 
 _FLOW_TOOL_RE = re.compile(
     r"(?m)^[ \t]*([A-Za-z_][A-Za-z0-9_]*)\s*=\s*"
-    r"(Background|Loader|Merge|AlphaDivide|ChannelBoolean|"
+    r"(Background|Loader|ChangeDepth|Merge|AlphaDivide|ChannelBoolean|"
     r"BrightnessContrast|AlphaMultiply|MediaOut|GroupOperator|Note)\s*\{"
 )
 
@@ -505,15 +505,17 @@ def _group_proxy_shape(
 
 def _chain_shape(tools: Sequence[Dict[str, Any]], base_id: str, member_ids: Sequence[str]) -> Dict[str, Any]:
     base_loaders = _role(tools, "Loader", base_id)
+    base_materialization = materialization_for(tools, base_id)
     outer_merges = [
         tool
         for tool in _role(tools, "Merge", base_id)
         if "PSD clipping chain merge:" in tool["comments"]
     ]
-    previous = base_loaders[0]["name"] if len(base_loaders) == 1 else None
+    previous = base_materialization["source"]
     rows: List[Dict[str, Any]] = []
     for member_id in member_ids:
         loaders = _role(tools, "Loader", member_id)
+        materialization = materialization_for(tools, member_id)
         clips = [tool for tool in _role(tools, "ClipIn", member_id) if tool["type"] == "Merge"]
         base_straights = [tool for tool in _role(tools, "BlendBaseStraight", member_id) if tool["type"] == "AlphaDivide"]
         base_opaques = [tool for tool in _role(tools, "BlendBaseOpaque", member_id) if tool["type"] == "ChannelBoolean"]
@@ -527,6 +529,7 @@ def _chain_shape(tools: Sequence[Dict[str, Any]], base_id: str, member_ids: Sequ
         stacks = [tool for tool in _role(tools, "ClipStack", member_id) if tool["type"] == "Merge"]
         row = {
             "loader": loaders[0] if len(loaders) == 1 else None,
+            "materialized_source": materialization["source"],
             "clip": clips[0] if len(clips) == 1 else None,
             "base_straight": base_straights[0] if len(base_straights) == 1 else None,
             "base_opaque": base_opaques[0] if len(base_opaques) == 1 else None,
@@ -541,6 +544,8 @@ def _chain_shape(tools: Sequence[Dict[str, Any]], base_id: str, member_ids: Sequ
         }
         row["pass"] = bool(
             len(base_loaders) == 1
+            and base_materialization["valid"]
+            and materialization["valid"]
             and row["loader"] is not None
             and row["clip"] is not None
             and row["base_straight"] is not None
@@ -553,13 +558,13 @@ def _chain_shape(tools: Sequence[Dict[str, Any]], base_id: str, member_ids: Sequ
             and row["blend_premult"] is not None
             and row["blend_restore"] is not None
             and row["stack"] is not None
-            and row["clip"]["background"] == base_loaders[0]["name"]
-            and row["clip"]["foreground"] == row["loader"]["name"]
+            and row["clip"]["background"] == base_materialization["source"]
+            and row["clip"]["foreground"] == row["materialized_source"]
             and row["clip"]["operator"] == 'FuID { "In" }'
             and row["base_straight"]["input"] == previous
             and row["base_opaque"]["background"] == row["base_straight"]["name"]
             and row["base_opaque"]["to_alpha"] == "16"
-            and row["member_straight"]["input"] == row["loader"]["name"]
+            and row["member_straight"]["input"] == row["materialized_source"]
             and row["member_opaque"]["background"] == row["member_straight"]["name"]
             and row["member_opaque"]["to_alpha"] == "16"
             and row["blend_function"]["background"] == row["base_opaque"]["name"]
@@ -574,7 +579,7 @@ def _chain_shape(tools: Sequence[Dict[str, Any]], base_id: str, member_ids: Sequ
             and row["blend_coverage"]["to_alpha"] == "3"
             and row["blend_premult"]["input"] == row["blend_coverage"]["name"]
             and row["blend_restore"]["background"] == row["blend_premult"]["name"]
-            and row["blend_restore"]["foreground"] == row["loader"]["name"]
+            and row["blend_restore"]["foreground"] == row["materialized_source"]
             and row["blend_restore"]["to_alpha"] == "3"
             and row["stack"]["background"] == previous
             and row["stack"]["foreground"] == row["blend_restore"]["name"]
@@ -595,6 +600,7 @@ def _chain_shape(tools: Sequence[Dict[str, Any]], base_id: str, member_ids: Sequ
     )
     return {
         "base_loader": base_loaders[0] if len(base_loaders) == 1 else None,
+        "base_materialized_source": base_materialization["source"],
         "members": rows,
         "outer": outer,
         "pass": chain_pass,

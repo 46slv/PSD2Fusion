@@ -329,7 +329,13 @@ def _host_comp_for_case(root: Path, case: Mapping[str, Any], slug: str) -> Dict[
         name="Source",
         asset_path="source.png",
         blend=case["mode"],
-        raw_blend={"Normal": "norm", "Multiply": "mul ", "Linear Dodge": "lddg", "Overlay": "over"}[case["mode"]],
+        raw_blend={
+            "Normal": "norm",
+            "Multiply": "mul ",
+            "Screen": "scrn",
+            "Linear Dodge": "lddg",
+            "Overlay": "over",
+        }[case["mode"]],
         opacity=float(case["opacity"]),
     )
     doc = _fixture_document(source_hash, FIXTURE_SIZE[0], FIXTURE_SIZE[1], [backdrop_layer, source_layer])

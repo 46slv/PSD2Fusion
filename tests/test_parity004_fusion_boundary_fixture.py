@@ -76,6 +76,19 @@ class P4FusionBoundaryFixtureTests(unittest.TestCase):
         self.assertNotEqual(1.0, inputs[0]["base_alpha"])
         self.assertNotEqual(0.0, inputs[0]["member_alpha"])
         self.assertNotEqual(1.0, inputs[0]["member_alpha"])
+        base_red = inputs[0]["assets"]["base"]["rgba8"][0]
+        member_red = inputs[0]["assets"]["member"]["rgba8"][0]
+        self.assertGreater(base_red + member_red, 255)
+        self.assertGreater(
+            base_red
+            + member_red
+            * inputs[0]["member_alpha"]
+            * inputs[0]["member_opacity"],
+            base_red
+            + (255 - base_red)
+            * inputs[0]["member_alpha"]
+            * inputs[0]["member_opacity"],
+        )
 
     def test_ordinary_render_inputs_never_consume_group_operator_output(self):
         with tempfile.TemporaryDirectory() as directory:

@@ -106,6 +106,8 @@ def _blend_channel_ref(backdrop: float, source: float, mode: str) -> float:
         return source
     if mode == "Multiply":
         return backdrop * source
+    if mode == "Screen":
+        return backdrop + source - backdrop * source
     if mode == "Linear Dodge":
         return backdrop + source
     if mode == "Overlay":

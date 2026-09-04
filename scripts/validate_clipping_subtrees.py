@@ -12,7 +12,7 @@ from psd2fusion.semantic import index_layers, walk_layers
 
 TOOL_HEADER = re.compile(
     r"(?m)^([ \t]*)([A-Za-z_][A-Za-z0-9_]*) = "
-    r"(Background|Loader|Merge|ChannelBoolean|AlphaDivide|BrightnessContrast|AlphaMultiply|MediaOut|GroupOperator|Note) \{"
+    r"(Background|Loader|ChangeDepth|Merge|ChannelBoolean|AlphaDivide|BrightnessContrast|AlphaMultiply|MediaOut|GroupOperator|Note) \{"
 )
 
 
@@ -108,12 +108,54 @@ def parse_tools(path):
                 "clip_white": _value(block, "ClipWhite"),
                 "gain": _value(block, "Gain"),
                 "process_alpha": _value(block, "ProcessAlpha"),
+                "depth": _value(block, "Depth"),
+                "dither": _value(block, "Dither"),
+                "post_multiply": _value(
+                    block, '["Clip1.PNGFormat.PostMultiply"]'
+                ),
                 "input_target": _input_source_op(block, "MainInput1"),
                 "position": _position(block),
                 "comments": _value(block, "Comments") or "",
             }
         )
     return tools
+
+
+def materialization_for(tools, layer_id):
+    """Return and validate one straight-PNG to float32 premult source chain."""
+
+    suffix = "_" + layer_id[:10]
+
+    def role(prefix, tool_type):
+        return [
+            tool
+            for tool in tools
+            if tool["type"] == tool_type
+            and tool["name"].startswith(prefix)
+            and (tool["name"].endswith(suffix) or suffix + "_" in tool["name"])
+        ]
+
+    loaders = role("Loader", "Loader")
+    depths = role("MaterializeDepth", "ChangeDepth")
+    premults = role("MaterializePremult", "AlphaMultiply")
+    valid = len(loaders) == len(depths) == len(premults) == 1
+    if valid:
+        valid = all(
+            (
+                loaders[0]["post_multiply"] == "0",
+                depths[0]["input"] == loaders[0]["name"],
+                depths[0]["depth"] == "4",
+                depths[0]["dither"] == "0",
+                premults[0]["input"] == depths[0]["name"],
+            )
+        )
+    return {
+        "valid": valid,
+        "loader": loaders[0] if len(loaders) == 1 else None,
+        "depth": depths[0] if len(depths) == 1 else None,
+        "premult": premults[0] if len(premults) == 1 else None,
+        "source": premults[0]["name"] if valid else None,
+    }
 
 
 def validate(psd_path, comp_path):
@@ -137,8 +179,13 @@ def validate(psd_path, comp_path):
     for chain_index, chain in enumerate(doc.clipping_chains, 1):
         base = layers[chain.base_id]
         base_nodes = role(base.id, "Loader", "Loader")
-        checks = [len(base_nodes) == 1, chain.blend_clipped_as_group]
-        previous = base_nodes[0]["name"] if len(base_nodes) == 1 else None
+        base_materialization = materialization_for(tools, base.id)
+        checks = [
+            len(base_nodes) == 1,
+            base_materialization["valid"],
+            chain.blend_clipped_as_group,
+        ]
+        previous = base_materialization["source"]
         emitted_members = []
         for member_id in chain.member_ids:
             member = layers[member_id]
@@ -146,6 +193,7 @@ def validate(psd_path, comp_path):
                 continue
             visible_member_count += 1
             loaders = role(member.id, "Loader", "Loader")
+            member_materialization = materialization_for(tools, member.id)
             clips = role(member.id, "ClipIn", "Merge")
             base_straight = role(member.id, "BlendBaseStraight", "AlphaDivide")
             base_opaque = role(member.id, "BlendBaseOpaque", "ChannelBoolean")
@@ -175,11 +223,14 @@ def validate(psd_path, comp_path):
                 blend_restore,
                 stacks,
             )
-            member_ok = all(len(nodes) == 1 for nodes in node_sets)
-            member_ok = member_ok and (
-                len(member_attenuate) == 1
-                if is_linear_dodge
-                else len(member_attenuate) == 0
+            member_ok = (
+                all(len(nodes) == 1 for nodes in node_sets)
+                and member_materialization["valid"]
+                and (
+                    len(member_attenuate) == 1
+                    if is_linear_dodge
+                    else len(member_attenuate) == 0
+                )
             )
             if member_ok:
                 clip = clips[0]
@@ -204,13 +255,13 @@ def validate(psd_path, comp_path):
                 )
                 member_ok = all(
                     (
-                        clip["background"] == (base_nodes[0]["name"] if base_nodes else None),
-                        clip["foreground"] == loaders[0]["name"],
+                        clip["background"] == base_materialization["source"],
+                        clip["foreground"] == member_materialization["source"],
                         clip["operator"] == 'FuID { "In" }',
                         base_div["input"] == previous,
                         base_opaque_node["background"] == base_div["name"],
                         base_opaque_node["to_alpha"] == "16",
-                        member_div["input"] == loaders[0]["name"],
+                        member_div["input"] == member_materialization["source"],
                         member_opaque_node["background"]
                         == (
                             member_attenuate[0]["name"]
@@ -230,15 +281,19 @@ def validate(psd_path, comp_path):
                         coverage["background"] == clamp["name"],
                         coverage["foreground"]
                         == (
-                            base_nodes[0]["name"]
-                            if is_linear_dodge and base_nodes
+                            base_materialization["source"]
+                            if is_linear_dodge
                             else clip["name"]
                         ),
                         coverage["to_alpha"] == "3",
                         premult["input"] == coverage["name"],
                         restore["background"] == premult["name"],
                         restore["foreground"]
-                        == (None if is_linear_dodge else loaders[0]["name"]),
+                        == (
+                            None
+                            if is_linear_dodge
+                            else member_materialization["source"]
+                        ),
                         restore["to_alpha"] == ("16" if is_linear_dodge else "3"),
                         stack["background"] == previous,
                         stack["foreground"] == restore["name"],
@@ -251,7 +306,8 @@ def validate(psd_path, comp_path):
                     attenuate = member_attenuate[0]
                     member_ok = all(
                         (
-                            attenuate["input"] == loaders[0]["name"],
+                            attenuate["input"]
+                            == member_materialization["source"],
                             attenuate["gain"] == "%.6f" % member.opacity,
                             attenuate["process_alpha"] == "0",
                         )

@@ -16,7 +16,7 @@ if str(ROOT) not in sys.path:
 from psd2fusion.fusion_comp import compile_comp
 from scripts.parity.p4_03 import BASE_ID, MEMBER_IDS, fixture_document
 from scripts.parity.p4_05 import fixture_documents
-from scripts.validate_clipping_subtrees import parse_tools
+from scripts.validate_clipping_subtrees import materialization_for, parse_tools
 
 
 def _artifact(path: Path) -> Dict[str, Any]:
@@ -51,6 +51,7 @@ def build(output: Path) -> Dict[str, Any]:
     group_tools = parse_tools(group_path)
 
     base = _one(clip_tools, "Loader", BASE_ID)
+    base_materialization = materialization_for(clip_tools, BASE_ID)
     members = [_one(clip_tools, "Loader", member_id) for member_id in MEMBER_IDS]
     clips = [_one(clip_tools, "ClipIn", member_id) for member_id in MEMBER_IDS]
     stacks = [_one(clip_tools, "ClipStack", member_id) for member_id in MEMBER_IDS]
@@ -105,9 +106,10 @@ def build(output: Path) -> Dict[str, Any]:
         ),
         "fixed_matte_connection_remains_obvious": (
             base is not None
+            and base_materialization["valid"]
             and all(
                 clip is not None
-                and clip["background"] == base["name"]
+                and clip["background"] == base_materialization["source"]
                 and clip["operator"] == 'FuID { "In" }'
                 for clip in clips
             )

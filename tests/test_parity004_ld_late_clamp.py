@@ -14,7 +14,7 @@ from pathlib import Path
 
 from psd2fusion.fusion_comp import FUSION_BLEND_IDS, compile_comp
 from psd2fusion.semantic import ClippingChain, SemanticDocument, SemanticLayer
-from scripts.validate_clipping_subtrees import parse_tools
+from scripts.validate_clipping_subtrees import materialization_for, parse_tools
 
 
 BASE_ID = "ldlatebase1"
@@ -99,13 +99,16 @@ class LDLateClampIslandTests(unittest.TestCase):
 
         member_id = "ldlatelddg01"
         loader = _one(tools, "Loader", member_id, "Loader")
+        materialization = materialization_for(tools, member_id)
+        self.assertTrue(materialization["valid"])
         attenuate = _one(tools, "BlendMemberAttenuate", member_id, "BrightnessContrast")
-        # Opacity lives in the float32 Gain, applied exactly once.
+        # Opacity lives in the float32 Gain, applied exactly once, on the
+        # materialized premultiplied member stream.
         self.assertEqual("0.500000", attenuate["gain"])
         self.assertEqual("0", attenuate["process_alpha"])
         self.assertIsNone(attenuate["clip_black"])
         self.assertIsNone(attenuate["clip_white"])
-        self.assertEqual(loader["name"], attenuate["input"])
+        self.assertEqual(materialization["source"], attenuate["input"])
         opaque = _one(tools, "BlendMemberOpaque", member_id, "ChannelBoolean")
         self.assertEqual(attenuate["name"], opaque["background"])
         self.assertEqual("16", opaque["to_alpha"])
@@ -113,9 +116,11 @@ class LDLateClampIslandTests(unittest.TestCase):
         self.assertEqual('FuID { "%s" }' % FUSION_BLEND_IDS["Linear Dodge"], function["apply_mode"])
         self.assertEqual("1.000000", function["blend"])
         coverage = _one(tools, "BlendCoverage", member_id, "ChannelBoolean")
+        base_materialization = materialization_for(tools, BASE_ID)
+        self.assertTrue(base_materialization["valid"])
         base_loader = _one(tools, "Loader", BASE_ID, "Loader")
         # Fixed base coverage M is attached, never the M*A intersection.
-        self.assertEqual(base_loader["name"], coverage["foreground"])
+        self.assertEqual(base_materialization["source"], coverage["foreground"])
         self.assertEqual("3", coverage["to_alpha"])
         restore = _one(tools, "BlendRestoreAlpha", member_id, "ChannelBoolean")
         self.assertEqual("16", restore["to_alpha"])

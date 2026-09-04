@@ -1,7 +1,7 @@
 """Strict compositing capability registry.
 
 Names in Fusion are not proof that the renderer produces the required pixels.
-The registry therefore keeps the four PARITY-003 candidates ``unverified``
+The registry therefore keeps the five PARITY-003 candidates ``unverified``
 until a summary packet contains deterministic semantic-fixture evidence, PSD
 provenance, an actual Fusion pixel artifact, and a golden-reference comparison
 tied to one exact commit. Photoshop is optional historical/additional evidence.
