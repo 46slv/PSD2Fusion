@@ -12,8 +12,8 @@ python .\scripts\parity\parity003.py generate --output .\.local\parity003-fixtur
 python .\scripts\parity\parity003.py validate --fixtures .\.local\parity003-fixtures
 ```
 
-The matrix contains 1,983 per-pixel cases for Normal, Multiply, Linear Dodge
-and Overlay.  Each mode covers transparent (including non-zero transparent
+The matrix contains 2,478 per-pixel cases for Normal, Multiply, Screen,
+Linear Dodge and Overlay.  Each mode covers transparent (including non-zero transparent
 RGB), black, white, gray, saturated, partial-alpha and gradient backdrops;
 source alpha `0/.125/.25/.375/.5/.625/.75/.875/1`; and opacity
 `0/.25/.5/.75/1`.  Additional rows isolate the declared linear-sRGB boundary,
@@ -37,7 +37,7 @@ the PARITY-001 comparator to return `PASS` for every candidate; otherwise it
 records `BLOCKED`.
 
 The strict capability registry in `psd2fusion/capabilities.py` therefore keeps
-all four modes and opacity/group operations `unverified` until one evidence
+all five modes and opacity/group operations `unverified` until one evidence
 packet contains Photoshop/reference pixels and an actual Resolve/Fusion render
 tied to the exact candidate commit, host versions, color settings, ICC bytes,
 alpha contract and quantitative RGBA/alpha metrics.  Unknown modes are

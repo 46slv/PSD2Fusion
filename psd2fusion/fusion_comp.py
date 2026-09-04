@@ -4,6 +4,7 @@ from dataclasses import dataclass
 import os
 from typing import Dict, Iterable, List, Optional, Sequence, Tuple
 
+from .capabilities import capability_for_blend
 from .semantic import SemanticDocument, SemanticLayer, index_layers
 
 
@@ -432,18 +433,27 @@ class _Compiler:
         self._x += 180.0
         return (self._x + depth * 40.0, float(row) * 110.0)
 
-    def mode_id(self, layer: SemanticLayer) -> str:
-        self.blend_modes.add(layer.blend)
-        mode_id = FUSION_BLEND_IDS.get(layer.blend)
+    def _mode_id(self, mode: str) -> str:
+        record = capability_for_blend(mode)
+        if record.status == "rejected":
+            raise ValueError(
+                "Cannot lower a blend mode rejected by the strict capability "
+                "registry: %s" % mode
+            )
+        self.blend_modes.add(mode)
+        mode_id = FUSION_BLEND_IDS.get(mode)
         if mode_id is None:
             # A same-named Fusion control is not a Photoshop proof, and an
             # unknown control must never be silently changed to Normal.  The
             # caller can choose an explicit bake/reject path instead.
             raise ValueError(
                 "Cannot lower unsupported/unverified blend mode without an "
-                "explicit capability decision: %s" % layer.blend
+                "explicit capability decision: %s" % mode
             )
         return mode_id
+
+    def mode_id(self, layer: SemanticLayer) -> str:
+        return self._mode_id(layer.blend)
 
     def leaf(self, layer: SemanticLayer, depth: int, scope: str) -> _ItemResult:
         loader_name = self.name("Loader" + scope, layer.id)
@@ -599,20 +609,22 @@ class _Compiler:
         mode: Optional[str] = None,
         backdrop_consumer: Optional[List[Optional[_Source]]] = None,
     ) -> _Source:
-        # The local clipping island is sufficient for an opaque/root
-        # backdrop. A fractional external backdrop plus a non-Normal base
-        # mode needs the same straight-function separation at this one
-        # diagnosed boundary; keep that repair local instead of changing every
-        # compiler Merge.
-        if comment_prefix == "PSD clipping chain merge" and mode not in (None, "Normal"):
-            return self._merge_clipping_outer_straight(
+        effective_mode = layer.blend if mode is None else mode
+        # Loader and subtree streams are premultiplied. Any separable
+        # non-Normal blend function must therefore be evaluated on explicit
+        # straight, opaque RGB inputs before source coverage is restored.
+        # Clipping already used this boundary; ordinary layers and groups must
+        # not feed premultiplied RGB directly into a same-named Fusion mode.
+        if effective_mode != "Normal":
+            return self._merge_non_normal_straight(
                 backdrop,
                 result,
                 layer,
                 depth,
                 scope,
                 opacity,
-                mode,
+                effective_mode,
+                comment_prefix,
                 backdrop_consumer,
             )
         merge_name = self.name("Merge" + scope, layer.id)
@@ -621,16 +633,7 @@ class _Compiler:
         if comment_prefix == "PSD clipping chain merge":
             row = self._clipping_outer_rows.get(layer.id, 0)
         x, y = self.position(row, depth)
-        if mode is None:
-            mode_id = self.mode_id(layer)
-        else:
-            self.blend_modes.add(mode)
-            mode_id = FUSION_BLEND_IDS.get(mode)
-            if mode_id is None:
-                raise ValueError(
-                    "Cannot lower unsupported/unverified blend mode without an "
-                    "explicit capability decision: %s" % mode
-                )
+        mode_id = self._mode_id(effective_mode)
         if backdrop_consumer is not None and backdrop_consumer[0] is None:
             backdrop_consumer[0] = _Source(merge_name, "Background")
         comment = "%s: %s" % (comment_prefix, layer.name)
@@ -650,7 +653,7 @@ class _Compiler:
         )
         return _Source(merge_name)
 
-    def _merge_clipping_outer_straight(
+    def _merge_non_normal_straight(
         self,
         backdrop: _Source,
         result: _ItemResult,
@@ -658,36 +661,50 @@ class _Compiler:
         depth: int,
         scope: str,
         opacity: Optional[float],
-        mode: Optional[str],
+        mode: str,
+        comment_prefix: str,
         backdrop_consumer: Optional[List[Optional[_Source]]] = None,
     ) -> _Source:
-        """Lower one non-Normal clipping outer boundary in straight RGB.
+        """Lower one separable non-Normal boundary in straight RGB.
 
-        result.output is the completed local clipping span (premultiplied RGB,
-        alpha M), while backdrop may have a fractional alpha D. The helper
-        stream constructs T=(1-D)S+D*B(C_D,S) and composites it with source
-        coverage q=M*opacity using a final Normal Merge. This is intentionally
-        scoped to the P4-09-localized outer boundary; ordinary layer merges
-        retain their established path.
+        ``result.output`` and ``backdrop`` are premultiplied streams. The
+        helper constructs ``T=(1-D)S+D*B(C_D,S)`` from straight opaque inputs,
+        restores ``q=A_s*opacity``, and performs one final Normal source-over.
+        The same algebra applies to an ordinary layer/group and to the outer
+        boundary of a completed clipping span.
         """
 
         if self._root_background_name is None:
-            raise ValueError("clipping outer straight boundary requires root canvas")
-        if mode is None:
-            mode = layer.blend
-        mode_id = FUSION_BLEND_IDS.get(mode)
-        if mode_id is None:
-            raise ValueError(
-                "Cannot lower unsupported/unverified blend mode without an "
-                "explicit capability decision: %s" % mode
-            )
+            raise ValueError("straight blend boundary requires root canvas")
+        mode_id = self._mode_id(mode)
         member_opacity = layer.opacity if opacity is None else opacity
         row = self._clipping_outer_rows.get(layer.id, 0)
+        clipping_outer = comment_prefix == "PSD clipping chain merge"
+        role_prefix = "OuterBlend" if clipping_outer else "LayerBlend"
+        boundary_label = "PSD clipping outer" if clipping_outer else "PSD layer"
 
         def emit_name(role: str) -> str:
-            return self.name(role + scope, layer.id)
+            return self.name(role_prefix + role + scope, layer.id)
 
-        backdrop_straight_name = emit_name("OuterBlendBackdropStraight")
+        if clipping_outer:
+            transparent_source = _Source(self._root_background_name)
+        else:
+            transparent_name = emit_name("Canvas")
+            x, y = self.position(row + 4.0, depth)
+            self._current_tools.append(
+                _background(
+                    transparent_name,
+                    self.doc.width,
+                    self.doc.height,
+                    "Transparent canvas for straight blend coverage: %s"
+                    % layer.name,
+                    x,
+                    y,
+                )
+            )
+            transparent_source = _Source(transparent_name)
+
+        backdrop_straight_name = emit_name("BackdropStraight")
         if backdrop_consumer is not None and backdrop_consumer[0] is None:
             backdrop_consumer[0] = _Source(backdrop_straight_name, "Input")
         x, y = self.position(row + 3.0, depth)
@@ -695,53 +712,54 @@ class _Compiler:
             _alpha_divide(
                 backdrop_straight_name,
                 backdrop,
-                "PSD clipping outer backdrop straight RGB: %s" % layer.name
+                "%s backdrop straight RGB: %s" % (boundary_label, layer.name)
                 + " [P4-HOST-PIXEL: localized fractional-backdrop boundary]",
                 x,
                 y,
             )
         )
 
-        backdrop_opaque_name = emit_name("OuterBlendBackdropOpaque")
+        backdrop_opaque_name = emit_name("BackdropOpaque")
         x, y = self.position(row + 2.5, depth)
         self._current_tools.append(
             _channel_boolean_force_opaque(
                 backdrop_opaque_name,
                 _Source(backdrop_straight_name),
-                "PSD clipping outer backdrop opaque RGB: %s" % layer.name
+                "%s backdrop opaque RGB: %s" % (boundary_label, layer.name)
                 + " [P4-HOST-PIXEL: force alpha=1 for base function]",
                 x,
                 y,
             )
         )
 
-        source_straight_name = emit_name("OuterBlendSourceStraight")
+        source_straight_name = emit_name("SourceStraight")
+        source_kind = "completed clipping span" if clipping_outer else "layer/group stream"
         x, y = self.position(row + 1.5, depth)
         self._current_tools.append(
             _alpha_divide(
                 source_straight_name,
                 result.output,
-                "PSD clipping outer local source straight RGB: %s" % layer.name
-                + " [P4-HOST-PIXEL: completed clipping span]",
+                "%s source straight RGB: %s" % (boundary_label, layer.name)
+                + " [P4-HOST-PIXEL: %s]" % source_kind,
                 x,
                 y,
             )
         )
 
-        source_opaque_name = emit_name("OuterBlendSourceOpaque")
+        source_opaque_name = emit_name("SourceOpaque")
         x, y = self.position(row + 1.0, depth)
         self._current_tools.append(
             _channel_boolean_force_opaque(
                 source_opaque_name,
                 _Source(source_straight_name),
-                "PSD clipping outer local source opaque RGB: %s" % layer.name
+                "%s source opaque RGB: %s" % (boundary_label, layer.name)
                 + " [P4-HOST-PIXEL: force alpha=1 for base function]",
                 x,
                 y,
             )
         )
 
-        function_name = emit_name("OuterBlendFunction")
+        function_name = emit_name("Function")
         self.merge_count += 1
         x, y = self.position(row + 0.5, depth)
         self._current_tools.append(
@@ -751,41 +769,41 @@ class _Compiler:
                 _Source(source_opaque_name),
                 mode_id,
                 1.0,
-                "PSD clipping outer blend function: %s" % layer.name
+                "%s blend function: %s" % (boundary_label, layer.name)
                 + " [P4-HOST-PIXEL: straight opaque; Blend=1]",
                 x,
                 y,
             )
         )
 
-        function_coverage_name = emit_name("OuterBlendFunctionCoverage")
+        function_coverage_name = emit_name("FunctionCoverage")
         x, y = self.position(row + 0.0, depth)
         self._current_tools.append(
             _channel_boolean_attach_alpha(
                 function_coverage_name,
                 _Source(function_name),
                 backdrop,
-                "PSD clipping outer blend backdrop coverage: %s" % layer.name
+                "%s blend backdrop coverage: %s" % (boundary_label, layer.name)
                 + " [P4-HOST-PIXEL: attach backdrop alpha D]",
                 x,
                 y,
             )
         )
 
-        function_premult_name = emit_name("OuterBlendFunctionPremult")
+        function_premult_name = emit_name("FunctionPremult")
         x, y = self.position(row - 0.25, depth)
         self._current_tools.append(
             _alpha_multiply(
                 function_premult_name,
                 _Source(function_coverage_name),
-                "PSD clipping outer blend function premultiply: %s" % layer.name
+                "%s blend function premultiply: %s" % (boundary_label, layer.name)
                 + " [P4-HOST-PIXEL: backdrop alpha * B(C_D,S)]",
                 x,
                 y,
             )
         )
 
-        source_mix_name = emit_name("OuterBlendSourceMix")
+        source_mix_name = emit_name("SourceMix")
         self.merge_count += 1
         x, y = self.position(row - 0.5, depth)
         self._current_tools.append(
@@ -795,52 +813,57 @@ class _Compiler:
                 _Source(function_premult_name),
                 "Normal",
                 1.0,
-                "PSD clipping outer straight source mix: %s" % layer.name
+                "%s straight source mix: %s" % (boundary_label, layer.name)
                 + " [P4-HOST-PIXEL: (1-D)S + D*B(C_D,S)]",
                 x,
                 y,
             )
         )
 
-        source_coverage_name = emit_name("OuterBlendCoverage")
+        source_coverage_name = emit_name("Coverage")
+        coverage_kind = (
+            "q=M*base opacity"
+            if clipping_outer
+            else "q=source alpha*layer/group opacity"
+        )
         self.merge_count += 1
         x, y = self.position(row - 1.0, depth)
         self._current_tools.append(
             _merge(
                 source_coverage_name,
-                _Source(self._root_background_name),
+                transparent_source,
                 result.output,
                 "Normal",
                 member_opacity,
-                "PSD clipping outer source coverage: %s" % layer.name
-                + " [P4-HOST-PIXEL: q=M*base opacity]",
+                "%s source coverage: %s" % (boundary_label, layer.name)
+                + " [P4-HOST-PIXEL: %s]" % coverage_kind,
                 x,
                 y,
                 process_alpha=True,
             )
         )
 
-        coverage_attached_name = emit_name("OuterBlendCoverageAttached")
+        coverage_attached_name = emit_name("CoverageAttached")
         x, y = self.position(row - 1.5, depth)
         self._current_tools.append(
             _channel_boolean_attach_alpha(
                 coverage_attached_name,
                 _Source(source_mix_name),
                 _Source(source_coverage_name),
-                "PSD clipping outer source mix coverage: %s" % layer.name
+                "%s source mix coverage: %s" % (boundary_label, layer.name)
                 + " [P4-HOST-PIXEL: attach q alpha]",
                 x,
                 y,
             )
         )
 
-        premult_name = emit_name("OuterBlendPremult")
+        premult_name = emit_name("Premult")
         x, y = self.position(row - 2.0, depth)
         self._current_tools.append(
             _alpha_multiply(
                 premult_name,
                 _Source(coverage_attached_name),
-                "PSD clipping outer premultiply: %s" % layer.name
+                "%s premultiply: %s" % (boundary_label, layer.name)
                 + " [P4-HOST-PIXEL: q*((1-D)S+D*B)]",
                 x,
                 y,
@@ -850,6 +873,17 @@ class _Compiler:
         merge_name = self.name("Merge" + scope, layer.id)
         self.merge_count += 1
         x, y = self.position(row - 2.5, depth)
+        final_comment = "%s: %s" % (comment_prefix, layer.name)
+        if clipping_outer:
+            final_comment += (
+                " [P4-01 outer boundary; P4-04 base blend/opacity once; "
+                "P4-HOST-PIXEL localized straight outer boundary]"
+            )
+        else:
+            final_comment += (
+                " [P4-OFFLINE straight/opaque non-Normal boundary; "
+                "source alpha and opacity restored once]"
+            )
         self._current_tools.append(
             _merge(
                 merge_name,
@@ -857,9 +891,7 @@ class _Compiler:
                 _Source(premult_name),
                 "Normal",
                 1.0,
-                "PSD clipping chain merge: %s" % layer.name
-                + " [P4-01 outer boundary; P4-04 base blend/opacity once; "
-                "P4-HOST-PIXEL localized straight outer boundary]",
+                final_comment,
                 x,
                 y,
                 process_alpha=True,

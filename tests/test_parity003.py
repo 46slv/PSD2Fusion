@@ -7,9 +7,11 @@ from psd2fusion.compositing import (
     ColorSpaceSpec,
     CompositingError,
     apply_opacity,
+    composite_clipping_span_u8,
     composite_isolated_group,
     composite_pass_through_group,
     composite_pixel,
+    composite_pixel_u8,
     premultiply,
     unpremultiply,
 )
@@ -24,6 +26,9 @@ class CoreCompositingTests(unittest.TestCase):
         source = (0.6, 0.4, 0.25, 1.0)
         self.assertEqual((0.6, 0.4, 0.25, 1.0), composite_pixel(backdrop, source, "Normal"))
         self.assertEqual((0.12, 0.2, 0.2, 1.0), composite_pixel(backdrop, source, "Multiply"))
+        got = composite_pixel(backdrop, source, "Screen")
+        for expected, actual in zip((0.68, 0.7, 0.85, 1.0), got):
+            self.assertAlmostEqual(expected, actual)
         self.assertEqual((0.8, 0.9, 1.0, 1.0), composite_pixel(backdrop, source, "Linear Dodge"))
         got = composite_pixel(backdrop, source, "Overlay")
         for expected, actual in zip((0.24, 0.4, 0.7, 1.0), got):
@@ -43,7 +48,7 @@ class CoreCompositingTests(unittest.TestCase):
     def test_transparent_backdrop_rgb_is_canonical_and_source_remains_visible(self):
         backdrop = (0.8, 0.3, 0.1, 0.0)
         source = (0.2, 0.7, 0.4, 1.0)
-        for mode in ("Normal", "Multiply", "Linear Dodge", "Overlay"):
+        for mode in ("Normal", "Multiply", "Screen", "Linear Dodge", "Overlay"):
             self.assertEqual(source, composite_pixel(backdrop, source, mode))
         self.assertEqual((0.0, 0.0, 0.0, 0.0), composite_pixel(backdrop, source, "Normal", 0.0))
 
@@ -93,10 +98,29 @@ class CoreCompositingTests(unittest.TestCase):
         with self.assertRaises(CompositingError):
             composite_pass_through_group(outer_a, layers, 0.5)
 
+    def test_strict_uint8_rounding_matches_fixture_oracle_boundaries(self):
+        ordinary = composite_pixel_u8(
+            (20, 40, 80, 128), (170, 150, 130, 192), "Normal"
+        )
+        ordinary = composite_pixel_u8(
+            ordinary, (120, 200, 60, 160), "Multiply"
+        )
+        self.assertEqual((101, 123, 64, 243), ordinary)
+
+        clipped = composite_clipping_span_u8(
+            (0, 0, 0, 0),
+            (90, 140, 210, 160),
+            [
+                ((210, 80, 40, 192), "Multiply", 128 / 255.0),
+                ((30, 180, 110, 128), "Screen", 192 / 255.0),
+            ],
+        )
+        self.assertEqual((92, 144, 161, 160), clipped)
+
 
 class CapabilityAndFixtureTests(unittest.TestCase):
     def test_core_registry_remains_unverified_without_host_packet(self):
-        for mode in ("Normal", "Multiply", "Linear Dodge", "Overlay"):
+        for mode in ("Normal", "Multiply", "Screen", "Linear Dodge", "Overlay"):
             record = capability_for_blend(mode)
             self.assertEqual("unverified", record.status)
             self.assertFalse(proof_fields_complete({"candidate_commit": "x", "proof_id": "p", "photoshop": {"version": "not_run"}, "resolve_fusion": {"version": "not_run"}, "metrics": {}}))
@@ -124,7 +148,7 @@ class CapabilityAndFixtureTests(unittest.TestCase):
             self.assertEqual("PASS", generated["status"])
             result = validate(directory)
             self.assertEqual("PASS", result["status"])
-            self.assertEqual(1983, result["blend_cases"])
+            self.assertEqual(2478, result["blend_cases"])
             self.assertEqual(5, result["recomputed_opacity_cases"])
             self.assertEqual(6, result["recomputed_group_cases"])
             self.assertEqual(0.0, result["max_boundary_error"])

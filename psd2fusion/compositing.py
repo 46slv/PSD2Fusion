@@ -20,8 +20,10 @@ from typing import Iterable, Sequence, Tuple
 
 RGBA = Tuple[float, float, float, float]
 RGB = Tuple[float, float, float]
+RGBA8 = Tuple[int, int, int, int]
+RGB8 = Tuple[int, int, int]
 
-CORE_BLEND_MODES = ("Normal", "Multiply", "Linear Dodge", "Overlay")
+CORE_BLEND_MODES = ("Normal", "Multiply", "Screen", "Linear Dodge", "Overlay")
 COLOR_SPACES = ("sRGB", "linear-sRGB")
 TRANSPARENT_RGB_POLICIES = ("canonical_zero", "preserve")
 
@@ -119,6 +121,8 @@ def _blend_channel(backdrop: float, source: float, mode: str) -> float:
         return source
     if mode == "Multiply":
         return backdrop * source
+    if mode == "Screen":
+        return backdrop + source - backdrop * source
     if mode == "Linear Dodge":
         return backdrop + source
     if mode == "Overlay":
@@ -126,6 +130,146 @@ def _blend_channel(backdrop: float, source: float, mode: str) -> float:
             return 2.0 * backdrop * source
         return 1.0 - 2.0 * (1.0 - backdrop) * (1.0 - source)
     raise CompositingError("unsupported blend mode: %s" % mode)
+
+
+def _round_u8(value: float, label: str) -> int:
+    """Round one normalized channel to uint8 with explicit half-up policy."""
+
+    value = _channel(value, label, True)
+    return int(math.floor(value * 255.0 + 0.5))
+
+
+def _rgba_u8(pixel: Sequence[int], label: str) -> RGBA8:
+    if len(pixel) != 4:
+        raise CompositingError("%s must contain RGBA" % label)
+    values = []
+    for index, value in enumerate(pixel):
+        if isinstance(value, bool) or not isinstance(value, int):
+            raise CompositingError("%s[%d] must be an integer" % (label, index))
+        if value < 0 or value > 255:
+            raise CompositingError("%s[%d] must be in 0..255" % (label, index))
+        values.append(value)
+    return (values[0], values[1], values[2], values[3])
+
+
+def _div255_half_up(value: int) -> int:
+    """Return ``value / 255`` rounded half-up for non-negative integers."""
+
+    return (value + 127) // 255
+
+
+def _blend_channel_u8(backdrop: int, source: int, mode: str) -> int:
+    if mode == "Normal":
+        return source
+    if mode == "Multiply":
+        return _div255_half_up(backdrop * source)
+    if mode == "Screen":
+        return 255 - _div255_half_up((255 - backdrop) * (255 - source))
+    if mode == "Linear Dodge":
+        return min(255, backdrop + source)
+    if mode == "Overlay":
+        if 2 * backdrop <= 255:
+            return _div255_half_up(2 * backdrop * source)
+        return 255 - _div255_half_up(
+            2 * (255 - backdrop) * (255 - source)
+        )
+    raise CompositingError("unsupported blend mode: %s" % mode)
+
+
+def blend_rgb_u8(
+    backdrop: Sequence[int], source: Sequence[int], mode: str
+) -> RGB8:
+    """Evaluate one encoded-sRGB blend function with exact uint8 rounding."""
+
+    if mode not in CORE_BLEND_MODES:
+        raise CompositingError("unsupported blend mode: %s" % mode)
+    if len(backdrop) != 3 or len(source) != 3:
+        raise CompositingError("blend_rgb_u8 expects RGB triples")
+    b = _rgba_u8(tuple(backdrop) + (255,), "backdrop")[:3]
+    s = _rgba_u8(tuple(source) + (255,), "source")[:3]
+    return tuple(
+        _blend_channel_u8(b[index], s[index], mode) for index in range(3)
+    )  # type: ignore[return-value]
+
+
+def composite_pixel_u8(
+    backdrop: Sequence[int],
+    source: Sequence[int],
+    mode: str = "Normal",
+    opacity: float = 1.0,
+) -> RGBA8:
+    """Composite straight RGBA8 with explicit half-up stage quantization.
+
+    This is the strict 8-bit companion to :func:`composite_pixel`. It is used
+    for byte-oracle verification where a one-LSB difference is a failure, not
+    a tolerance decision. The arithmetic is the W3C separable source-over
+    equation in encoded sRGB and canonicalizes fully transparent output RGB.
+    """
+
+    d = _rgba_u8(backdrop, "backdrop")
+    s = _rgba_u8(source, "source")
+    opacity_u8 = _round_u8(_alpha(opacity, "opacity"), "opacity")
+    source_alpha = _div255_half_up(s[3] * opacity_u8)
+    backdrop_alpha = d[3]
+    alpha_numerator = source_alpha * 255 + backdrop_alpha * (255 - source_alpha)
+    if alpha_numerator == 0:
+        return (0, 0, 0, 0)
+    output_alpha = _div255_half_up(alpha_numerator)
+    colors = []
+    for channel in range(3):
+        blended = _blend_channel_u8(d[channel], s[channel], mode)
+        numerator = (
+            s[channel] * source_alpha * (255 - backdrop_alpha)
+            + blended * source_alpha * backdrop_alpha
+            + d[channel] * backdrop_alpha * (255 - source_alpha)
+        )
+        colors.append((numerator + alpha_numerator // 2) // alpha_numerator)
+    return (colors[0], colors[1], colors[2], output_alpha)
+
+
+def composite_clipping_span_u8(
+    backdrop: Sequence[int],
+    base: Sequence[int],
+    members: Iterable[tuple[Sequence[int], str, float]],
+    base_mode: str = "Normal",
+    base_opacity: float = 1.0,
+) -> RGBA8:
+    """Evaluate the strict uint8 ``clbl=true`` fixed-matte contract.
+
+    Each member is quantized at its local PSD stage, the base alpha stays
+    fixed throughout the span, and base opacity is quantized once at the outer
+    boundary. This makes 1-LSB behavior explicit for independent byte oracles.
+    """
+
+    local = _rgba_u8(base, "base")
+    fixed_alpha = local[3]
+    for index, (member_pixel, member_mode, member_opacity) in enumerate(members):
+        member = _rgba_u8(member_pixel, "member[%d]" % index)
+        opacity_u8 = _round_u8(
+            _alpha(member_opacity, "member[%d].opacity" % index),
+            "member[%d].opacity" % index,
+        )
+        coverage = _div255_half_up(member[3] * opacity_u8)
+        if coverage == 0:
+            continue
+        if fixed_alpha == 0:
+            local = (0, 0, 0, 0)
+            continue
+        blended = blend_rgb_u8(local[:3], member[:3], member_mode)
+        rgb = tuple(
+            _div255_half_up(
+                local[channel] * (255 - coverage)
+                + blended[channel] * coverage
+            )
+            for channel in range(3)
+        )
+        local = (rgb[0], rgb[1], rgb[2], fixed_alpha)
+
+    base_opacity_u8 = _round_u8(
+        _alpha(base_opacity, "base opacity"), "base opacity"
+    )
+    local = local[:3] + (_div255_half_up(fixed_alpha * base_opacity_u8),)
+    return composite_pixel_u8(backdrop, local, base_mode, 1.0)
 
 
 def blend_rgb(
