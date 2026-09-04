@@ -199,8 +199,8 @@ def _chain_control_row(
                     blend_coverage["background"] == blend_clamp["name"],
                     blend_coverage["foreground"]
                     == (
-                        base_loaders[0]["name"]
-                        if is_linear_dodge and base_loaders
+                        base_materialization["source"]
+                        if is_linear_dodge
                         else clip["name"]
                     ),
                     blend_coverage["to_alpha"] == "3",
