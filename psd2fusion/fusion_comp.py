@@ -162,7 +162,10 @@ def _loader(
         "\t\t}",
         "\t},",
         "\tInputs = {",
-        "\t\t[\"Clip1.PNGFormat.PostMultiply\"] = Input { Value = 1, },",
+        # Keep PNG bytes straight until ChangeDepth promotes the stream to
+        # float32.  Resolve/Fusion 21.0.3 premultiplies an int8 Loader with a
+        # truncating boundary that loses one RGB LSB for fractional alpha.
+        "\t\t[\"Clip1.PNGFormat.PostMultiply\"] = Input { Value = 0, },",
         "\t\tGlobalOut = Input { Value = 1000, },",
         "\t\tComments = Input { Value = %s, }," % _quote(comment),
         "\t},",
@@ -170,6 +173,29 @@ def _loader(
         "},",
     ]
     return "\n".join(lines)
+
+
+def _change_depth(
+    name: str,
+    source: _Source,
+    comment: str,
+    x: float,
+    y: float,
+) -> str:
+    """Promote straight loader bytes to float32 before premultiplication."""
+
+    return _simple_tool(
+        name,
+        "ChangeDepth",
+        [
+            _input_connection("Input", source),
+            _input_value("Depth", "4"),
+            _input_value("Dither", "0"),
+        ],
+        comment,
+        x,
+        y,
+    )
 
 
 def _merge(
@@ -471,7 +497,31 @@ class _Compiler:
         self._current_tools.append(
             _loader(loader_name, filename, "PSD layer: %s" % layer.name, x, y)
         )
-        source = _Source(loader_name)
+        depth_name = self.name("MaterializeDepth" + scope, layer.id)
+        x, y = self.position(row, depth)
+        self._current_tools.append(
+            _change_depth(
+                depth_name,
+                _Source(loader_name),
+                "PSD layer float32 materialization: %s" % layer.name
+                + " [P4-HOST-PIXEL: preserve straight PNG bytes before premultiply]",
+                x,
+                y,
+            )
+        )
+        premult_name = self.name("MaterializePremult" + scope, layer.id)
+        x, y = self.position(row, depth)
+        self._current_tools.append(
+            _alpha_multiply(
+                premult_name,
+                _Source(depth_name),
+                "PSD layer premultiply: %s" % layer.name
+                + " [P4-HOST-PIXEL: float32 straight-to-premult boundary]",
+                x,
+                y,
+            )
+        )
+        source = _Source(premult_name)
         return _ItemResult(source, source)
 
     @staticmethod

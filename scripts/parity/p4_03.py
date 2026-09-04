@@ -22,7 +22,7 @@ if str(ROOT) not in sys.path:
 
 from psd2fusion.fusion_comp import FUSION_BLEND_IDS, compile_comp
 from psd2fusion.semantic import ClippingChain, SemanticDocument, SemanticLayer
-from scripts.validate_clipping_subtrees import parse_tools
+from scripts.validate_clipping_subtrees import materialization_for, parse_tools
 
 
 BASE_ID = "p403base01x"
@@ -110,12 +110,14 @@ def build(output: Path) -> Dict[str, Any]:
 
     base_loaders = _role(tools, "Loader", BASE_ID)
     outer_loaders = _role(tools, "Loader", OUTER_ID)
+    base_materialization = materialization_for(tools, BASE_ID)
     member_rows: List[Dict[str, Any]] = []
-    previous_stack = base_loaders[0]["name"] if len(base_loaders) == 1 else None
+    previous_stack = base_materialization["source"]
     for index, (member_id, (mode, opacity)) in enumerate(
         zip(MEMBER_IDS, MEMBER_CONTROLS), 1
     ):
         loaders = _role(tools, "Loader", member_id)
+        materialization = materialization_for(tools, member_id)
         clips = [tool for tool in _role(tools, "ClipIn", member_id) if tool["type"] == "Merge"]
         base_straights = [tool for tool in _role(tools, "BlendBaseStraight", member_id) if tool["type"] == "AlphaDivide"]
         base_opaques = [tool for tool in _role(tools, "BlendBaseOpaque", member_id) if tool["type"] == "ChannelBoolean"]
@@ -141,6 +143,7 @@ def build(output: Path) -> Dict[str, Any]:
             "blend_restore_count": len(blend_restores),
             "stack_count": len(stacks),
             "loader": loaders[0]["name"] if len(loaders) == 1 else None,
+            "materialized_source": materialization["source"],
             "clip": clips[0]["name"] if len(clips) == 1 else None,
             "blend_function": blend_functions[0]["name"] if len(blend_functions) == 1 else None,
             "blend_clamp": blend_clamps[0]["name"] if len(blend_clamps) == 1 else None,
@@ -169,8 +172,10 @@ def build(output: Path) -> Dict[str, Any]:
             and len(blend_functions) == len(blend_clamps) == 1
             and len(blend_coverages) == len(blend_premults) == len(blend_restores) == 1
             and len(base_loaders) == 1
-            and row["clip_background"] == base_loaders[0]["name"]
-            and row["clip_foreground"] == row["loader"]
+            and base_materialization["valid"]
+            and materialization["valid"]
+            and row["clip_background"] == base_materialization["source"]
+            and row["clip_foreground"] == row["materialized_source"]
             and row["clip_apply_mode"] == 'FuID { "Normal" }'
             and row["clip_blend"] == "1.000000"
             and row["clip_operator"] == 'FuID { "In" }'
@@ -198,8 +203,9 @@ def build(output: Path) -> Dict[str, Any]:
     ]
     outer = outer_merges[0] if len(outer_merges) == 1 else None
     checks = {
-        "one_base_loader": len(base_loaders) == 1,
-        "one_outer_loader": len(outer_loaders) == 1,
+        "one_base_loader": len(base_loaders) == 1 and base_materialization["valid"],
+        "one_outer_loader": len(outer_loaders) == 1
+        and materialization_for(tools, OUTER_ID)["valid"],
         "four_members": len(member_rows) == len(MEMBER_CONTROLS),
         "each_member_controls_on_local_stack": all(row["shape"] for row in member_rows),
         "member_modes_are_not_outer_controls": (

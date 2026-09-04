@@ -9,6 +9,7 @@
 
 local task_path = arg and arg[1]
 local records_path = arg and arg[2]
+local readback_path = arg and arg[3]
 assert(task_path and records_path, "usage: parity004_boundary_probe.lua <tasks.tsv> <records.tsv>")
 
 local function text(value)
@@ -81,6 +82,36 @@ local function list_values(object)
     return {}
 end
 
+local function tool_names(object)
+    local names = {}
+    for _, tool in pairs(list_values(object)) do
+        names[tool_name(tool)] = true
+    end
+    return names
+end
+
+local function delete_new_tools(object, before)
+    local added = {}
+    for _, tool in pairs(list_values(object)) do
+        if not before[tool_name(tool)] then table.insert(added, tool) end
+    end
+    table.sort(added, function(left, right)
+        -- Remove GroupOperator containers after their children.  Some Resolve
+        -- builds expose nested tools through the composition tool list.
+        local left_group = tool_regid(left) == "GroupOperator"
+        local right_group = tool_regid(right) == "GroupOperator"
+        if left_group ~= right_group then return not left_group end
+        return tool_name(left) > tool_name(right)
+    end)
+    local failures = {}
+    for _, tool in ipairs(added) do
+        local name = tool_name(tool)
+        local ok, error_value = pcall(function() tool:Delete() end)
+        if not ok then table.insert(failures, name .. ":" .. text(error_value)) end
+    end
+    return #added, failures
+end
+
 local function find_in_list(values, name)
     for _, tool in pairs(values) do
         if tool_name(tool) == name then return tool end
@@ -88,31 +119,48 @@ local function find_in_list(values, name)
     return nil
 end
 
-local function find_tool(comp, name)
-    local ok, direct = pcall(function() return comp:FindTool(name) end)
-    if ok and direct ~= nil then return direct end
-    local direct_list = find_in_list(list_values(comp), name)
-    if direct_list ~= nil then return direct_list end
-    -- GroupOperator children are not guaranteed to be returned by the parent
-    -- composition's FindTool.  Search each group through both APIs when the
-    -- host exposes them.
-    for _, group in pairs(list_values(comp)) do
+local function find_tool(container, name)
+    -- Search direct children first so the returned owner is the container in
+    -- which a temporary Saver must be created.  A root FindTool call may find
+    -- nested tools but does not expose their owning GroupOperator.
+    local values = list_values(container)
+    local direct = find_in_list(values, name)
+    if direct ~= nil then return direct, container end
+    for _, group in pairs(values) do
         if tool_regid(group) == "GroupOperator" then
-            local nested_ok, nested = pcall(function() return group:FindTool(name) end)
-            if nested_ok and nested ~= nil then return nested end
-            local nested_list = find_in_list(list_values(group), name)
-            if nested_list ~= nil then return nested_list end
+            local nested, owner = find_tool(group, name)
+            if nested ~= nil then return nested, owner end
         end
     end
-    return nil
+    return nil, nil
 end
 
 local function output_of(tool)
+    if tool_regid(tool) == "GroupOperator" then
+        local group_ok, group_output = pcall(function() return tool.MainOutput1 end)
+        if group_ok and group_output ~= nil then return group_output end
+    end
     local ok, output = pcall(function() return tool.Output end)
     if ok and output ~= nil then return output end
     ok, output = pcall(function() return tool.MainOutput1 end)
     if ok and output ~= nil then return output end
     return nil
+end
+
+local function safe_input(tool, name)
+    local ok, value = pcall(function() return tool:GetInput(name) end)
+    if ok then return value end
+    return nil
+end
+
+local function connected_source(tool, name)
+    local input_ok, input = pcall(function() return tool[name] end)
+    if not input_ok or input == nil then return "" end
+    local output_ok, output = pcall(function() return input:GetConnectedOutput() end)
+    if not output_ok or output == nil then return "" end
+    local source_ok, source = pcall(function() return output:GetTool() end)
+    if not source_ok or source == nil then return "" end
+    return tool_name(source)
 end
 
 local function exists(path)
@@ -157,10 +205,32 @@ local function emit(handle, case_id, boundary, status, requested, artifact, rend
     print("RESULT=" .. table.concat(values, "|"))
 end
 
+local function emit_readback(handle, case_id, boundary, tool)
+    if handle == nil then return end
+    local values = {
+        field(case_id), field(boundary), field(tool_name(tool)), field(tool_regid(tool)),
+        field(output_of(tool) ~= nil),
+        field(safe_input(tool, "ApplyMode")), field(safe_input(tool, "Blend")),
+        field(safe_input(tool, "Operator")), field(safe_input(tool, "ProcessAlpha")),
+        field(safe_input(tool, "Clip1.PNGFormat.PostMultiply")),
+        field(connected_source(tool, "Input")), field(connected_source(tool, "Background")),
+        field(connected_source(tool, "Foreground")), field(connected_source(tool, "MainInput1")),
+        field(safe_input(tool, "Comments")),
+    }
+    handle:write(table.concat(values, "\t") .. "\n")
+    handle:flush()
+end
+
 local fusion = assert(bmd.scriptapp("Fusion", "localhost"), "Fusion scripting endpoint unavailable")
 local comp = assert(fusion:GetCurrentComp(), "no current Fusion composition")
 local records = assert(io.open(records_path, "wb"), "cannot write records file: " .. records_path)
 records:write("# schema=psd2fusion-parity-004-fusion-boundary-record.v1\n")
+local readback = nil
+if readback_path ~= nil and readback_path ~= "" then
+    readback = assert(io.open(readback_path, "wb"), "cannot write readback file: " .. readback_path)
+    readback:write("# schema=psd2fusion-parity-004-fusion-runtime-readback.v1\n")
+    readback:write("# case_id\tboundary\ttool\tregid\toutput_available\tapply_mode\tblend\toperator\tprocess_alpha\tpost_multiply\tinput_source\tbackground_source\tforeground_source\tmain_input_source\tcomments\n")
+end
 print("HOST=Fusion_current_comp")
 print("TASK_FILE=" .. field(task_path))
 print("RECORD_FILE=" .. field(records_path))
@@ -174,6 +244,8 @@ local function run_case(parts)
     local pasted = false
     local undo_started = false
     local lock_started = false
+    local before_names = tool_names(comp)
+    local before_attrs = comp:GetAttrs() or {}
     local before_count = 0
     for _, _ in pairs(list_values(comp)) do before_count = before_count + 1 end
 
@@ -206,17 +278,18 @@ local function run_case(parts)
             local name = pair[2] or ""
             local safe_label = string.gsub(boundary, "[^%w_%-]", "_")
             local requested = output_dir .. "\\" .. safe_label .. ".png"
-            local tool = find_tool(comp, name)
+            local tool, owner = find_tool(comp, name)
             if tool == nil then
                 emit(records, case_id, boundary, "TOOL_MISSING", requested, "", false, "", "tool_not_found:" .. name)
             else
+                emit_readback(readback, case_id, boundary, tool)
                 local source = output_of(tool)
                 if source == nil then
                     emit(records, case_id, boundary, "OUTPUT_MISSING", requested, "", false, "", "tool_output_not_found:" .. name)
                 else
                     remove(requested)
                     remove(sequence_path(requested))
-                    local saver_ok, saver = pcall(function() return comp:AddTool("Saver", -2, 0) end)
+                    local saver_ok, saver = pcall(function() return owner:AddTool("Saver", -2, 0) end)
                     if not saver_ok or saver == nil then
                         emit(records, case_id, boundary, "SAVER_FAILED", requested, "", false, "", text(saver))
                     else
@@ -247,14 +320,23 @@ local function run_case(parts)
         end
     end
 
-    if undo_started then
-        pcall(function() comp:EndUndo(true) end)
-        pcall(function() comp:Undo() end)
-    end
     if lock_started then pcall(function() comp:Unlock() end) end
+    local deleted_count, delete_failures = delete_new_tools(comp, before_names)
+    pcall(function()
+        comp:SetAttrs({
+            COMPN_GlobalStart = before_attrs.COMPN_GlobalStart,
+            COMPN_GlobalEnd = before_attrs.COMPN_GlobalEnd,
+            COMPN_RenderStart = before_attrs.COMPN_RenderStart,
+            COMPN_RenderEnd = before_attrs.COMPN_RenderEnd
+        })
+    end)
+    if undo_started then pcall(function() comp:EndUndo(true) end) end
     local after_count = 0
     for _, _ in pairs(list_values(comp)) do after_count = after_count + 1 end
-    print("CASE=" .. field(case_id) .. " SCOPE=" .. field(scope) .. " PASTE=" .. text(pasted) .. " RESTORED=" .. text(after_count == before_count))
+    print("CASE=" .. field(case_id) .. " SCOPE=" .. field(scope)
+        .. " PASTE=" .. text(pasted) .. " RESTORED=" .. text(after_count == before_count)
+        .. " DELETED=" .. text(deleted_count) .. " DELETE_FAILURES=" .. text(#delete_failures))
+    for _, failure in ipairs(delete_failures) do print("DELETE_FAILURE=" .. field(failure)) end
 end
 
 for _, line in ipairs(read_lines(task_path)) do
@@ -267,4 +349,5 @@ for _, line in ipairs(read_lines(task_path)) do
 end
 
 records:close()
+if readback ~= nil then readback:close() end
 print("DONE=true")

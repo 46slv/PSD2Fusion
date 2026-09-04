@@ -20,7 +20,7 @@ if str(ROOT) not in sys.path:
 
 from psd2fusion.fusion_comp import FUSION_BLEND_IDS, compile_comp
 from psd2fusion.semantic import ClippingChain, SemanticDocument, SemanticLayer
-from scripts.validate_clipping_subtrees import parse_tools
+from scripts.validate_clipping_subtrees import materialization_for, parse_tools
 
 
 BASE_ID = "p404base01x"
@@ -142,6 +142,7 @@ def _graph(comp_path: Path) -> Dict[str, Any]:
         "local_controls": local_controls,
         "pass": (
             len(base_loaders) == 1
+            and materialization_for(tools, BASE_ID)["valid"]
             and len(stacks) == len(MEMBER_IDS)
             and len(blend_functions) == len(MEMBER_IDS)
             and outer is not None

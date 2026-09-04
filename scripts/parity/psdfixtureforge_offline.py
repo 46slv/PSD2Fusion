@@ -376,12 +376,34 @@ def _graph_structure(
         if layer.id[:10] not in function_suffixes
     ]
     loaders = [tool for tool in tools if tool["type"] == "Loader"]
+    by_name = {tool["name"]: tool for tool in tools}
+    materialization_rows = []
+    for loader in loaders:
+        suffix = loader["name"][len("Loader") :]
+        depth = by_name.get("MaterializeDepth" + suffix)
+        premult = by_name.get("MaterializePremult" + suffix)
+        materialization_rows.append(
+            {
+                "loader": loader["name"],
+                "depth": depth["name"] if depth else None,
+                "premult": premult["name"] if premult else None,
+                "pass": bool(
+                    loader.get("post_multiply") == "0"
+                    and depth is not None
+                    and depth.get("type") == "ChangeDepth"
+                    and depth.get("input") == loader["name"]
+                    and depth.get("depth") == "4"
+                    and depth.get("dither") == "0"
+                    and premult is not None
+                    and premult.get("type") == "AlphaMultiply"
+                    and premult.get("input") == depth["name"]
+                ),
+            }
+        )
     clipping = validate_clipping(str(psd_path), str(comp_path))
     checks = {
-        "loader_postmultiply_one": text.count(
-            '["Clip1.PNGFormat.PostMultiply"] = Input { Value = 1, }'
-        )
-        == len(loaders),
+        "loader_float32_materialization": bool(loaders)
+        and all(row["pass"] for row in materialization_rows),
         "nonnormal_only_on_straight_opaque_functions": not malformed_functions,
         "every_nonnormal_layer_has_function": not missing_mode_functions,
         "group_proxy_has_no_render_consumers": not proxy_consumers,
@@ -392,6 +414,7 @@ def _graph_structure(
         "checks": checks,
         "tool_count": len(tools),
         "loader_count": len(loaders),
+        "loader_materialization": materialization_rows,
         "group_count": len(group_names),
         "nonnormal_functions": non_normal_functions,
         "malformed_functions": malformed_functions,

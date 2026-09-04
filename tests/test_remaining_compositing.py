@@ -104,7 +104,17 @@ class RemainingCompositingLoweringTests(unittest.TestCase):
                 self.assertEqual(
                     2,
                     path.read_text(encoding="utf-8").count(
-                        '["Clip1.PNGFormat.PostMultiply"] = Input { Value = 1, }'
+                        '["Clip1.PNGFormat.PostMultiply"] = Input { Value = 0, }'
+                    ),
+                )
+                self.assertEqual(
+                    2,
+                    path.read_text(encoding="utf-8").count(" = ChangeDepth {"),
+                )
+                self.assertEqual(
+                    2,
+                    path.read_text(encoding="utf-8").count(
+                        "PSD layer float32 materialization:"
                     ),
                 )
 

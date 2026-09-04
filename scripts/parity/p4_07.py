@@ -22,7 +22,7 @@ if str(ROOT) not in sys.path:
 from psd2fusion.fusion_comp import FUSION_BLEND_IDS
 from psd2fusion.parse_psd import parse_psd
 from psd2fusion.semantic import SemanticLayer, index_layers, walk_layers
-from scripts.validate_clipping_subtrees import parse_tools, validate
+from scripts.validate_clipping_subtrees import materialization_for, parse_tools, validate
 
 
 EXPECTED_CHAINS = 23
@@ -89,16 +89,22 @@ def _chain_control_row(
     provenance: str,
 ) -> Dict[str, Any]:
     base_loaders = _role(tools, "Loader", base.id)
+    base_materialization = materialization_for(tools, base.id)
     outer_merges = [
         tool
         for tool in _role(tools, "Merge", base.id)
         if "PSD clipping chain merge:" in tool["comments"]
     ]
-    previous = base_loaders[0]["name"] if len(base_loaders) == 1 else None
+    previous = base_materialization["source"]
     member_rows: List[Dict[str, Any]] = []
-    controls_pass = len(base_loaders) == 1 and len(outer_merges) == 1
+    controls_pass = (
+        len(base_loaders) == 1
+        and base_materialization["valid"]
+        and len(outer_merges) == 1
+    )
     for member in members:
         loaders = _role(tools, "Loader", member.id)
+        materialization = materialization_for(tools, member.id)
         clips = _role(tools, "ClipIn", member.id)
         base_straights = _role(tools, "BlendBaseStraight", member.id)
         base_opaques = _role(tools, "BlendBaseOpaque", member.id)
@@ -125,7 +131,7 @@ def _chain_control_row(
             row["pass"] = True
             member_rows.append(row)
             continue
-        ok = all(
+        ok = materialization["valid"] and all(
             len(nodes) == 1
             for nodes in (
                 loaders,
@@ -159,15 +165,15 @@ def _chain_control_row(
             expected_blend = "%.6f" % member.opacity
             ok = all(
                 (
-                    clip["background"] == (base_loaders[0]["name"] if base_loaders else None),
-                    clip["foreground"] == loaders[0]["name"],
+                    clip["background"] == base_materialization["source"],
+                    clip["foreground"] == materialization["source"],
                     clip["apply_mode"] == 'FuID { "Normal" }',
                     clip["blend"] == "1.000000",
                     clip["operator"] == 'FuID { "In" }',
                     base_straight["input"] == previous,
                     base_opaque["background"] == base_straight["name"],
                     base_opaque["to_alpha"] == "16",
-                    member_straight["input"] == loaders[0]["name"],
+                    member_straight["input"] == materialization["source"],
                     member_opaque["background"] == member_straight["name"],
                     member_opaque["to_alpha"] == "16",
                     blend_function["background"] == base_opaque["name"],
@@ -183,7 +189,7 @@ def _chain_control_row(
                     blend_coverage["to_alpha"] == "3",
                     blend_premult["input"] == blend_coverage["name"],
                     blend_restore["background"] == blend_premult["name"],
-                    blend_restore["foreground"] == loaders[0]["name"],
+                    blend_restore["foreground"] == materialization["source"],
                     blend_restore["to_alpha"] == "3",
                     stack["background"] == previous,
                     stack["foreground"] == blend_restore["name"],
@@ -195,6 +201,7 @@ def _chain_control_row(
             row.update(
                 {
                     "loader": loaders[0]["name"],
+                    "materialized_source": materialization["source"],
                     "clip": clip["name"],
                     "base_straight": base_straight["name"],
                     "base_opaque": base_opaque["name"],

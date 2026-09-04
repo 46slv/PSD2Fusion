@@ -22,7 +22,7 @@ if str(ROOT) not in sys.path:
 
 from psd2fusion.fusion_comp import compile_comp
 from psd2fusion.semantic import ClippingChain, SemanticDocument, SemanticLayer
-from scripts.validate_clipping_subtrees import parse_tools
+from scripts.validate_clipping_subtrees import materialization_for, parse_tools
 
 
 BASE_ID = "p402base01x"
@@ -106,9 +106,11 @@ def build(output: Path) -> Dict[str, Any]:
     base_loaders = _role(tools, "Loader", BASE_ID)
     outer_loaders = _role(tools, "Loader", OUTER_ID)
     member_rows: List[Dict[str, Any]] = []
-    previous_stack = base_loaders[0]["name"] if len(base_loaders) == 1 else None
+    base_materialization = materialization_for(tools, BASE_ID)
+    previous_stack = base_materialization["source"]
     for index, member_id in enumerate(MEMBER_IDS, 1):
         loaders = _role(tools, "Loader", member_id)
+        materialization = materialization_for(tools, member_id)
         clips = [
             tool
             for tool in _role(tools, "ClipIn", member_id)
@@ -167,6 +169,7 @@ def build(output: Path) -> Dict[str, Any]:
             "blend_restore_count": len(blend_restores),
             "stack_count": len(stacks),
             "loader": loaders[0]["name"] if len(loaders) == 1 else None,
+            "materialized_source": materialization["source"],
             "clip": clips[0]["name"] if len(clips) == 1 else None,
             "base_straight": base_straights[0]["name"] if len(base_straights) == 1 else None,
             "base_opaque": base_opaques[0]["name"] if len(base_opaques) == 1 else None,
@@ -194,7 +197,8 @@ def build(output: Path) -> Dict[str, Any]:
             and len(blend_functions) == len(blend_clamps) == 1
             and len(blend_coverages) == len(blend_premults) == len(blend_restores) == 1
             and len(stacks) == 1
-            and row["clip_foreground"] == row["loader"]
+            and materialization["valid"]
+            and row["clip_foreground"] == row["materialized_source"]
             and row["clip_operator"] == 'FuID { "In" }'
             and row["base_straight"] is not None
             and row["base_opaque"] is not None
@@ -209,7 +213,7 @@ def build(output: Path) -> Dict[str, Any]:
             and row["stack_background"] == previous_stack
             and row["stack_process_alpha"] == "0"
             and next(
-                tool["input"] == row["loader"]
+                tool["input"] == row["materialized_source"]
                 for tool in member_straights
             )
             and row["clip_start"] < row["stack_start"]
@@ -249,12 +253,16 @@ def build(output: Path) -> Dict[str, Any]:
     if outer is not None:
         outer_sources.update(source for source in (outer["background"], outer["foreground"]) if source)
     checks = {
-        "one_base_loader": len(base_loaders) == 1,
-        "one_outer_loader": len(outer_loaders) == 1,
+        "one_base_loader": len(base_loaders) == 1 and base_materialization["valid"],
+        "one_outer_loader": len(outer_loaders) == 1
+        and materialization_for(tools, OUTER_ID)["valid"],
         "three_members": len(member_rows) == 3,
         "every_member_has_operator_in_and_local_stack": all(row["shape"] for row in member_rows),
-        "all_members_reuse_exact_base_matte": bool(base_loaders)
-        and all(row["clip_background"] == base_loaders[0]["name"] for row in member_rows),
+        "all_members_reuse_exact_base_matte": base_materialization["valid"]
+        and all(
+            row["clip_background"] == base_materialization["source"]
+            for row in member_rows
+        ),
         "member_order_is_bottom_to_top": all(
             member_rows[index]["stack_start"] < member_rows[index + 1]["stack_start"]
             for index in range(len(member_rows) - 1)
