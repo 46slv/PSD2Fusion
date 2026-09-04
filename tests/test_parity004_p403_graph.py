@@ -24,8 +24,15 @@ class P403MemberControlTests(unittest.TestCase):
             self.assertEqual("1.000000", row["clip_blend"])
             self.assertEqual('FuID { "In" }', row["clip_operator"])
             self.assertEqual('FuID { "Normal" }', row["stack_apply_mode"])
-            self.assertEqual("%.6f" % opacity, row["stack_blend"])
             self.assertEqual("0", row["stack_process_alpha"])
+            if mode == "Linear Dodge":
+                # Late-clamp Linear Dodge carries member opacity in the
+                # float32 attenuate Gain so the add saturates only once;
+                # the local ClipStack Merge then replaces with Blend 1.0.
+                self.assertEqual("1.000000", row["stack_blend"])
+                self.assertEqual("%.6f" % opacity, row["attenuate_gain"])
+            else:
+                self.assertEqual("%.6f" % opacity, row["stack_blend"])
 
     def test_member_controls_do_not_move_to_the_outer_boundary(self):
         with tempfile.TemporaryDirectory() as directory:
@@ -39,7 +46,9 @@ class P403MemberControlTests(unittest.TestCase):
         self.assertEqual('FuID { "Normal" }', outer["apply_mode"])
         self.assertEqual("1.000000", outer["blend"])
         stacks = [tool for tool in tools if "P4-03 member opacity local" in tool["comments"]]
-        self.assertEqual(len(MEMBER_CONTROLS), len(stacks))
+        ld_stacks = [tool for tool in tools if "late-clamp Linear Dodge opacity in attenuate Gain" in tool["comments"]]
+        self.assertEqual(len(MEMBER_CONTROLS) - 1, len(stacks))
+        self.assertEqual(1, len(ld_stacks))
         self.assertEqual(1, len([tool for tool in tools if "PSD clipping chain merge:" in tool["comments"]]))
 
 

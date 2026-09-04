@@ -4,7 +4,9 @@ The fixture keeps the selected P4-01/P4-02 topology and varies only clipped
 member blend modes and opacity. It proves that the mode lives on each
 straight/opaque Function Merge, while member opacity and alpha preservation
 live on the Normal ClipStack Merge and the single outer chain Merge remains
-the base boundary.
+the base boundary. Linear Dodge members instead carry member opacity in the
+float32 attenuate Gain so the late-clamp add saturates only once; their local
+ClipStack Merge then replaces with Blend 1.0.
 """
 
 from __future__ import annotations
@@ -126,6 +128,7 @@ def build(output: Path) -> Dict[str, Any]:
         blend_coverages = [tool for tool in _role(tools, "BlendCoverage", member_id) if tool["type"] == "ChannelBoolean"]
         blend_premults = [tool for tool in _role(tools, "BlendPremult", member_id) if tool["type"] == "AlphaMultiply"]
         blend_restores = [tool for tool in _role(tools, "BlendRestoreAlpha", member_id) if tool["type"] == "ChannelBoolean"]
+        attenuates = [tool for tool in _role(tools, "BlendMemberAttenuate", member_id) if tool["type"] == "BrightnessContrast"]
         stacks = [tool for tool in _role(tools, "ClipStack", member_id) if tool["type"] == "Merge"]
         row: Dict[str, Any] = {
             "index": index,
@@ -161,7 +164,11 @@ def build(output: Path) -> Dict[str, Any]:
             "stack_blend": stacks[0]["blend"] if len(stacks) == 1 else None,
             "stack_process_alpha": stacks[0]["process_alpha"] if len(stacks) == 1 else None,
             "stack_start": stacks[0]["start"] if len(stacks) == 1 else None,
+            "attenuate": attenuates[0]["name"] if len(attenuates) == 1 else None,
+            "attenuate_gain": attenuates[0]["gain"] if len(attenuates) == 1 else None,
         }
+        is_linear_dodge = mode == "Linear Dodge"
+        expected_stack_blend = "1.000000" if is_linear_dodge else "%.6f" % opacity
         row["shape"] = bool(
             len(loaders) == len(clips) == len(stacks) == 1
             and len(base_straights) == len(base_opaques) == 1
@@ -184,8 +191,16 @@ def build(output: Path) -> Dict[str, Any]:
             and row["blend_function_apply_mode"] == 'FuID { "%s" }' % FUSION_BLEND_IDS[mode]
             and row["blend_function_blend"] == "1.000000"
             and row["stack_apply_mode"] == 'FuID { "Normal" }'
-            and row["stack_blend"] == "%.6f" % opacity
+            and row["stack_blend"] == expected_stack_blend
             and row["stack_process_alpha"] == "0"
+            and (
+                (
+                    len(attenuates) == 1
+                    and row["attenuate_gain"] == "%.6f" % opacity
+                )
+                if is_linear_dodge
+                else len(attenuates) == 0
+            )
         )
         if row["stack"] is not None:
             previous_stack = row["stack"]

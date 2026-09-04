@@ -112,7 +112,17 @@ class P4FusionBoundaryFixtureTests(unittest.TestCase):
             self.assertEqual('FuID { "Normal" }', observed["clip_in"]["apply_mode"])
             self.assertEqual("1.000000", observed["clip_in"]["blend"])
             self.assertEqual('FuID { "Normal" }', observed["clip_stack"]["apply_mode"])
-            self.assertEqual("%.6f" % MEMBER_OPACITY, observed["clip_stack"]["blend"])
+            if mode == "Linear Dodge":
+                # Late-clamp Linear Dodge carries member opacity in the
+                # float32 attenuate Gain; the local stack then replaces.
+                self.assertEqual("1.000000", observed["clip_stack"]["blend"])
+                self.assertEqual("%.6f" % MEMBER_OPACITY, observed["member_attenuate"]["gain"])
+                self.assertEqual("0", observed["member_attenuate"]["process_alpha"])
+                self.assertEqual("%.6f" % MEMBER_OPACITY, controls["member_attenuate_gain"])
+            else:
+                self.assertEqual("%.6f" % MEMBER_OPACITY, observed["clip_stack"]["blend"])
+                self.assertIsNone(observed["member_attenuate"])
+                self.assertIsNone(controls["member_attenuate_gain"])
             self.assertEqual("0", observed["clip_stack"]["process_alpha"])
             self.assertEqual('FuID { "Normal" }', observed["parent_merge"]["apply_mode"])
             self.assertEqual("1.000000", observed["parent_merge"]["blend"])

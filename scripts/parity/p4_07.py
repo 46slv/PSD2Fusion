@@ -103,6 +103,7 @@ def _chain_control_row(
         base_straights = _role(tools, "BlendBaseStraight", member.id)
         base_opaques = _role(tools, "BlendBaseOpaque", member.id)
         member_straights = _role(tools, "BlendMemberStraight", member.id)
+        member_attenuates = _role(tools, "BlendMemberAttenuate", member.id)
         member_opaques = _role(tools, "BlendMemberOpaque", member.id)
         blend_functions = _role(tools, "BlendFunction", member.id)
         blend_clamps = _role(tools, "BlendClamp", member.id)
@@ -125,6 +126,7 @@ def _chain_control_row(
             row["pass"] = True
             member_rows.append(row)
             continue
+        is_linear_dodge = member.blend == "Linear Dodge"
         ok = all(
             len(nodes) == 1
             for nodes in (
@@ -142,6 +144,11 @@ def _chain_control_row(
                 stacks,
             )
         )
+        ok = ok and (
+            len(member_attenuates) == 1
+            if is_linear_dodge
+            else len(member_attenuates) == 0
+        )
         if ok:
             clip = clips[0]
             base_straight = base_straights[0]
@@ -156,7 +163,7 @@ def _chain_control_row(
             stack = stacks[0]
             mode_id = FUSION_BLEND_IDS.get(member.blend)
             expected_mode = 'FuID { "%s" }' % mode_id if mode_id else None
-            expected_blend = "%.6f" % member.opacity
+            expected_blend = "1.000000" if is_linear_dodge else "%.6f" % member.opacity
             ok = all(
                 (
                     clip["background"] == (base_loaders[0]["name"] if base_loaders else None),
@@ -168,7 +175,12 @@ def _chain_control_row(
                     base_opaque["background"] == base_straight["name"],
                     base_opaque["to_alpha"] == "16",
                     member_straight["input"] == loaders[0]["name"],
-                    member_opaque["background"] == member_straight["name"],
+                    member_opaque["background"]
+                    == (
+                        member_attenuates[0]["name"]
+                        if is_linear_dodge
+                        else member_straight["name"]
+                    ),
                     member_opaque["to_alpha"] == "16",
                     blend_function["background"] == base_opaque["name"],
                     blend_function["foreground"] == member_opaque["name"],
@@ -179,12 +191,18 @@ def _chain_control_row(
                     blend_clamp["clip_white"] == "1",
                     blend_clamp["process_alpha"] == "0",
                     blend_coverage["background"] == blend_clamp["name"],
-                    blend_coverage["foreground"] == clip["name"],
+                    blend_coverage["foreground"]
+                    == (
+                        base_loaders[0]["name"]
+                        if is_linear_dodge and base_loaders
+                        else clip["name"]
+                    ),
                     blend_coverage["to_alpha"] == "3",
                     blend_premult["input"] == blend_coverage["name"],
                     blend_restore["background"] == blend_premult["name"],
-                    blend_restore["foreground"] == loaders[0]["name"],
-                    blend_restore["to_alpha"] == "3",
+                    blend_restore["foreground"]
+                    == (None if is_linear_dodge else loaders[0]["name"]),
+                    blend_restore["to_alpha"] == ("16" if is_linear_dodge else "3"),
                     stack["background"] == previous,
                     stack["foreground"] == blend_restore["name"],
                     stack["apply_mode"] == 'FuID { "Normal" }',
@@ -192,6 +210,15 @@ def _chain_control_row(
                     stack["process_alpha"] == "0",
                 )
             )
+            if ok and is_linear_dodge:
+                attenuate = member_attenuates[0]
+                ok = all(
+                    (
+                        attenuate["input"] == loaders[0]["name"],
+                        attenuate["gain"] == "%.6f" % member.opacity,
+                        attenuate["process_alpha"] == "0",
+                    )
+                )
             row.update(
                 {
                     "loader": loaders[0]["name"],

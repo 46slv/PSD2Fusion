@@ -310,6 +310,30 @@ def _brightness_contrast_clamp(
     return _simple_tool(name, "BrightnessContrast", inputs, comment, x, y)
 
 
+def _brightness_contrast_gain(
+    name: str,
+    source: _Source,
+    gain: float,
+    comment: str,
+    x: float,
+    y: float,
+) -> str:
+    """Scale premultiplied member RGB to its opacity in float32.
+
+    Only the Linear Dodge late-clamp island uses this boundary; every other
+    mode keeps member opacity on the local ClipStack Merge Blend control, so
+    opacity is still applied exactly once.  No quantization, depth change, or
+    alpha processing is added here (ProcessAlpha stays off).
+    """
+
+    inputs = [
+        _input_connection("Input", source),
+        _input_value("Gain", "%.6f" % max(0.0, min(1.0, gain))),
+        _input_value("ProcessAlpha", "0"),
+    ]
+    return _simple_tool(name, "BrightnessContrast", inputs, comment, x, y)
+
+
 def _alpha_multiply(
     name: str,
     source: _Source,
@@ -978,6 +1002,13 @@ class _Compiler:
             # Separate both streams into straight RGB with opaque alpha before
             # the mode function, then restore the ClipIn intersection coverage
             # and the original member alpha around the final Normal Merge.
+            # Linear Dodge members instead use the late-clamp island: the
+            # member premultiplied stream is first attenuated to its opacity
+            # in float32, the opaque add saturates only once at the clamp,
+            # the fixed base coverage M (never M*A) is reattached, and the
+            # completed result replaces the local stream with fg alpha 1, so
+            # base alpha is applied exactly once and never double-multiplied
+            # into the RGB contribution.
             island_row = self._clipping_stack_rows[member.id]
             base_straight_name = self.name("BlendBaseStraight" + scope, member.id)
             base_straight_x, base_straight_y = self.position(island_row + 2.0, depth)
@@ -1021,13 +1052,35 @@ class _Compiler:
             )
             member_opaque_name = self.name("BlendMemberOpaque" + scope, member.id)
             member_opaque_x, member_opaque_y = self.position(island_row - 2.5, depth)
+            is_linear_dodge = member.blend == "Linear Dodge"
+            if is_linear_dodge:
+                attenuate_name = self.name("BlendMemberAttenuate" + scope, member.id)
+                attenuate_x, attenuate_y = self.position(island_row - 2.75, depth)
+                self._current_tools.append(
+                    _brightness_contrast_gain(
+                        attenuate_name,
+                        member_result.output,
+                        member.opacity,
+                        "PSD clipping member premult to opacity (base=%s): %s"
+                        % (base.id, member.name)
+                        + " [late-clamp Linear Dodge: float32 Gain=opacity, ProcessAlpha=0]",
+                        attenuate_x,
+                        attenuate_y,
+                    )
+                )
             self._current_tools.append(
                 _channel_boolean_force_opaque(
                     member_opaque_name,
-                    _Source(member_straight_name),
+                    _Source(
+                        attenuate_name if is_linear_dodge else member_straight_name
+                    ),
                     "PSD clipping blend member opaque RGB (base=%s): %s"
                     % (base.id, member.name)
-                    + " [P4-HOST-PIXEL: force alpha=1]",
+                    + (
+                        " [P4-HOST-PIXEL: force alpha=1; late-clamp attenuated input]"
+                        if is_linear_dodge
+                        else " [P4-HOST-PIXEL: force alpha=1]"
+                    ),
                     member_opaque_x,
                     member_opaque_y,
                 )
@@ -1072,10 +1125,14 @@ class _Compiler:
                 _channel_boolean_attach_alpha(
                     coverage_name,
                     _Source(clamp_name),
-                    clipped_source,
+                    fixed_matte if is_linear_dodge else clipped_source,
                     "PSD clipping blend coverage (base=%s): %s"
                     % (base.id, member.name)
-                    + " [P4-HOST-PIXEL: attach ClipIn M*A alpha]",
+                    + (
+                        " [late-clamp Linear Dodge: attach fixed base coverage M]"
+                        if is_linear_dodge
+                        else " [P4-HOST-PIXEL: attach ClipIn M*A alpha]"
+                    ),
                     coverage_x,
                     coverage_y,
                 )
@@ -1097,18 +1154,35 @@ class _Compiler:
 
             restore_name = self.name("BlendRestoreAlpha" + scope, member.id)
             restore_x, restore_y = self.position(island_row + 0.0, depth)
-            self._current_tools.append(
-                _channel_boolean_attach_alpha(
-                    restore_name,
-                    _Source(premult_name),
-                    member_result.output,
-                    "PSD clipping blend restore alpha (base=%s): %s"
-                    % (base.id, member.name)
-                    + " [P4-HOST-PIXEL: restore original member A]",
-                    restore_x,
-                    restore_y,
+            if is_linear_dodge:
+                # The late-clamp result is already complete (coverage lives in
+                # the attenuated add), so restore opaque alpha instead of the
+                # member alpha: the ClipStack replace below then yields T*M
+                # over M, i.e. exactly T, with no second coverage multiply.
+                self._current_tools.append(
+                    _channel_boolean_force_opaque(
+                        restore_name,
+                        _Source(premult_name),
+                        "PSD clipping blend restore alpha (base=%s): %s"
+                        % (base.id, member.name)
+                        + " [late-clamp Linear Dodge: force opaque T*M]",
+                        restore_x,
+                        restore_y,
+                    )
                 )
-            )
+            else:
+                self._current_tools.append(
+                    _channel_boolean_attach_alpha(
+                        restore_name,
+                        _Source(premult_name),
+                        member_result.output,
+                        "PSD clipping blend restore alpha (base=%s): %s"
+                        % (base.id, member.name)
+                        + " [P4-HOST-PIXEL: restore original member A]",
+                        restore_x,
+                        restore_y,
+                    )
+                )
 
             merge_name = self.name("ClipStack" + scope, member.id)
             self.merge_count += 1
@@ -1119,15 +1193,18 @@ class _Compiler:
                     current,
                     _Source(restore_name),
                     "Normal",
-                    member.opacity,
+                    1.0 if is_linear_dodge else member.opacity,
                     "PSD clipping subtree member (base=%s): %s"
                     % (base.id, member.name)
                     + " [P4-01 local Merge; straight blend island; ProcessAlpha=0 preserves base alpha; "
                     + (
                         "P4-02 shared base matte member %d/%d; "
+                        "late-clamp Linear Dodge opacity in attenuate Gain; FunctionMerge carries member mode]"
+                        if is_linear_dodge
+                        else "P4-02 shared base matte member %d/%d; "
                         "P4-03 member opacity local; FunctionMerge carries member mode]"
-                        % (member_index, member_total)
-                    ),
+                    )
+                    % (member_index, member_total),
                     x,
                     y,
                     # Photoshop clipping keeps the base alpha as the chain

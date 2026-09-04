@@ -252,6 +252,7 @@ def _compact_tool(tool: Optional[Mapping[str, Any]]) -> Optional[Dict[str, Any]]
         "to_alpha",
         "clip_black",
         "clip_white",
+        "gain",
         "comments",
     )
     return {field: tool.get(field) for field in fields}
@@ -357,6 +358,11 @@ def _case_boundaries(
         [tool for tool in _role(tools, "ClipStack", MEMBER_ID) if tool.get("type") == "Merge"],
         "clip_stack",
     )
+    attenuate_tools = [
+        tool for tool in _role(tools, "BlendMemberAttenuate", MEMBER_ID)
+        if tool.get("type") == "BrightnessContrast"
+    ]
+    member_attenuate = attenuate_tools[0] if len(attenuate_tools) == 1 else None
     parent_merges = [
         tool
         for tool in _role(tools, "Merge", BASE_ID)
@@ -429,8 +435,19 @@ def _case_boundaries(
             and clip_stack.get("background") == base_name
             and clip_stack.get("foreground") == channel_names["restore_alpha"]
             and clip_stack.get("apply_mode") == 'FuID { "Normal" }'
-            and clip_stack.get("blend") == "%.6f" % MEMBER_OPACITY
+            and clip_stack.get("blend")
+            == ("1.000000" if mode == "Linear Dodge" else "%.6f" % MEMBER_OPACITY)
             and clip_stack.get("process_alpha") == "0"
+        ),
+        "late_clamp_opacity_in_attenuate_gain": bool(
+            (
+                member_attenuate is not None
+                and member_attenuate.get("input") == member_name
+                and member_attenuate.get("gain") == "%.6f" % MEMBER_OPACITY
+                and member_attenuate.get("process_alpha") == "0"
+            )
+            if mode == "Linear Dodge"
+            else member_attenuate is None
         ),
         "one_parent_merge_after_clip_stack": bool(
             parent_merge
@@ -481,6 +498,7 @@ def _case_boundaries(
             "member_loader": _compact_tool(member_loader),
             "clip_in": _compact_tool(clip_in),
             "channel_boolean": compact_channels,
+            "member_attenuate": _compact_tool(member_attenuate),
             "blend_function": _compact_tool(blend_function),
             "clip_stack": _compact_tool(clip_stack),
             "parent_merge": _compact_tool(parent_merge),
@@ -492,7 +510,12 @@ def _case_boundaries(
             "clip_in_blend": "1.000000",
             "clip_in_operator": 'FuID { "In" }',
             "clip_stack_apply_mode": 'FuID { "Normal" }',
-            "clip_stack_blend": "%.6f" % MEMBER_OPACITY,
+            "clip_stack_blend": (
+                "1.000000" if mode == "Linear Dodge" else "%.6f" % MEMBER_OPACITY
+            ),
+            "member_attenuate_gain": (
+                "%.6f" % MEMBER_OPACITY if mode == "Linear Dodge" else None
+            ),
             "clip_stack_process_alpha": "0",
             "parent_merge_apply_mode": 'FuID { "Normal" }',
             "parent_merge_blend": "1.000000",

@@ -106,6 +106,7 @@ def parse_tools(path):
                 "to_alpha": _value(block, "ToAlpha"),
                 "clip_black": _value(block, "ClipBlack"),
                 "clip_white": _value(block, "ClipWhite"),
+                "gain": _value(block, "Gain"),
                 "process_alpha": _value(block, "ProcessAlpha"),
                 "input_target": _input_source_op(block, "MainInput1"),
                 "position": _position(block),
@@ -149,6 +150,9 @@ def validate(psd_path, comp_path):
             base_straight = role(member.id, "BlendBaseStraight", "AlphaDivide")
             base_opaque = role(member.id, "BlendBaseOpaque", "ChannelBoolean")
             member_straight = role(member.id, "BlendMemberStraight", "AlphaDivide")
+            member_attenuate = role(
+                member.id, "BlendMemberAttenuate", "BrightnessContrast"
+            )
             member_opaque = role(member.id, "BlendMemberOpaque", "ChannelBoolean")
             blend_function = role(member.id, "BlendFunction", "Merge")
             blend_clamp = role(member.id, "BlendClamp", "BrightnessContrast")
@@ -156,6 +160,7 @@ def validate(psd_path, comp_path):
             blend_premult = role(member.id, "BlendPremult", "AlphaMultiply")
             blend_restore = role(member.id, "BlendRestoreAlpha", "ChannelBoolean")
             stacks = role(member.id, "ClipStack", "Merge")
+            is_linear_dodge = member.blend == "Linear Dodge"
             node_sets = (
                 loaders,
                 clips,
@@ -171,6 +176,11 @@ def validate(psd_path, comp_path):
                 stacks,
             )
             member_ok = all(len(nodes) == 1 for nodes in node_sets)
+            member_ok = member_ok and (
+                len(member_attenuate) == 1
+                if is_linear_dodge
+                else len(member_attenuate) == 0
+            )
             if member_ok:
                 clip = clips[0]
                 base_div = base_straight[0]
@@ -189,6 +199,9 @@ def validate(psd_path, comp_path):
                     if expected_mode_id
                     else None
                 )
+                expected_stack_blend = (
+                    "1.000000" if is_linear_dodge else "%.6f" % member.opacity
+                )
                 member_ok = all(
                     (
                         clip["background"] == (base_nodes[0]["name"] if base_nodes else None),
@@ -198,7 +211,12 @@ def validate(psd_path, comp_path):
                         base_opaque_node["background"] == base_div["name"],
                         base_opaque_node["to_alpha"] == "16",
                         member_div["input"] == loaders[0]["name"],
-                        member_opaque_node["background"] == member_div["name"],
+                        member_opaque_node["background"]
+                        == (
+                            member_attenuate[0]["name"]
+                            if is_linear_dodge
+                            else member_div["name"]
+                        ),
                         member_opaque_node["to_alpha"] == "16",
                         function["background"] == base_opaque_node["name"],
                         function["foreground"] == member_opaque_node["name"],
@@ -210,18 +228,34 @@ def validate(psd_path, comp_path):
                         clamp["clip_white"] == "1",
                         clamp["process_alpha"] == "0",
                         coverage["background"] == clamp["name"],
-                        coverage["foreground"] == clip["name"],
+                        coverage["foreground"]
+                        == (
+                            base_nodes[0]["name"]
+                            if is_linear_dodge and base_nodes
+                            else clip["name"]
+                        ),
                         coverage["to_alpha"] == "3",
                         premult["input"] == coverage["name"],
                         restore["background"] == premult["name"],
-                        restore["foreground"] == loaders[0]["name"],
-                        restore["to_alpha"] == "3",
+                        restore["foreground"]
+                        == (None if is_linear_dodge else loaders[0]["name"]),
+                        restore["to_alpha"] == ("16" if is_linear_dodge else "3"),
                         stack["background"] == previous,
                         stack["foreground"] == restore["name"],
                         stack["apply_mode"] == 'FuID { "Normal" }',
+                        stack["blend"] == expected_stack_blend,
                         stack["process_alpha"] == "0",
                     )
                 )
+                if member_ok and is_linear_dodge:
+                    attenuate = member_attenuate[0]
+                    member_ok = all(
+                        (
+                            attenuate["input"] == loaders[0]["name"],
+                            attenuate["gain"] == "%.6f" % member.opacity,
+                            attenuate["process_alpha"] == "0",
+                        )
+                    )
                 previous = stack["name"]
                 emitted_members.append(stack["name"])
             checks.append(member_ok)
