@@ -1,0 +1,235 @@
+{
+  "schema": "psd2fusion.parity-004-offline-oracle-convergence.v1",
+  "observed_at": "2026-09-04T13:12:01+09:00",
+  "task": "PARITY-004",
+  "status": "OFFLINE_PASS_HOST_PENDING",
+  "scope": {
+    "resolve_fusion": "NOT_RUN_PROHIBITED",
+    "host_probe": "NOT_RUN_PROHIBITED",
+    "host_render": "NOT_RUN_PROHIBITED",
+    "host_claim": "NOT_MADE",
+    "psdfixtureforge_modified": false,
+    "main_merged": false,
+    "pull_requests_merged": false
+  },
+  "psd2fusion": {
+    "branch": "codex/parity-004-offline-convergence-20260904",
+    "base_commit": "ff03cc669dba78a2e8952a9d48e5253b03978a41",
+    "implementation_commit": "f41b5771ec5abaf01210951e91c959b52a96bd1d",
+    "implementation_tree": "b6597957c50cfa8fdd3d3e644f76e75edc1e2b9c",
+    "origin_main": "2c13cd8efef8061dccb17ba89a320664c5d1c206",
+    "local_parity_004": "ff03cc669dba78a2e8952a9d48e5253b03978a41",
+    "origin_parity_004": "4f8293d292465dc7f1fdd40d3be04fd63c710a1c",
+    "open_pr": {
+      "number": 3,
+      "draft": true,
+      "state": "OPEN",
+      "merge_state": "DIRTY",
+      "head": "f5d488032059e7b13880d4fe6ba9e2d37fc3dcf8",
+      "url": "https://github.com/46slv/PSD2Fusion/pull/3",
+      "modified_by_this_task": false
+    }
+  },
+  "psdfixtureforge": {
+    "candidate_root": "D:/Documents/PSDFixtureForge-production-20260904",
+    "candidate_head": "05b7acc4b21e0a8805e0ff1e0f2c4ed982cd0391",
+    "candidate_worktree_clean": true,
+    "draft_pr": {
+      "number": 2,
+      "draft": true,
+      "state": "OPEN",
+      "merge_state": "CLEAN",
+      "base": "45ab1920343eab020fb169744f0bdb10e7f0dc8a",
+      "head": "05b7acc4b21e0a8805e0ff1e0f2c4ed982cd0391",
+      "url": "https://github.com/46slv/PSDFixtureForge/pull/2",
+      "modified_by_this_task": false
+    },
+    "dependencies": {
+      "psd_tools": "1.18.0",
+      "pillow": "12.3.0"
+    },
+    "fresh_gate": {
+      "fixture_valid": "9/9",
+      "oracle_valid": "9/9",
+      "psd_tools_1_18_semantic_readback": "9/9",
+      "deterministic_bytes": "9/9",
+      "oracle_independence": true,
+      "unit_tests": "46/46 PASS"
+    }
+  },
+  "defects_fixed": [
+    {
+      "boundary": "strict blend capability and lowering",
+      "before": "Screen parsed and emitted as a Fusion ApplyMode but was absent from the strict core registry, so strict Evaluation IR rejected cases that lowering still emitted",
+      "after": "Screen has an independent formula oracle, a strict unverified capability record, a PSD raw-key fixture path, and no silent rejected-mode lowering"
+    },
+    {
+      "boundary": "ordinary and group non-Normal blend",
+      "before": "premultiplied Loader or subtree RGB fed directly into a native non-Normal Merge",
+      "after": "the named blend function receives straight opaque source/backdrop RGB; T=(1-D)S+D*B(C_D,S), q=A_s*opacity is restored once, and final source-over is Normal"
+    },
+    {
+      "boundary": "8-bit strict oracle",
+      "before": "floating-point equations did not make per-stage 8-bit half-up quantization or one-LSB failures explicit",
+      "after": "uint8 Normal/Multiply/Screen and fixed-matte clipping helpers match the independent fixture oracle byte-for-byte without tolerance"
+    }
+  ],
+  "preserved_authority": {
+    "clipping_recipe": "operator_in_fixed_matte_local_stack",
+    "group_render_source": "internal_terminal_not_GroupOperator_proxy",
+    "clbl_false": "OUT_OF_SCOPE_UNCHANGED",
+    "parity_004_state": "IN_PROGRESS_HOST_PIXEL_PENDING",
+    "control_current_json_modified": false
+  },
+  "offline_verification": {
+    "fixture_matrix": {
+      "status": "PASS",
+      "case_count": 9,
+      "counts": {
+        "fixture_valid": 9,
+        "oracle_valid": 9,
+        "psd_tools_1_18_readback": 9,
+        "deterministic_bytes": 9,
+        "psd2fusion_semantic_ir_valid": 9,
+        "materialized_asset_rgba_valid": 9,
+        "strict_without_rejection": 9,
+        "semantic_math_exact": 9,
+        "lowering_structural": 9,
+        "comp_deterministic": 9
+      },
+      "maximum_rgba8_channel_delta": 0,
+      "local_full_report": {
+        "path": ".local/p4-offline-oracle-20260904-solmax/offline-summary-f41b577.json",
+        "bytes": 31805,
+        "sha256": "364a62dbb65d105c9bfbdf4af9bd2f95e29525f91691b86cf0880edea6ad50cb"
+      }
+    },
+    "real_psd_structure": {
+      "source_sha256": "574d8a6511b2aabe744835d81ed76c8fc8ffd0c9c5678f3359e8eda10f9174db",
+      "reference_sha256": "91ff8daef941b3d9052497190fdc8aa6f4d56ba524c8d912cf011b6818535f54",
+      "p4_07": "PASS",
+      "tools": 906,
+      "loaders": 100,
+      "groups": 34,
+      "clipping_chains": 23,
+      "clipped_members": 59,
+      "nonnormal_functions": 17,
+      "nonnormal_function_inputs_straight_opaque": true,
+      "group_proxy_render_consumers": 0,
+      "strict_rejections": 0,
+      "composition_sha256": "5c9e6b306c0296e7486d4dd9350e5a5bffd29f7fd8c2806364e9e4153cc9da06",
+      "p4_07_report_sha256": "d0d67b49d5f5da7d3b144ab3afb99b6956f3fc902f3c4cd6099d5e157c792b6f"
+    },
+    "repository_checks": {
+      "control_state": "PASS",
+      "unit_tests": "80/80 PASS",
+      "compileall": "PASS",
+      "diff_check": "PASS"
+    }
+  },
+  "transport_boundary": {
+    "description": "PSDFixtureForge canvas.background participates in expected pixels and the PSD stored composite, but is not serialized as a semantic pixel layer consumed by PSD2Fusion",
+    "semantic_math_with_explicit_fixture_backdrop": "9/9 exact",
+    "generated_psd_graph_root_matches_oracle_backdrop": "6/9",
+    "affected_cases": [
+      "fractional-alpha-opacity",
+      "multiply",
+      "screen"
+    ],
+    "policy": "Do not modify the oracle or hide this boundary; any future host micro must carry the same backdrop as an explicit bottom layer"
+  },
+  "case_classification": [
+    {
+      "case": "basic-pixel",
+      "classification": "OFFLINE_PROVEN_PASS",
+      "reason": "opaque single-layer transport, semantic pixels, strict math, and graph structure are exact"
+    },
+    {
+      "case": "fractional-alpha-opacity",
+      "classification": "UNRESOLVED",
+      "reason": "math is byte-exact only when the fixture canvas backdrop is supplied explicitly; the generated PSD does not transport that backdrop as a layer"
+    },
+    {
+      "case": "clipping-one-member",
+      "classification": "HOST_REQUIRED",
+      "reason": "fixed-matte semantic math and structure are exact, but saved actual evidence leaves strict ProcessAlpha/quantization behavior above zero-LSB unproven"
+    },
+    {
+      "case": "clipping-multi-member",
+      "classification": "OFFLINE_DEFECT_FIXED_AWAITING_HOST",
+      "reason": "Multiply then Screen fixed-matte order is byte-exact and Screen is no longer rejected by strict IR; actual Fusion execution remains pending"
+    },
+    {
+      "case": "multiply",
+      "classification": "OFFLINE_DEFECT_FIXED_AWAITING_HOST",
+      "reason": "ordinary premultiplied-mode lowering was replaced by the proved straight/opaque boundary; use an explicit backdrop-layer host carrier"
+    },
+    {
+      "case": "screen",
+      "classification": "OFFLINE_DEFECT_FIXED_AWAITING_HOST",
+      "reason": "Screen formula, registry, raw-key fixture, and straight/opaque lowering now agree; use an explicit backdrop-layer host carrier"
+    },
+    {
+      "case": "nested-isolated-group",
+      "classification": "OFFLINE_DEFECT_FIXED_AWAITING_HOST",
+      "reason": "nested Screen is strict, byte-exact, and consumes the internal group terminal through a straight/opaque boundary"
+    },
+    {
+      "case": "pass-through-group",
+      "classification": "OFFLINE_DEFECT_FIXED_AWAITING_HOST",
+      "reason": "Multiply child now consumes the real parent backdrop through the first AlphaDivide input proxy and never the GroupOperator output"
+    },
+    {
+      "case": "group-clipping",
+      "classification": "HOST_REQUIRED",
+      "reason": "offline fixed-matte/group-terminal equivalence is exact, but strict Multiply/ProcessAlpha host quantization is not proven"
+    }
+  ],
+  "linear_dodge": {
+    "classification": "HOST_REQUIRED",
+    "nine_case_oracle_coverage": false,
+    "offline_findings": "the current float and uint8 contracts clamp the Linear Dodge blend function before coverage interpolation; repository evidence does not prove a zero-LSB Fusion lowering for that boundary",
+    "production_change_in_this_commit": "ordinary non-Normal straight/opaque separation applies algebraically, but the existing clipping-member clamp path was not changed",
+    "claim": "NO_LINEAR_DODGE_PIXEL_FIX_CLAIM"
+  },
+  "minimum_host_matrix_after_unlock": [
+    {
+      "id": "H1-ordinary-alpha-modes",
+      "covers": [
+        "fractional-alpha-opacity",
+        "multiply",
+        "screen"
+      ],
+      "carrier": "one atlas comp with the three fixture canvas backgrounds materialized as explicit bottom layers",
+      "assert": "strict RGBA byte equality at source alpha, layer opacity, Multiply, and Screen boundaries"
+    },
+    {
+      "id": "H2-clipping-modes-and-quantization",
+      "covers": [
+        "clipping-one-member",
+        "clipping-multi-member",
+        "group-clipping",
+        "Linear Dodge diagnostic"
+      ],
+      "carrier": "one atlas comp with isolated regions for Normal, Multiply+Screen order, isolated group+clip, and localized Linear Dodge over-range/coverage stages",
+      "assert": "zero-LSB RGBA plus boundary taps for ClipIn alpha, blend function, ProcessAlpha=0 stack, group terminal, and final output"
+    },
+    {
+      "id": "H3-group-scope",
+      "covers": [
+        "nested-isolated-group",
+        "pass-through-group"
+      ],
+      "carrier": "one atlas comp comparing nested isolated Screen and Pass Through Multiply against equivalent ungrouped controls",
+      "assert": "zero-LSB RGBA and byte-identical group-vs-control outputs where semantics are equivalent"
+    },
+    {
+      "id": "H4-real-regression",
+      "covers": [
+        "real a.psd regression"
+      ],
+      "carrier": "regenerate from implementation commit and render once after H1-H3 pass or localize a failure",
+      "assert": "compare against the qualified reference without tolerance or fitting; retain exact artifact hashes and region metrics"
+    }
+  ]
+}
