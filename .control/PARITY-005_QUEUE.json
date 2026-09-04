@@ -1,0 +1,232 @@
+{
+  "schema": "psd2fusion-parity-005-queue.v1",
+  "task": "PARITY-005",
+  "goal": "Resolve explicit clbl=false semantics and group interaction, or fail closed through verified bake/reject.",
+  "coordinator_only_writes": true,
+  "parallel_axes": ["A_semantics", "B_host", "C_referee"],
+  "global_rules": {
+    "production_before_semantic_gate": false,
+    "allow_parallel_production_edits": false,
+    "allow_reference_fitting": false,
+    "allow_threshold_relaxation": false,
+    "allow_pixelwise_formula_selection": false,
+    "allow_silent_normal_fallback": false,
+    "preserve_float32": true,
+    "start_parity006": false,
+    "start_parity007": false
+  },
+  "stop_codes": {
+    "S-AUTHORITY": "Explicit authority required for merge/release/deploy/destructive/history/credential action.",
+    "S-INPUT": "Required PSD/fixture/reference input is missing, hash-mismatched, mutable, or unqualified.",
+    "S-HOST": "Required actual Fusion artifact cannot be acquired or qualified after multiple reasonable routes.",
+    "S-NONDISCRIMINATING": "Current fixtures cannot separate surviving hypotheses above host noise.",
+    "S-CONTRADICTION": "Independent material evidence conflicts with no resolved confound.",
+    "S-CONFOUND": "Premult/straight, transparent RGB, opacity, clamp, ICC, canvas, or quantization confounds the result.",
+    "S-FAILOPEN": "Strict rejected/unverified capability still emits an approximate legacy graph.",
+    "S-REGRESSION": "Bounded implementation causes new material semantic/visual/alpha/group/clipping regression.",
+    "S-UNSUPPORTED": "Required semantics remain unverified or cannot be safely represented.",
+    "S-VERIFIER": "Fresh verifier FAIL/BLOCKED or cannot reproduce evidence.",
+    "S-REMOTE": "Publish/readback/remote completion guard fails or canonical remote state mismatches."
+  },
+  "items": [
+    {
+      "id": "P5-00",
+      "stage": "S0",
+      "axis": "coordinator",
+      "depends_on": [],
+      "action": "Fresh-read main/task branch/current state/contracts and establish clean baseline.",
+      "done_when": ["exact HEADs recorded", "current state recorded", "working tree status recorded", "PARITY-004 not re-opened"]
+    },
+    {
+      "id": "P5-01",
+      "stage": "S0",
+      "axis": "A_semantics",
+      "depends_on": ["P5-00"],
+      "action": "Create/reparse fixtures proving absent, explicit true, explicit false clbl provenance on the base layer.",
+      "done_when": ["three provenance classes byte-backed", "parser output machine-recorded", "no semantic equivalence inferred"]
+    },
+    {
+      "id": "P5-02",
+      "stage": "S0",
+      "axis": "C_referee",
+      "depends_on": ["P5-00"],
+      "action": "Inventory current false-path capability decisions, lowering fallback and test coverage; record fail-open debt.",
+      "done_when": ["strict rejected path identified", "legacy emitted path identified", "false-PASS risk recorded"]
+    },
+    {
+      "id": "P5-03",
+      "stage": "S1",
+      "axis": "A_semantics",
+      "depends_on": ["P5-01"],
+      "action": "Register H1-H5 as independent offline formula/oracle models outside production lowering.",
+      "done_when": ["all live hypotheses executable", "no production helper reuse that makes oracle circular"]
+    },
+    {
+      "id": "P5-04",
+      "stage": "S1",
+      "axis": "A_semantics",
+      "depends_on": ["P5-03"],
+      "action": "Generate machine-readable expected RGBA for the fixture matrix under every live hypothesis.",
+      "done_when": ["predictions deterministic", "fixture IDs stable", "hashes/inputs recorded"]
+    },
+    {
+      "id": "P5-05",
+      "stage": "S1",
+      "axis": "C_referee",
+      "depends_on": ["P5-04"],
+      "action": "Build pairwise discrimination matrix and choose cheapest above-noise discriminators.",
+      "done_when": ["every live pair has a discriminator or S-NONDISCRIMINATING is raised"]
+    },
+    {
+      "id": "P5-06",
+      "stage": "S2",
+      "axis": "B_host",
+      "depends_on": ["P5-05"],
+      "action": "Render absent vs explicit true control in actual Fusion using PARITY-004 Loader/Saver contract.",
+      "done_when": ["host artifacts acquired", "internal/final metrics recorded", "result classified"]
+    },
+    {
+      "id": "P5-07",
+      "stage": "S2",
+      "axis": "B_host",
+      "depends_on": ["P5-05"],
+      "action": "Render explicit false backdrop-swap discriminator.",
+      "done_when": ["outer backdrop changed materially", "hypothesis support/contradiction table updated"]
+    },
+    {
+      "id": "P5-08",
+      "stage": "S2",
+      "axis": "B_host",
+      "depends_on": ["P5-05"],
+      "action": "Render explicit false base non-Normal mode-scope discriminator.",
+      "done_when": ["base-mode boundary observable", "hypotheses updated"]
+    },
+    {
+      "id": "P5-09",
+      "stage": "S2",
+      "axis": "B_host",
+      "depends_on": ["P5-05"],
+      "action": "Render explicit false base opacity 0.5 discriminator.",
+      "done_when": ["opacity boundary observable", "double-apply confound excluded", "hypotheses updated"]
+    },
+    {
+      "id": "P5-10",
+      "stage": "S2",
+      "axis": "B_host",
+      "depends_on": ["P5-05"],
+      "action": "Render two-member chaining/order discriminator.",
+      "done_when": ["member-member dependency observable", "reverse/order control available", "hypotheses updated"]
+    },
+    {
+      "id": "P5-11",
+      "stage": "S2",
+      "axis": "B_host",
+      "depends_on": ["P5-05"],
+      "action": "Render fractional-base-alpha discriminator with alpha-growth checks.",
+      "done_when": ["RGB and alpha divergence both measured", "premult confound controlled", "hypotheses updated"]
+    },
+    {
+      "id": "P5-12",
+      "stage": "S3",
+      "axis": "B_host",
+      "depends_on": ["P5-06", "P5-07", "P5-08", "P5-09", "P5-10", "P5-11"],
+      "action": "Run isolated-group interaction fixture.",
+      "done_when": ["group-local vs parent backdrop scope measured"]
+    },
+    {
+      "id": "P5-13",
+      "stage": "S3",
+      "axis": "B_host",
+      "depends_on": ["P5-06", "P5-07"],
+      "action": "Run Pass Through interaction fixture.",
+      "done_when": ["parent-backdrop consumption measured or capability rejection justified"]
+    },
+    {
+      "id": "P5-14",
+      "stage": "S3",
+      "axis": "B_host",
+      "depends_on": ["P5-12", "P5-13"],
+      "action": "Run nested-group interaction fixture.",
+      "done_when": ["nested boundary result measured or explicit unsupported classification recorded"]
+    },
+    {
+      "id": "P5-15",
+      "stage": "S3",
+      "axis": "B_host",
+      "depends_on": ["P5-12"],
+      "action": "Run group-as-base fixture.",
+      "done_when": ["base coverage/mode/opacity scope measured"]
+    },
+    {
+      "id": "P5-16",
+      "stage": "S3",
+      "axis": "B_host",
+      "depends_on": ["P5-12"],
+      "action": "Run group-as-member fixture.",
+      "done_when": ["member subtree semantics measured"]
+    },
+    {
+      "id": "P5-17",
+      "stage": "S3",
+      "axis": "A_semantics",
+      "depends_on": ["P5-01"],
+      "action": "Prove span termination/no cross-parent membership structurally and add regression fixture.",
+      "done_when": ["same-parent/contiguous invariant executable", "cross-group span rejected"]
+    },
+    {
+      "id": "P5-18",
+      "stage": "S4",
+      "axis": "coordinator",
+      "depends_on": ["P5-12", "P5-13", "P5-14", "P5-15", "P5-16", "P5-17"],
+      "action": "Write semantic decision record and grant native_candidate / verified_bake_candidate / reject authority.",
+      "done_when": ["survivors/rejections decisive", "unresolved cases explicit", "Axis C false-PASS audit attached"]
+    },
+    {
+      "id": "P5-19",
+      "stage": "S5",
+      "axis": "coordinator",
+      "depends_on": ["P5-18"],
+      "action": "Connect strict capability decision to lowering so rejected/unverified clbl=false cannot emit legacy approximate graph.",
+      "done_when": ["strict fail-closed test exists", "compatibility behavior explicit", "no silent fallback"]
+    },
+    {
+      "id": "P5-20",
+      "stage": "S5",
+      "axis": "coordinator",
+      "depends_on": ["P5-19"],
+      "action": "Implement smallest authorized native/bake/reject lowering behavior.",
+      "done_when": ["bounded implementation only", "float32 preserved", "no layer-ID special case", "focused tests pass"]
+    },
+    {
+      "id": "P5-21",
+      "stage": "S6",
+      "axis": "B_host",
+      "depends_on": ["P5-20"],
+      "action": "Run focused actual Fusion regression matrix for any promoted Fusion claim.",
+      "done_when": ["host artifacts tied to exact candidate", "no material regression", "alpha/group/clipping checks pass"]
+    },
+    {
+      "id": "P5-22",
+      "stage": "S6",
+      "axis": "C_referee",
+      "depends_on": ["P5-19", "P5-20", "P5-21"],
+      "action": "Fresh Verifier evaluates exact candidate and false-PASS risks.",
+      "done_when": ["PASS permits state transition", "FAIL/BLOCKED raises S-VERIFIER"]
+    },
+    {
+      "id": "P5-23",
+      "stage": "S6",
+      "axis": "coordinator",
+      "depends_on": ["P5-22"],
+      "action": "State transition, publish, fresh readback and remote completion guard. Stop before main merge unless explicitly authorized.",
+      "done_when": ["branch state transitioned only after PASS", "remote branch published", "guard result recorded", "S-AUTHORITY raised if main merge needed"]
+    }
+  ],
+  "checkpoint_when": [
+    "P5-18 semantic decision gate reached",
+    "any stop code requires human authority/input",
+    "P5-21 host-proven implementation is ready for fresh verifier",
+    "branch-level PARITY-005 closure reached",
+    "about eight queue items completed since last durable checkpoint and a material decision changed"
+  ]
+}
