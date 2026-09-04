@@ -30,6 +30,13 @@ def _parser() -> argparse.ArgumentParser:
         action="store_true",
         help="allow writing into an existing non-empty output directory",
     )
+    parser.add_argument(
+        "--policy",
+        choices=("strict", "compatibility"),
+        default="strict",
+        help="strict fails closed on explicit clbl=false (default); "
+        "compatibility emits the explicitly labelled fallback",
+    )
     return parser
 
 
@@ -58,7 +65,12 @@ def _prepare_output(path: str, force: bool) -> None:
     os.makedirs(path, exist_ok=True)
 
 
-def run(source: str, output: Optional[str] = None, force: bool = False) -> dict:
+def run(
+    source: str,
+    output: Optional[str] = None,
+    force: bool = False,
+    policy: str = "strict",
+) -> dict:
     source = os.path.abspath(source)
     if not os.path.isfile(source):
         raise FileNotFoundError(source)
@@ -86,8 +98,8 @@ def run(source: str, output: Optional[str] = None, force: bool = False) -> dict:
         )
 
     comp_path = os.path.join(output_dir, "PSD2Fusion.comp")
-    graph = compile_comp(document, comp_path)
-    evaluation = evaluate_document(document, policy="strict")
+    graph = compile_comp(document, comp_path, policy)
+    evaluation = evaluate_document(document, policy=policy)
     manifest_path = write_manifest(document, output_dir, assets, graph, evaluation)
     return {
         "source": source,
@@ -106,7 +118,7 @@ def run(source: str, output: Optional[str] = None, force: bool = False) -> dict:
 def main(argv: Optional[Sequence[str]] = None) -> int:
     args = _parser().parse_args(argv)
     try:
-        result = run(args.psd, args.output, args.force)
+        result = run(args.psd, args.output, args.force, args.policy)
     except Exception as exc:
         print("psd2fusion: %s" % exc, file=sys.stderr)
         return 2

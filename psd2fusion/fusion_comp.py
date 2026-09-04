@@ -446,9 +446,12 @@ def _group_operator(
 
 
 class _Compiler:
-    def __init__(self, doc: SemanticDocument, output_path: str):
+    def __init__(self, doc: SemanticDocument, output_path: str, policy: str = "strict"):
+        if policy not in ("strict", "compatibility"):
+            raise ValueError("policy must be strict or compatibility")
         self.doc = doc
         self.output_path = os.path.abspath(output_path)
+        self.policy = policy
         self.lookup = index_layers(doc.children)
         self.clipping_chains = {
             chain.base_id: chain for chain in doc.clipping_chains
@@ -467,6 +470,30 @@ class _Compiler:
         self._clipping_clip_rows: Dict[str, int] = {}
         self._clipping_stack_rows: Dict[str, int] = {}
         self._clipping_outer_rows: Dict[str, int] = {}
+
+    def _require_clbl_policy(self) -> None:
+        """Fail closed on explicit clbl=false under strict policy.
+
+        PARITY-005 S4 decision is `reject`: the strict Evaluation IR marks a
+        clbl=false span `rejected`, so strict lowering must not emit the
+        legacy approximate graph. Compatibility policy keeps the explicitly
+        labelled H2-characterization fallback.
+        """
+        false_chains = [
+            chain for chain in self.doc.clipping_chains
+            if not chain.blend_clipped_as_group
+        ]
+        if false_chains and self.policy == "strict":
+            bases = ", ".join(
+                "%s (%s)" % (chain.base_id[:10], chain.blend_clipped_as_group_provenance)
+                for chain in false_chains
+            )
+            raise ValueError(
+                "Strict policy rejects explicit clbl=false clipping span(s) "
+                "and emits no approximate graph: %s. Use policy="
+                "'compatibility' for the explicitly labelled fallback, or an "
+                "explicit bake/reject path." % bases
+            )
 
     def name(self, role: str, layer_id: str) -> str:
         base = "%s_%s" % (role, layer_id[:10])
@@ -1370,9 +1397,12 @@ class _Compiler:
                         backdrop_consumer=backdrop_consumer,
                     )
                 else:
-                    # Explicit clbl=false is outside this Goal. Preserve the
-                    # named FIRST_USABLE fallback instead of silently claiming
-                    # group-scope semantics.
+                    # Explicit clbl=false under strict policy is rejected
+                    # (PARITY-005 S4). Preserve the named FIRST_USABLE
+                    # fallback only under explicit compatibility policy,
+                    # never as silent group-scope semantics.
+                    if self.policy == "strict":
+                        self._require_clbl_policy()
                     current = self.merge_item(
                         current,
                         base_result,
@@ -1412,6 +1442,7 @@ class _Compiler:
         return _SequenceResult(current, self._current_tools, backdrop_consumer[0])
 
     def compile(self) -> Dict[str, str]:
+        self._require_clbl_policy()
         root_bg = self.name("Background", self.doc.source_sha256)
         self._root_background_name = root_bg
         root_tools: List[str] = [
@@ -1485,7 +1516,9 @@ class _Compiler:
         }
 
 
-def compile_comp(doc: SemanticDocument, output_path: str) -> Dict[str, str]:
+def compile_comp(
+    doc: SemanticDocument, output_path: str, policy: str = "strict"
+) -> Dict[str, str]:
     """Compile a semantic document to a deterministic Fusion composition."""
 
-    return _Compiler(doc, output_path).compile()
+    return _Compiler(doc, output_path, policy).compile()

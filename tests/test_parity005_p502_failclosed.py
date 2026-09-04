@@ -1,10 +1,9 @@
-"""PARITY-005 P5-02: strict fail-open detector for the clbl=false path.
+"""PARITY-005 P5-19: strict fail-closed test for the clbl=false path.
 
-Stage S0 / Axis C. Records S-FAILOPEN debt: strict EvaluationPlan marks the
-clbl=false span "rejected", but Fusion lowering still emits the legacy
-FIRST_USABLE approximate graph. This test PASSES while documenting the debt;
-P5-19 must replace it with a fail-closed assertion (raise / explicit
-bake-reject marker, no silent fallback).
+Stage S5 / Coordinator. S4 decision authority is REJECT: strict lowering
+must raise on an explicit clbl=false span instead of emitting the legacy
+approximate graph. Compatibility policy keeps the explicitly labelled
+H2-characterization fallback (never parity proof).
 """
 import tempfile
 import unittest
@@ -50,7 +49,7 @@ def _doc():
     )
 
 
-class FailOpenDetectorTests(unittest.TestCase):
+class FailClosedTests(unittest.TestCase):
     def test_strict_evaluation_rejects(self):
         plan = evaluate_document(_doc(), policy="strict")
         span = [d for d in plan.decisions if d.operation == "clipping_span"]
@@ -58,16 +57,19 @@ class FailOpenDetectorTests(unittest.TestCase):
         self.assertEqual("rejected", span[0].status)
         self.assertIn("clbl=false", span[0].reason)
 
-    def test_strict_lowering_currently_emits_labelled_fallback(self):
-        # S-FAILOPEN debt record: strict "rejected" still emits an editable
-        # approximate graph with an explicit comment label. This is NOT parity
-        # proof. P5-19 must make strict fail closed; then this test is replaced.
+    def test_strict_lowering_raises_no_graph(self):
+        # S-FAILOPEN repair: strict must not emit the legacy fallback.
         with tempfile.TemporaryDirectory() as d:
             out = Path(d) / "fix.comp"
-            try:
+            with self.assertRaisesRegex(ValueError, "clbl=false"):
                 compile_comp(_doc(), str(out))
-            except ValueError:
-                return  # fail-closed via reject is acceptable
+            self.assertFalse(out.exists(), "strict must write no .comp on reject")
+
+    def test_compatibility_lowering_labels_fallback(self):
+        # Compatibility keeps the explicitly labelled fallback (not parity).
+        with tempfile.TemporaryDirectory() as d:
+            out = Path(d) / "fix.comp"
+            compile_comp(_doc(), str(out), "compatibility")
             text = out.read_text(encoding="utf-8")
             self.assertIn("PSD clipped layer fallback (clbl=false)", text)
             plan = evaluate_document(_doc(), policy="strict")
@@ -75,6 +77,11 @@ class FailOpenDetectorTests(unittest.TestCase):
                 any(dd.status == "rejected" for dd in plan.decisions),
                 "emitted fallback must coincide with a strict rejected decision",
             )
+
+    def test_invalid_policy_rejected(self):
+        with tempfile.TemporaryDirectory() as d:
+            with self.assertRaisesRegex(ValueError, "policy"):
+                compile_comp(_doc(), str(Path(d) / "fix.comp"), "silent")
 
 
 if __name__ == "__main__":
