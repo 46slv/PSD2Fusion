@@ -1,0 +1,190 @@
+{
+  "schema": "psd2fusion-program-closeout-queue.v1",
+  "model_target": "Muse 1.3",
+  "goal": "Complete PARITY-006 canonical closure, PARITY-007 independent closeout, and canonical program terminal state.",
+  "global_rules": {
+    "fresh_remote_over_chat": true,
+    "continue_without_human_when_ready": true,
+    "allow_task_branch_commit_push_pr_update": true,
+    "allow_main_merge_without_explicit_authority": false,
+    "allow_force_push": false,
+    "allow_history_rewrite": false,
+    "allow_branch_delete": false,
+    "allow_release_or_deploy": false,
+    "preserve_float32": true,
+    "allow_threshold_relaxation": false,
+    "allow_reference_fitting": false,
+    "allow_known_1lsb_repair_loop": false
+  },
+  "stop_codes": [
+    "S-AUTHORITY",
+    "S-INPUT",
+    "S-HOST",
+    "S-CONFOUND",
+    "S-NONLOCALIZED",
+    "S-CONTRADICTION",
+    "S-REGRESSION",
+    "S-UNSUPPORTED",
+    "S-VERIFIER",
+    "S-REMOTE"
+  ],
+  "items": [
+    {
+      "id": "C00",
+      "phase": "P6_CLOSE",
+      "depends_on": [],
+      "action": "Fresh-read repo/cwd/main/codex-parity-006/PR6/current state/P6 verifier/evidence using remote API+ls-remote+explicit fetch as needed.",
+      "done_when": ["exact live HEADs known", "working tree state known", "stale local refs not treated as truth"]
+    },
+    {
+      "id": "C01",
+      "phase": "P6_CLOSE",
+      "depends_on": ["C00"],
+      "action": "Audit P6 verifier linkage and branch drift; prove any post-verifier changes are control/evidence-only or re-verify if production changed.",
+      "done_when": ["exact evaluated production candidate unique", "fresh verifier PASS still applicable"]
+    },
+    {
+      "id": "C02",
+      "phase": "P6_CLOSE",
+      "depends_on": ["C01"],
+      "action": "Apply branch-level PARITY-006 done/pass transition and advance P7 to ready only as Goal/schema allow; update evidence linkage; run state/schema validation and check.ps1.",
+      "done_when": ["P6 done/pass", "P7 readiness correct", "checks PASS"]
+    },
+    {
+      "id": "C03",
+      "phase": "P6_CLOSE",
+      "depends_on": ["C02"],
+      "action": "Publish P6 branch; fresh readback; verify state, candidate, verifier and evidence reachability; run branch-level remote guard if applicable.",
+      "done_when": ["remote branch current", "readback matches", "branch guard/result recorded"]
+    },
+    {
+      "id": "C04",
+      "phase": "P6_CLOSE",
+      "depends_on": ["C03"],
+      "action": "Canonical main promotion of P6 only with explicit authority and fresh safe-FF checks; then fresh main readback and canonical remote completion guard.",
+      "done_when": ["origin/main contains P6 done/pass", "P7 ready canonical", "remote guard PASS"],
+      "stop_if": "S-AUTHORITY when merge authority absent"
+    },
+    {
+      "id": "C05",
+      "phase": "P7_BOOTSTRAP",
+      "depends_on": ["C04"],
+      "action": "Create codex/parity-007 from exact canonical main; add P7 RUNBOOK/QUEUE; set branch-level in_progress according to Worker/state rules; open/update Draft PR.",
+      "done_when": ["P7 branch from canonical main", "durable P7 control plane exists"]
+    },
+    {
+      "id": "C06",
+      "phase": "P7_VERIFY",
+      "depends_on": ["C05"],
+      "action": "Create fresh clean verification environment/worktree; establish exact versions/state with no stale generated artifact dependency.",
+      "done_when": ["clean environment", "exact HEAD/version inventory recorded"]
+    },
+    {
+      "id": "C07",
+      "phase": "P7_VERIFY",
+      "depends_on": ["C06"],
+      "action": "Audit P1-P6 state/evidence integrity, commit reachability, contracts, privacy, unsupported/rejected semantics and transition consistency.",
+      "done_when": ["proof chain intact or defects classified"]
+    },
+    {
+      "id": "C08",
+      "phase": "P7_VERIFY",
+      "depends_on": ["C06"],
+      "action": "Run full offline regression: check.ps1, all tests/static checks, parser/evaluation/capability/clipping/group/LD/clbl-failclosed/comparator false-PASS coverage.",
+      "done_when": ["offline regression PASS or bounded correction loop triggered"]
+    },
+    {
+      "id": "C09",
+      "phase": "P7_VERIFY",
+      "depends_on": ["C07", "C08"],
+      "action": "Fresh regenerate real PSD to ignored temp path; record hashes/counts/warnings/tool count/comp hash/float32/forbidden-tool audit.",
+      "done_when": ["fresh regen qualified"]
+    },
+    {
+      "id": "C10",
+      "phase": "P7_VERIFY",
+      "depends_on": ["C09"],
+      "action": "Acquire final fresh actual Fusion proof in dedicated project PSD2Fusion using disposable comp and qualified host route; record full host evidence.",
+      "done_when": ["fresh final artifact qualified", "host healthy or S-HOST"]
+    },
+    {
+      "id": "C11",
+      "phase": "P7_VERIFY",
+      "depends_on": ["C10"],
+      "action": "Strict threshold-0 final comparison against qualified reference; record dimensions/profile/RGB/alpha/outlier/coherent-region metrics and classify material vs quantization residual.",
+      "done_when": ["no material blocker or correction loop triggered"]
+    },
+    {
+      "id": "C12",
+      "phase": "P7_VERIFY",
+      "depends_on": ["C09"],
+      "action": "Independent final semantic/capability audit: fail-closed unknown/clbl false, group/clipping/opacity/non-Normal/LD boundaries, capability-lowering gate, float32, no ID special cases.",
+      "done_when": ["semantic/capability closure audit PASS or defect classified"]
+    },
+    {
+      "id": "C13",
+      "phase": "P7_VERIFY",
+      "depends_on": ["C07", "C08", "C11", "C12"],
+      "action": "False-PASS, privacy and complexity audit including stale artifact, wrong alpha/dims/profile/crop/premult/local outlier/threshold relaxation/oracle-SUT coupling/host-load-vs-render risks.",
+      "done_when": ["no unresolved false-PASS/privacy blocker"]
+    },
+    {
+      "id": "C14",
+      "phase": "P7_VERDICT",
+      "depends_on": ["C13"],
+      "action": "Run fresh independent PARITY-007 verifier returning exactly PASS/FAIL/BLOCKED. Verifier must not repair its own candidate.",
+      "done_when": ["verdict recorded"]
+    },
+    {
+      "id": "C15",
+      "phase": "P7_CORRECTION",
+      "depends_on": ["C14"],
+      "conditional": "only when C14 != PASS",
+      "action": "Separate Worker classifies verifier finding and applies smallest bounded correction, then launches a new fresh verifier; do not repeat unchanged failure more than once.",
+      "done_when": ["new verifier PASS or genuine stop code"]
+    },
+    {
+      "id": "C16",
+      "phase": "PROGRAM_CLOSE",
+      "depends_on": ["C14"],
+      "conditional": "C14 PASS or later correction-loop fresh PASS",
+      "action": "Fresh-read schema/Goal and apply legal P7 done/pass plus program terminal state; update evidence linkage; state validation/check.ps1.",
+      "done_when": ["branch-level terminal state valid", "checks PASS"]
+    },
+    {
+      "id": "C17",
+      "phase": "PROGRAM_CLOSE",
+      "depends_on": ["C16"],
+      "action": "Publish P7 branch and fresh remote readback of terminal state, verifier and evidence reachability.",
+      "done_when": ["remote branch terminal proof readable"]
+    },
+    {
+      "id": "C18",
+      "phase": "PROGRAM_CLOSE",
+      "depends_on": ["C17"],
+      "action": "Canonical final main promotion only with explicit authority and fresh safe-FF checks; no force/rewrite/delete; fresh main readback afterward.",
+      "done_when": ["origin/main contains terminal program state"],
+      "stop_if": "S-AUTHORITY when merge authority absent"
+    },
+    {
+      "id": "C19",
+      "phase": "PROGRAM_CLOSE",
+      "depends_on": ["C18"],
+      "action": "Run final remote completion guard plus final check.ps1/clean/privacy confirmation from canonical main.",
+      "done_when": ["remote guard PASS", "checks PASS", "repo clean"]
+    },
+    {
+      "id": "C20",
+      "phase": "PROGRAM_DONE",
+      "depends_on": ["C19"],
+      "action": "Report PROGRAM DONE only if canonical main proves required P1-P7 done/pass, legal terminal state, final fresh verifier PASS, final fresh Fusion proof, accepted reference comparison, no material/false-PASS blocker, remote guard PASS and no private leakage.",
+      "done_when": ["PROGRAM DONE proof complete"]
+    }
+  ],
+  "checkpoint_when": [
+    "a genuine stop code requires human action",
+    "unexpected material production defect is found during P7",
+    "branch-level final program closure reached",
+    "PROGRAM DONE reached"
+  ]
+}
