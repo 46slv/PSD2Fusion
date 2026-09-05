@@ -1,0 +1,1 @@
+{"errors": ["state_reachable", "state_matches", "remote_expectations"], "remote": {"branch": "59c6f2df95bfb962af93d7b77024e63d7c391988", "candidate": "2bd99781fdf98e15b27d734549f39b36b2889840", "main": "fe98c7abb4ff5627ccee6126781b228ccd17a70f", "state_commit": "59c6f2df95bfb962af93d7b77024e63d7c391988"}, "status": "FAIL"}

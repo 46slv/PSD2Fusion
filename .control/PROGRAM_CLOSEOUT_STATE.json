@@ -5,15 +5,16 @@
   "task": "PROGRAM_CLOSEOUT",
   "phase": "P6_CLOSE",
   "active_items": [
-    "C03"
+    "C04"
   ],
   "completed_items": [
     "C00",
     "C01",
-    "C02"
+    "C02",
+    "C03"
   ],
   "blocked_items": [],
-  "active_stop_code": null,
+  "active_stop_code": "S-AUTHORITY",
   "reconcile_with_live_git_before_use": true,
   "last_known": {
     "canonical_main_at_closeout_start": "fe98c7abb4ff5627ccee6126781b228ccd17a70f",
@@ -24,7 +25,7 @@
     "p6_host_project": "PSD2Fusion",
     "p7_started": false,
     "control_plane_hardened_for_muse_orchestration": true,
-    "closeout_branch_tip": "b6e8d3ab0e16cf4782c0c10ed6873c27d97dde4",
+    "closeout_branch_tip": "59c6f2df95bfb962af93d7b77024e63d7c391988",
     "local_equals_remote_parity006": true,
     "origin_main": "fe98c7abb4ff5627ccee6126781b228ccd17a70f",
     "pr6": "open draft head b6e8d3a base main mergeable true",
@@ -34,7 +35,11 @@
     "p7_branch_status": "ready",
     "active_task": "PARITY-007",
     "c02_evidence": ".control/evidence/PARITY-006/20260905-p624-c02-transition/summary.json",
-    "c02_checks": "validate ok; check.ps1 108/108 PASS"
+    "c02_checks": "validate ok; check.ps1 108/108 PASS",
+    "c03_readback": "fetch+API match: P6 done/pass P7 ready active PARITY-007",
+    "c03_guard": ".control/evidence/PARITY-006/20260905-p625-guard/summary.json",
+    "c03_guard_result": "FAIL expected pre-merge; branch PASS preserved",
+    "c04_blocker": "main merge needs explicit authority; allow_main_merge_without_explicit_authority=false"
   },
   "orchestration": {
     "coordinator": {
@@ -69,10 +74,10 @@
     "parallelism_rule": "Use queue.parallel_group when available; if parallel workers are unavailable, execute lanes sequentially in fresh independent contexts without stopping."
   },
   "last_checkpoint": {
-    "kind": "c02-done",
-    "note": "Branch-level P6 done/pass applied; P7 ready; checks PASS. Next C03 publish/readback/guard.",
+    "kind": "c03-done-c04-authority-stop",
+    "note": "Branch publish/readback/guard complete. C04 main promotion blocked on merge authority.",
     "evidence": [
-      ".control/evidence/PARITY-006/20260905-p624-c02-transition/summary.json"
+      ".control/evidence/PARITY-006/20260905-p625-guard/summary.json"
     ]
   },
   "update_policy": {
