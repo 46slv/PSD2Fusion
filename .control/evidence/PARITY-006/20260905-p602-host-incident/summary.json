@@ -1,0 +1,52 @@
+{
+  "schema": "psd2fusion-parity-006.p602-host-incident.v1",
+  "task": "PARITY-006",
+  "run_id": "20260905-p602-host-incident",
+  "queue_id": "P6-02",
+  "status": "HOST_INCIDENT_NO_ARTIFACT",
+  "branch": "codex/parity-006",
+  "candidate_HEAD": "eb7d702529ffb6dbb030078b0ff50678bdd34e58",
+  "candidate_comp": ".local/p6-baseline-20260905/PSD2Fusion.comp (1109 tools, sha ae02bd2c, from latest task-branch candidate, no production change)",
+  "procedure": ".local/p6-real-render-20260905/parity006_real_render.lua (temp-only; PARITY-004 qualified paste pattern: snapshot, Lock+StartUndo, Paste, frame 0-0, Saver PreDivide=1 on pasted MediaOut1 source, Render FrameRange 0 Wait=true, delete added, restore attrs, EndUndo, count check; never saves project)",
+  "host_before": {
+    "resolve": "21.0.3.7 (endpoint OK)",
+    "project": "PSD2Fusion P4-08 20260902",
+    "current_comp_tools": 383,
+    "existing_preserved_plan": "name-snapshot plus delete-added plus undo"
+  },
+  "host_run": {
+    "paste_ok": true,
+    "render_source_found": true,
+    "saver_predivide": 1,
+    "render_call": true,
+    "render_result": null,
+    "render_seconds": 125,
+    "artifact": null,
+    "polls": 120
+  },
+  "restore": {
+    "deleted": 0,
+    "after_tool_count": 0,
+    "restored": false,
+    "cause": "comp handle went stale; host was already dying, tool list read empty so nothing was deleted by us"
+  },
+  "host_after": {
+    "resolve_exe": "process gone (tasklist: no Resolve.exe, no fuscript.exe)",
+    "scripting_endpoints": "Fusion and Resolve endpoints unavailable",
+    "session_state": "UNKNOWN; we never issued save; in-memory paste died with the process; relaunch will show last-saved project state"
+  },
+  "repo_state": "clean; only ignored .local artifacts added; no production change; inputs re-hashed unchanged",
+  "fresh_input_qualification": {
+    "psd_sha256": "574d8a6511b2aabe744835d81ed76c8fc8ffd0c9c5678f3359e8eda10f9174db",
+    "reference_sha256": "91ff8daef941b3d9052497190fdc8aa6f4d56ba524c8d912cf011b6818535f54",
+    "classification": "exact_canvas; dimensions 2304x1296 match; PSD RGB and reference RGBA-all-opaque share ICC sha 2b3aa164 (3144 bytes); structure recomputed 136/34/23/59",
+    "stored_composite_note": "psd-tools stored composite vs reference is max3/mean0.186/p99 1/alpha0 with stored-artifact profile mismatch; separate origin, not Fusion evidence"
+  },
+  "stop_code": "S-HOST (first route failed with host death; second route needs relaunch decision)",
+  "not_claimed": "no pixel_verified claim; no PARITY-004 render reused as fresh evidence",
+  "next_options": [
+    "user relaunches Resolve and confirms project/comp integrity (do not let us relaunch silently)",
+    "retry P6-02 via fusion LoadComp into a disposable comp instead of the live 383-tool comp",
+    "smaller staged render (single chain) before full 1109-tool paste to test host stability"
+  ]
+}
