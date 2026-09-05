@@ -1,0 +1,11 @@
+{
+  "schema": "psd2fusion-parity-007.p704-semantic-audit.v1",
+  "policy": "strict",
+  "capabilities": "explicit incl layer_masks unknown",
+  "fail_closed": "unknown capability raises; unsupported rejected under strict",
+  "clipping": "23 chains local_span, clbl provenance recorded",
+  "groups": "34 reconstructed",
+  "float32": "provenance comments only",
+  "id_special_cases": "none (no hash literals in code)",
+  "verdict": "C12 done"
+}

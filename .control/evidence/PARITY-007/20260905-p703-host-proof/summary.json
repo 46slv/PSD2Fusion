@@ -1,0 +1,36 @@
+{
+  "schema": "psd2fusion-parity-007.p703-host-proof.v1",
+  "host": {
+    "project": "PSD2Fusion API-gated",
+    "resolve": "Studio 21.0.3.7",
+    "pid_same_before_after": true,
+    "before_tools": 1,
+    "after_tools": 1,
+    "cleanup_deleted": 1110,
+    "cleanup_failures": 0,
+    "project_saved": false
+  },
+  "sanity": {
+    "result": "render false, no artifact (v1+v2); full success supersedes as pipeline proof; recorded anomaly, not blocker"
+  },
+  "full": {
+    "pasted_tools": 1109,
+    "mediaout": "pasted MediaOut1_1 connected",
+    "render": "true first poll",
+    "artifact": "PSD2Fusion.p7final0000.png",
+    "bytes": 7926961,
+    "sha256": "d8d940415ac25804cde1efcc15189bf4e206849a1496c75301fa88f7b60ba984",
+    "deterministic_vs_p6": "byte-identical"
+  },
+  "compare": {
+    "threshold": 0,
+    "status": "FAIL diagnostic retained",
+    "max": 3,
+    "mean": 0.3621194889188957,
+    "p99": 1.0,
+    "alpha_max": 0,
+    "gt32": 0,
+    "classification": "acceptance-nonblocking quantization class; no material blocker; no correction loop"
+  },
+  "verdict": "C10 done, C11 done"
+}

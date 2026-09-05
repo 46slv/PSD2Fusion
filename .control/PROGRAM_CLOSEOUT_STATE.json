@@ -5,8 +5,7 @@
   "task": "PROGRAM_CLOSEOUT",
   "phase": "P6_CLOSE",
   "active_items": [
-    "C10",
-    "C12"
+    "C13"
   ],
   "completed_items": [
     "C00",
@@ -18,7 +17,10 @@
     "C06",
     "C07",
     "C08",
-    "C09"
+    "C09",
+    "C10",
+    "C11",
+    "C12"
   ],
   "blocked_items": [],
   "active_stop_code": null,
@@ -56,7 +58,10 @@
     "c07_c08_evidence": ".control/evidence/PARITY-007/20260905-p701-static/summary.json",
     "static_group": "PASS",
     "c09_evidence": ".control/evidence/PARITY-007/20260905-p702-regen/summary.json",
-    "regen": "136/34/23/1109/196/0warns; path-masked byte-identical"
+    "regen": "136/34/23/1109/196/0warns; path-masked byte-identical",
+    "final_artifact_sha256": "d8d940415ac25804cde1efcc15189bf4e206849a1496c75301fa88f7b60ba984",
+    "final_compare": "max3 mean0.362 p99 1 alpha0 gt32 0",
+    "dynamic_group": "PASS"
   },
   "orchestration": {
     "coordinator": {
@@ -91,10 +96,11 @@
     "parallelism_rule": "Use queue.parallel_group when available; if parallel workers are unavailable, execute lanes sequentially in fresh independent contexts without stopping."
   },
   "last_checkpoint": {
-    "kind": "c09-done",
-    "note": "Fresh regen qualified; dynamic group C10+C12 starts.",
+    "kind": "c10-c11-c12-done",
+    "note": "Fresh Fusion proof byte-identical to P6; compare reproduces accepted quantization class; semantic audit PASS. Next C13 false-PASS/privacy audit.",
     "evidence": [
-      ".control/evidence/PARITY-007/20260905-p702-regen/summary.json"
+      ".control/evidence/PARITY-007/20260905-p703-host-proof/summary.json",
+      ".control/evidence/PARITY-007/20260905-p704-semantic-audit/summary.json"
     ]
   },
   "update_policy": {
