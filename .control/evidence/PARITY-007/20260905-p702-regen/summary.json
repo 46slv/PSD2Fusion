@@ -1,0 +1,28 @@
+{
+  "schema": "psd2fusion-parity-007.p702-regen.v1",
+  "inputs": {
+    "psd_sha256": "574d8a6511b2aabe744835d81ed76c8fc8ffd0c9c5678f3359e8eda10f9174db",
+    "reference_sha256": "91ff8daef941b3d9052497190fdc8aa6f4d56ba524c8d912cf011b6818535f54",
+    "read_only_preserved": true
+  },
+  "regen": {
+    "output": ".local/p7-regen-20260905 (clean worktree, ignored)",
+    "layers": 136,
+    "groups": 34,
+    "clipping_chains": 23,
+    "tool_count": 1109,
+    "merge_count": 196,
+    "warnings": 0,
+    "dimensions": [
+      2304,
+      1296
+    ],
+    "depth": 8,
+    "comp_bytes": 747878,
+    "comp_sha256": "46a111c89b0582d6ddb3ba26b83d475b9ec2b67d63e2ab133a80b9aace44b34e"
+  },
+  "path_proof": "second regen to .local/p7-regen-b is byte-identical after masking the output-dir string; P6 comp-hash difference is embedded absolute asset paths only, never fitted",
+  "forbidden_tools": "Grade/Blur/Resize/Gamut/OCIO 0",
+  "float32": "provenance Comments only (materialization contract), no pixel edits",
+  "verdict": "C09 done"
+}
