@@ -244,5 +244,23 @@ class GroupLocalLayoutTests(unittest.TestCase):
         self.assertIn("PSD Group:", stripped)
 
 
+    def test_group_operator_emits_native_viewport_contract(self) -> None:
+        docs = fixture_documents()
+        with tempfile.TemporaryDirectory() as directory:
+            comp = Path(directory) / "gi.comp"
+            _compile(docs["isolated"], comp)
+            text = comp.read_text(encoding="utf-8")
+        block = re.search(r"GroupOperator \{(.*?)\n\t\},", text, re.S)
+        self.assertIsNotNone(block)
+        view = block.group(1)
+        for token in ("Scale = 1,", "Offset = { 0, 0 },", "PipeStyle = ",
+                      "Direction = ", "AllowPan = false,", "GridSnap = true,",
+                      "ConnectedSnap = true,", "AutoSnap = true,",
+                      "RemoveRouters = true"):
+            self.assertIn(token, view)
+        # Size stays host-computed; the serializer must not fabricate it.
+        self.assertNotIn("Size = {", view)
+
+
 if __name__ == "__main__":
     unittest.main()
