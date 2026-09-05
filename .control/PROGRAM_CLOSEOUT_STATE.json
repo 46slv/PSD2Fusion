@@ -4,8 +4,13 @@
   "runbook": ".control/PROGRAM_CLOSEOUT_RUNBOOK.md",
   "task": "PROGRAM_CLOSEOUT",
   "phase": "P6_CLOSE",
-  "active_items": ["C00"],
-  "completed_items": [],
+  "active_items": [
+    "C02"
+  ],
+  "completed_items": [
+    "C00",
+    "C01"
+  ],
   "blocked_items": [],
   "active_stop_code": null,
   "reconcile_with_live_git_before_use": true,
@@ -17,30 +22,51 @@
     "p6_material_residual": "none; remaining residual classified quantization-scale under active acceptance",
     "p6_host_project": "PSD2Fusion",
     "p7_started": false,
-    "control_plane_hardened_for_muse_orchestration": true
+    "control_plane_hardened_for_muse_orchestration": true,
+    "closeout_branch_tip": "b6e8d3ab0e16cf4782c0c10ed6873c27d97dde4",
+    "local_equals_remote_parity006": true,
+    "origin_main": "fe98c7abb4ff5627ccee6126781b228ccd17a70f",
+    "pr6": "open draft head b6e8d3a base main mergeable true",
+    "c00_c01_evidence": ".control/evidence/PARITY-006/20260905-p623-c01-linkage/summary.json",
+    "c01_linkage": "PASS applicable; post-verifier drift control-only; production candidate 29c18b4 unchanged"
   },
   "orchestration": {
     "coordinator": {
       "lane": "COORD",
-      "owner": null,
-      "status": "ready"
+      "owner": "Muse-C this run",
+      "status": "active"
     },
     "workers": {
-      "A_AUDIT": {"owner": null, "status": "idle", "assigned_items": []},
-      "B_HOST": {"owner": null, "status": "idle", "assigned_items": []},
-      "C_REFEREE": {"owner": null, "status": "idle", "assigned_items": []},
-      "V_FRESH": {"owner": null, "status": "idle", "assigned_items": []}
+      "A_AUDIT": {
+        "owner": null,
+        "status": "idle",
+        "assigned_items": []
+      },
+      "B_HOST": {
+        "owner": null,
+        "status": "idle",
+        "assigned_items": []
+      },
+      "C_REFEREE": {
+        "owner": null,
+        "status": "idle",
+        "assigned_items": []
+      },
+      "V_FRESH": {
+        "owner": null,
+        "status": "idle",
+        "assigned_items": []
+      }
     },
     "shared_write_rule": "Coordinator is the only shared production/control writer unless one disjoint path set is explicitly delegated to one worker.",
     "fresh_verifier_rule": "Verifier uses a fresh context and never repairs its own candidate.",
     "parallelism_rule": "Use queue.parallel_group when available; if parallel workers are unavailable, execute lanes sequentially in fresh independent contexts without stopping."
   },
   "last_checkpoint": {
-    "kind": "muse_orchestration_hardening",
-    "note": "Program runbook/queue now include explicit Muse coordinator/worker lanes, parallel groups, retry budgets, and if-this-then-that recovery routes. C00 must fresh-read current branch/remote because control-only commits were added after the P6 verifier candidate.",
+    "kind": "c00-c01-done",
+    "note": "C00 live fresh-read reconciled; C01 linkage audit proves verifier PASS still maps to 29c18b4 with control-only post-verifier drift.",
     "evidence": [
-      ".control/evidence/PARITY-006/20260905-p621-verifier/verifier.json",
-      ".control/evidence/PARITY-006/20260905-p622-guard/summary.json"
+      ".control/evidence/PARITY-006/20260905-p623-c01-linkage/summary.json"
     ]
   },
   "update_policy": {

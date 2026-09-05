@@ -1,0 +1,23 @@
+{
+  "schema": "psd2fusion-parity-006.p623-c01-linkage.v1",
+  "task": "PARITY-006",
+  "run_ids": [
+    "C00-fresh-read",
+    "C01-linkage-audit"
+  ],
+  "live_git": {
+    "local_HEAD": "b6e8d3ab0e16cf4782c0c10ed6873c27d97dde4",
+    "remote_HEAD": "b6e8d3ab0e16cf4782c0c10ed6873c27d97dde4",
+    "local_equals_remote": true,
+    "origin_main": "fe98c7abb4ff5627ccee6126781b228ccd17a70f",
+    "main_advanced": false,
+    "pr6": "open draft head b6e8d3a base main mergeable true",
+    "tree": "clean"
+  },
+  "production_candidate": "29c18b4b4c6ed4f9c8f3cc1a9c547e5bb23a6c06",
+  "post_verifier_range": "29c18b4..b6e8d3a",
+  "post_verifier_scope": "control evidence docs ownership-map only; psd2fusion scripts tests untouched",
+  "verifier_linkage": "p621 PASS on 29c18b4 remains applicable; no production drift",
+  "guard": "p622 FAIL is expected pre-merge S-AUTHORITY; branch PASS preserved",
+  "verdict": "C00 done, C01 done"
+}
