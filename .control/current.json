@@ -129,12 +129,12 @@
     },
     {
       "id": "PARITY-006",
-      "status": "ready",
+      "status": "in_progress",
       "requires": [
         "PARITY-004"
       ],
       "verification": "pending",
-      "branch": null,
+      "branch": "codex/parity-006",
       "commit": null,
       "evidence": []
     },

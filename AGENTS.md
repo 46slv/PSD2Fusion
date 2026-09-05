@@ -31,6 +31,8 @@ When `active_task_id` is `PARITY-004`, also read `.control/PARITY-004_TODO.md` a
 
 When `active_task_id` is `PARITY-005`, also read `.control/PARITY-005_RUNBOOK.md` and `.control/PARITY-005_QUEUE.json`. Treat the runbook as the execution/stop/promotion contract and the queue as the machine-readable work order. Continue through ready reversible items without asking for per-step confirmation; stop only for a declared stop condition, a semantic decision checkpoint, a verifier boundary, or an authority boundary.
 
+When `active_task_id` is `PARITY-006`, also read `.control/PARITY-006_RUNBOOK.md` and `.control/PARITY-006_QUEUE.json`. Treat the runbook as the execution/stop/promotion contract and the queue as the machine-readable work order. Continue through ready reversible items without asking for per-step confirmation; stop only for a declared stop condition, a semantic decision checkpoint, a verifier boundary, or an authority boundary.
+
 Read `docs/AGENT_OPERATIONS.md` only when delegation or a persistent loop materially helps. Do not load all research files by default.
 
 ## Protected invariants
@@ -98,6 +100,8 @@ In-scope reversible repository edits and non-destructive validation are allowed.
 - active PARITY-004 host/pixel procedure -> `docs/PARITY_004_HOST_PIXEL_GATE.md`;
 - active PARITY-005 execution/stop/promotion contract -> `.control/PARITY-005_RUNBOOK.md`;
 - active PARITY-005 machine-readable work queue -> `.control/PARITY-005_QUEUE.json`;
+- active PARITY-006 execution/stop/promotion contract -> `.control/PARITY-006_RUNBOOK.md`;
+- active PARITY-006 machine-readable work queue -> `.control/PARITY-006_QUEUE.json`;
 - historical FIRST_USABLE architecture -> root `ARCHITECTURE.md`;
 - PSD/file-format evidence -> `docs/research/`;
 - repeatable procedure -> tests/scripts/Harness;

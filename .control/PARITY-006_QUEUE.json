@@ -1,0 +1,54 @@
+{
+  "schema": "psd2fusion-parity-006-queue.v1",
+  "task": "PARITY-006",
+  "goal": "Converge real PSD actual-Fusion vs qualified reference by semantic region; material differences only.",
+  "coordinator_only_writes": true,
+  "parallel_axes": ["A_localizer", "B_fixture_repair", "C_referee"],
+  "global_rules": {
+    "production_before_repair_authority": false,
+    "allow_parallel_production_edits": false,
+    "allow_reference_fitting": false,
+    "allow_threshold_relaxation": false,
+    "allow_global_grade_resize_blur_flatten": false,
+    "allow_pixelwise_formula_selection": false,
+    "allow_silent_normal_fallback": false,
+    "preserve_float32": true,
+    "forbid_1lsb_only_repair": true,
+    "do_not_repeat_parity004_ld": true,
+    "do_not_repeat_parity005_clblfalse": true,
+    "start_parity007": false
+  },
+  "stop_codes": {
+    "S-AUTHORITY": "merge/release/destructive/credential/history needs explicit authority",
+    "S-INPUT": "PSD/reference/hash/qualification problem",
+    "S-HOST": "actual Fusion artifact unobtainable via reasonable routes",
+    "S-CONFOUND": "ICC/premult/transparent-RGB/canvas confound unresolved",
+    "S-NONLOCALIZED": "material diff not narrowable to a semantic boundary",
+    "S-CONTRADICTION": "independent material evidence conflicts",
+    "S-REGRESSION": "repair creates new material regression",
+    "S-UNSUPPORTED": "semantics not safely representable as native/bake/reject",
+    "S-VERIFIER": "fresh verifier FAIL/BLOCKED or irreproducible",
+    "S-REMOTE": "publish/readback/guard fails or remote mismatch"
+  },
+  "items": [
+    {"id": "P6-00", "stage": "S0", "axis": "coordinator", "depends_on": [], "action": "Fresh-read main/task branch/state/contracts/evidence; record exact HEADs and clean tree.", "done_when": ["exact HEADs recorded", "state recorded", "tree status recorded", "no past values used as truth"]},
+    {"id": "P6-01", "stage": "S0", "axis": "coordinator", "depends_on": ["P6-00"], "action": "Regen real PSD from latest candidate to temp path; record layers/groups/chains/tools/comp sha.", "done_when": ["regen reproducible", "structure counts recorded", "comp sha recorded"]},
+    {"id": "P6-02", "stage": "S0", "axis": "B_fixture_repair", "depends_on": ["P6-01"], "action": "Acquire actual Fusion render via qualified production path; record host/version/settings/artifact hash.", "done_when": ["host artifact qualified", "provenance recorded", "no fitting nodes"]},
+    {"id": "P6-03", "stage": "S0", "axis": "A_localizer", "depends_on": ["P6-02"], "action": "Qualified reference compare at threshold 0 with RGB/alpha max/mean/p99, >1/>2/>8/>16/>32, bbox.", "done_when": ["strict metrics recorded", "artifacts linked", "alpha/canvas checked"]},
+    {"id": "P6-04", "stage": "S0", "axis": "A_localizer", "depends_on": ["P6-03"], "action": "Material residual inventory: coherent/connected regions mapped to layer/group/chain/mode/opacity and ranked.", "done_when": ["regions enumerated", "owners mapped", "ranking recorded"]},
+    {"id": "P6-05", "stage": "S0", "axis": "C_referee", "depends_on": ["P6-03", "P6-04"], "action": "Confound + false-PASS audit of baseline; separate quantization class from material diff.", "done_when": ["confounds checked", "quantization vs material separated", "next discriminator or closure proposed"]},
+    {"id": "P6-10", "stage": "S1", "axis": "B_fixture_repair", "depends_on": ["P6-04", "P6-05"], "action": "Reduce top material region to minimal fixture.", "done_when": ["minimal fixture reproduces region", "fixture ID stable"]},
+    {"id": "P6-11", "stage": "S1", "axis": "A_localizer", "depends_on": ["P6-10"], "action": "List competing semantic/implementation hypotheses with discriminating fixtures.", "done_when": ["hypotheses executable", "discriminators identified"]},
+    {"id": "P6-12", "stage": "S1", "axis": "B_fixture_repair", "depends_on": ["P6-11"], "action": "Host micro/region evidence for the narrowed boundary.", "done_when": ["host artifacts tied to candidate", "support/contradict recorded"]},
+    {"id": "P6-13", "stage": "S1", "axis": "coordinator", "depends_on": ["P6-12"], "action": "Bounded single-boundary production repair (only after repair authority).", "done_when": ["one boundary only", "float32 preserved", "no fitting", "focused tests pass"]},
+    {"id": "P6-14", "stage": "S1", "axis": "B_fixture_repair", "depends_on": ["P6-13"], "action": "Focused tests + check.ps1 + micro/region gate + full real render/recompare.", "done_when": ["no new material regression", "before/after metrics recorded"]},
+    {"id": "P6-20", "stage": "S2", "axis": "coordinator", "depends_on": ["P6-04", "P6-05"], "action": "Worker closeout when no material residual or all classified supported/rejected.", "done_when": ["closeout packet complete", "evidence paths committed"]},
+    {"id": "P6-21", "stage": "S2", "axis": "coordinator", "depends_on": ["P6-20"], "action": "Fresh verifier + state transition + publish + fresh readback + remote guard; stop before main merge unless authorized.", "done_when": ["verdict recorded", "guard recorded", "S-AUTHORITY raised if merge needed"]}
+  ],
+  "checkpoint_when": [
+    "fresh baseline finds new material blocker with narrowed cause boundary",
+    "bounded repair is host-proven",
+    "branch-level PARITY-006 closure reached",
+    "any stop code needs human authority/input"
+  ]
+}
