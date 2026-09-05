@@ -21,7 +21,7 @@
     "psd_sha256": "574d8a6511b2aabe744835d81ed76c8fc8ffd0c9c5678f3359e8eda10f9174db",
     "reference_png_sha256": "91ff8daef941b3d9052497190fdc8aa6f4d56ba524c8d912cf011b6818535f54"
   },
-  "active_task_id": "PARITY-005",
+  "active_task_id": "PARITY-006",
   "task_contract": ".control/CURRENT_GOAL.md",
   "tasks": [
     {
@@ -103,11 +103,11 @@
     },
     {
       "id": "PARITY-005",
-      "status": "awaiting_verification",
+      "status": "done",
       "requires": [
         "PARITY-004"
       ],
-      "verification": "pending",
+      "verification": "pass",
       "branch": "codex/parity-005",
       "commit": "d382a1ab606b7aa9d4c90bafa13e1d2850e0add5",
       "evidence": [
@@ -123,12 +123,13 @@
         ".control/evidence/PARITY-005/20260905-p514-p516-nested-groupbase/summary.json",
         ".control/evidence/PARITY-005/20260905-p518-decision/decision.md",
         ".control/evidence/PARITY-005/20260905-p519-p521-failclosed/summary.json",
-        ".control/evidence/PARITY-005/20260905-p522-verifier/verifier.json"
+        ".control/evidence/PARITY-005/20260905-p522-verifier/verifier.json",
+        ".control/evidence/PARITY-005/20260905-p523-guard/summary.json"
       ]
     },
     {
       "id": "PARITY-006",
-      "status": "blocked",
+      "status": "ready",
       "requires": [
         "PARITY-004"
       ],
