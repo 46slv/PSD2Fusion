@@ -1,0 +1,10 @@
+{
+  "schema": "psd2fusion-program-closeout.c19-final.v1",
+  "canonical_main": "215419b9b9c7bcafffbf4170af47e2b45b8e47ec",
+  "guard_p6": "PASS",
+  "guard_p7": "PASS",
+  "checks": "108/108 PASS",
+  "privacy": "clean (347 files, no binaries)",
+  "repair": "P7 commit transcription fix d51a971ac7e (state-only, FF, reversible)",
+  "api_readback": "P1-P6 done/pass, P7 awaiting_verification/pass, program done"
+}
