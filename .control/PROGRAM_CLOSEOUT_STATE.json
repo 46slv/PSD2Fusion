@@ -5,7 +5,7 @@
   "task": "PROGRAM_CLOSEOUT",
   "phase": "P6_CLOSE",
   "active_items": [
-    "C14"
+    "C16"
   ],
   "completed_items": [
     "C00",
@@ -21,7 +21,8 @@
     "C10",
     "C11",
     "C12",
-    "C13"
+    "C13",
+    "C14"
   ],
   "blocked_items": [],
   "active_stop_code": null,
@@ -63,7 +64,10 @@
     "final_artifact_sha256": "d8d940415ac25804cde1efcc15189bf4e206849a1496c75301fa88f7b60ba984",
     "final_compare": "max3 mean0.362 p99 1 alpha0 gt32 0",
     "dynamic_group": "PASS",
-    "c13_evidence": ".control/evidence/PARITY-007/20260905-p705-falsepass/summary.json"
+    "c13_evidence": ".control/evidence/PARITY-007/20260905-p705-falsepass/summary.json",
+    "p7_verifier": "PASS",
+    "c14_evidence": ".control/evidence/PARITY-007/20260905-p706-verifier/verifier.json",
+    "c15": "skipped (C14 PASS)"
   },
   "orchestration": {
     "coordinator": {
@@ -88,9 +92,11 @@
         "assigned_items": []
       },
       "V_FRESH": {
-        "owner": null,
-        "status": "idle",
-        "assigned_items": []
+        "owner": "COORD-emulated (isolated runtime unavailable)",
+        "status": "done",
+        "assigned_items": [
+          "C14"
+        ]
       }
     },
     "shared_write_rule": "Coordinator is the only shared production/control writer unless one disjoint path set is explicitly delegated to one worker.",
@@ -98,10 +104,10 @@
     "parallelism_rule": "Use queue.parallel_group when available; if parallel workers are unavailable, execute lanes sequentially in fresh independent contexts without stopping."
   },
   "last_checkpoint": {
-    "kind": "c13-done",
-    "note": "No unresolved false-PASS/privacy blocker. Next C14 fresh independent verifier.",
+    "kind": "c14-done",
+    "note": "Fresh verifier PASS (recomputed). C15 skipped. Next C16 legal terminal state on branch.",
     "evidence": [
-      ".control/evidence/PARITY-007/20260905-p705-falsepass/summary.json"
+      ".control/evidence/PARITY-007/20260905-p706-verifier/verifier.json"
     ]
   },
   "update_policy": {

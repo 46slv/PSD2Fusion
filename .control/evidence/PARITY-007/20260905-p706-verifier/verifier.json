@@ -1,0 +1,21 @@
+{
+  "schema": "psd2fusion-parity-007.verifier.v1",
+  "task": "PARITY-007",
+  "verdict": "PASS",
+  "role": "V_FRESH lane; isolated subagent runtime unavailable so executed as coordinator-emulated sequential lane with every fact recomputed from live repo (no transcript trust)",
+  "evaluated_branch_HEAD": "db2237769064dc3fda3ed977ced65d09ed08f7d1",
+  "canonical_main": "4032e0e082df77ed6509c1b44398e60f9682375e",
+  "checks_reproduced": {
+    "merge_base": "4032e0e",
+    "state_schema": "ok",
+    "check_ps1": "108/108 PASS fresh",
+    "prod_diff_29c18b4_to_main": "empty under psd2fusion/scripts/tests",
+    "artifact_sha256": "d8d94041 recomputed match",
+    "regen_tool_count": "1109",
+    "verifier_compare": "max3 mean0.362119 p99 1 alpha0 gt32 0 strict FAIL retained",
+    "privacy": "no binaries tracked"
+  },
+  "residual_classification": "no material-scale residual; remainder acceptance-nonblocking quantization class",
+  "false_pass_risks": "checked per C13; none unresolved",
+  "permitted_transition": "P7 done/pass branch-level terminal; C15 skipped (PASS); proceed C16"
+}
