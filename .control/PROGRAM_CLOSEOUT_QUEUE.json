@@ -1,10 +1,13 @@
 {
-  "schema": "psd2fusion-program-closeout-queue.v1",
+  "schema": "psd2fusion-program-closeout-queue.v2",
   "model_target": "Muse 1.3",
   "goal": "Complete PARITY-006 canonical closure, PARITY-007 independent closeout, and canonical program terminal state.",
+  "execution_state": ".control/PROGRAM_CLOSEOUT_STATE.json",
   "global_rules": {
     "fresh_remote_over_chat": true,
     "continue_without_human_when_ready": true,
+    "orchestration_expected": true,
+    "coordinator_is_single_shared_writer": true,
     "allow_task_branch_commit_push_pr_update": true,
     "allow_main_merge_without_explicit_authority": false,
     "allow_force_push": false,
@@ -14,7 +17,16 @@
     "preserve_float32": true,
     "allow_threshold_relaxation": false,
     "allow_reference_fitting": false,
-    "allow_known_1lsb_repair_loop": false
+    "allow_known_1lsb_repair_loop": false,
+    "unchanged_failure_retry_max": 1,
+    "remote_read_retry_methods": 2
+  },
+  "lanes": {
+    "COORD": "Muse coordinator: queue/state/Git/shared writes/promotion decisions",
+    "A_AUDIT": "repository, state, evidence, privacy and reachability audit",
+    "B_HOST": "Resolve/Fusion host execution and artifact qualification",
+    "C_REFEREE": "semantic/capability/false-PASS/confound audit",
+    "V_FRESH": "fresh independent verifier; never repairs own candidate"
   },
   "stop_codes": [
     "S-AUTHORITY",
@@ -28,125 +40,206 @@
     "S-VERIFIER",
     "S-REMOTE"
   ],
+  "recovery_routes": {
+    "wrong_repo": "switch to D:\\Documents\\PSD2Fusion and rerun opening sequence",
+    "local_ref_missing": "GitHub API + git ls-remote + explicit refspec fetch; continue if remote resolves",
+    "unrelated_dirty_tree": "create fresh worktree at intended exact commit; preserve unrelated work",
+    "main_advanced": "fresh compare; non-destructively integrate main; rerun only affected verification; no force rewrite",
+    "gh007": "for unpushed commit use established repository noreply author/reset-author without global config change",
+    "single_test_fail": "retry once unchanged; if deterministic localize/fix smallest cause and continue",
+    "evidence_missing_reproducible": "regenerate from qualified inputs/candidate; record superseding evidence",
+    "resolve_absent": "relaunch/reconnect if safe and available; exact project PSD2Fusion; sanity before full",
+    "resolve_crash": "record incident; changed diagnostic route after at most one unchanged retry; classify size/node/Saver/range/memory/lifecycle",
+    "artifact_hash_changed": "recompute pixel/metadata metrics; hash difference alone is not material failure",
+    "strict_small_quantization_fail": "retain diagnostic FAIL; do not repair byte identity",
+    "verifier_evidence_fail": "separate Worker repairs evidence/state only; launch new fresh verifier",
+    "verifier_code_fail": "separate Worker bounded fix + affected regression; launch new fresh verifier",
+    "verifier_material_fail": "localize -> fixture -> hypotheses -> host evidence -> one bounded repair -> full regression -> new fresh verifier",
+    "premerge_guard_fail": "expected until canonical main promotion; preserve branch PASS",
+    "postmerge_guard_fail": "fresh main/state/evidence read; repair reversible publish/state mismatch; rerun guard"
+  },
   "items": [
     {
       "id": "C00",
       "phase": "P6_CLOSE",
+      "lane": "COORD",
+      "parallel_group": null,
       "depends_on": [],
+      "status": "pending",
       "action": "Fresh-read repo/cwd/main/codex-parity-006/PR6/current state/P6 verifier/evidence using remote API+ls-remote+explicit fetch as needed.",
-      "done_when": ["exact live HEADs known", "working tree state known", "stale local refs not treated as truth"]
+      "done_when": ["exact live HEADs known", "working tree state known", "stale local refs not treated as truth"],
+      "on_fail": "apply recovery_routes for repo/ref/remote before any stop code"
     },
     {
       "id": "C01",
       "phase": "P6_CLOSE",
+      "lane": "A_AUDIT",
+      "parallel_group": null,
       "depends_on": ["C00"],
-      "action": "Audit P6 verifier linkage and branch drift; prove any post-verifier changes are control/evidence-only or re-verify if production changed.",
-      "done_when": ["exact evaluated production candidate unique", "fresh verifier PASS still applicable"]
+      "status": "pending",
+      "action": "Audit P6 verifier linkage and branch drift; prove post-verifier changes are control/evidence-only or re-verify affected production behavior.",
+      "done_when": ["exact evaluated production candidate unique", "fresh verifier PASS still applicable"],
+      "on_fail": "if production drift -> rerun affected verification; if only control/evidence drift -> superseding linkage evidence"
     },
     {
       "id": "C02",
       "phase": "P6_CLOSE",
+      "lane": "COORD",
+      "parallel_group": null,
       "depends_on": ["C01"],
+      "status": "pending",
       "action": "Apply branch-level PARITY-006 done/pass transition and advance P7 to ready only as Goal/schema allow; update evidence linkage; run state/schema validation and check.ps1.",
-      "done_when": ["P6 done/pass", "P7 readiness correct", "checks PASS"]
+      "done_when": ["P6 done/pass", "P7 readiness correct", "checks PASS"],
+      "on_fail": "fix state/schema/check issue if reversible; do not alter production for state-only failure"
     },
     {
       "id": "C03",
       "phase": "P6_CLOSE",
+      "lane": "COORD",
+      "parallel_group": null,
       "depends_on": ["C02"],
-      "action": "Publish P6 branch; fresh readback; verify state, candidate, verifier and evidence reachability; run branch-level remote guard if applicable.",
-      "done_when": ["remote branch current", "readback matches", "branch guard/result recorded"]
+      "status": "pending",
+      "action": "Publish P6 branch; fresh readback; verify state, candidate, verifier and evidence reachability; run branch-level guard/result record.",
+      "done_when": ["remote branch current", "readback matches", "branch guard/result recorded"],
+      "on_fail": "fresh remote recovery; S-REMOTE only after reasonable push/fetch/readback retries"
     },
     {
       "id": "C04",
       "phase": "P6_CLOSE",
+      "lane": "COORD",
+      "parallel_group": null,
       "depends_on": ["C03"],
+      "status": "pending",
       "action": "Canonical main promotion of P6 only with explicit authority and fresh safe-FF checks; then fresh main readback and canonical remote completion guard.",
       "done_when": ["origin/main contains P6 done/pass", "P7 ready canonical", "remote guard PASS"],
-      "stop_if": "S-AUTHORITY when merge authority absent"
+      "stop_if": "S-AUTHORITY when merge authority absent",
+      "on_fail": "if main advanced, use recovery_routes.main_advanced; if guard fails postmerge, use recovery_routes.postmerge_guard_fail"
     },
     {
       "id": "C05",
       "phase": "P7_BOOTSTRAP",
+      "lane": "COORD",
+      "parallel_group": null,
       "depends_on": ["C04"],
+      "status": "pending",
       "action": "Create codex/parity-007 from exact canonical main; add P7 RUNBOOK/QUEUE; set branch-level in_progress according to Worker/state rules; open/update Draft PR.",
       "done_when": ["P7 branch from canonical main", "durable P7 control plane exists"]
     },
     {
       "id": "C06",
       "phase": "P7_VERIFY",
+      "lane": "COORD",
+      "parallel_group": null,
       "depends_on": ["C05"],
+      "status": "pending",
       "action": "Create fresh clean verification environment/worktree; establish exact versions/state with no stale generated artifact dependency.",
       "done_when": ["clean environment", "exact HEAD/version inventory recorded"]
     },
     {
       "id": "C07",
       "phase": "P7_VERIFY",
+      "lane": "A_AUDIT",
+      "parallel_group": "P7_STATIC_A",
       "depends_on": ["C06"],
+      "status": "pending",
       "action": "Audit P1-P6 state/evidence integrity, commit reachability, contracts, privacy, unsupported/rejected semantics and transition consistency.",
-      "done_when": ["proof chain intact or defects classified"]
+      "done_when": ["proof chain intact or defects classified"],
+      "on_fail": "repair reproducible evidence/linkage if possible; fresh evidence supersedes stale history"
     },
     {
       "id": "C08",
       "phase": "P7_VERIFY",
+      "lane": "C_REFEREE",
+      "parallel_group": "P7_STATIC_A",
       "depends_on": ["C06"],
+      "status": "pending",
       "action": "Run full offline regression: check.ps1, all tests/static checks, parser/evaluation/capability/clipping/group/LD/clbl-failclosed/comparator false-PASS coverage.",
-      "done_when": ["offline regression PASS or bounded correction loop triggered"]
+      "done_when": ["offline regression PASS or bounded correction loop triggered"],
+      "on_fail": "retry once unchanged; deterministic failure -> bounded fix in separate Worker then rerun affected/full offline checks"
     },
     {
       "id": "C09",
       "phase": "P7_VERIFY",
+      "lane": "COORD",
+      "parallel_group": null,
       "depends_on": ["C07", "C08"],
+      "status": "pending",
       "action": "Fresh regenerate real PSD to ignored temp path; record hashes/counts/warnings/tool count/comp hash/float32/forbidden-tool audit.",
-      "done_when": ["fresh regen qualified"]
+      "done_when": ["fresh regen qualified"],
+      "on_fail": "historical count/hash mismatch must be explained, never fitted"
     },
     {
       "id": "C10",
       "phase": "P7_VERIFY",
+      "lane": "B_HOST",
+      "parallel_group": "P7_DYNAMIC_B",
       "depends_on": ["C09"],
+      "status": "pending",
       "action": "Acquire final fresh actual Fusion proof in dedicated project PSD2Fusion using disposable comp and qualified host route; record full host evidence.",
-      "done_when": ["fresh final artifact qualified", "host healthy or S-HOST"]
+      "done_when": ["fresh final artifact qualified", "host healthy or genuine S-HOST"],
+      "on_fail": "use Resolve recovery playbook; do not repeat identical crashing full route more than once"
     },
     {
       "id": "C11",
       "phase": "P7_VERIFY",
+      "lane": "B_HOST",
+      "parallel_group": null,
       "depends_on": ["C10"],
+      "status": "pending",
       "action": "Strict threshold-0 final comparison against qualified reference; record dimensions/profile/RGB/alpha/outlier/coherent-region metrics and classify material vs quantization residual.",
-      "done_when": ["no material blocker or correction loop triggered"]
+      "done_when": ["no material blocker or correction loop triggered"],
+      "on_fail": "localized >8/>32 or alpha difference is material; localize before any repair"
     },
     {
       "id": "C12",
       "phase": "P7_VERIFY",
+      "lane": "C_REFEREE",
+      "parallel_group": "P7_DYNAMIC_B",
       "depends_on": ["C09"],
+      "status": "pending",
       "action": "Independent final semantic/capability audit: fail-closed unknown/clbl false, group/clipping/opacity/non-Normal/LD boundaries, capability-lowering gate, float32, no ID special cases.",
       "done_when": ["semantic/capability closure audit PASS or defect classified"]
     },
     {
       "id": "C13",
       "phase": "P7_VERIFY",
+      "lane": "C_REFEREE",
+      "parallel_group": null,
       "depends_on": ["C07", "C08", "C11", "C12"],
+      "status": "pending",
       "action": "False-PASS, privacy and complexity audit including stale artifact, wrong alpha/dims/profile/crop/premult/local outlier/threshold relaxation/oracle-SUT coupling/host-load-vs-render risks.",
       "done_when": ["no unresolved false-PASS/privacy blocker"]
     },
     {
       "id": "C14",
       "phase": "P7_VERDICT",
+      "lane": "V_FRESH",
+      "parallel_group": null,
       "depends_on": ["C13"],
+      "status": "pending",
       "action": "Run fresh independent PARITY-007 verifier returning exactly PASS/FAIL/BLOCKED. Verifier must not repair its own candidate.",
-      "done_when": ["verdict recorded"]
+      "done_when": ["verdict recorded"],
+      "on_fail": "route to C15 using verifier classification; new verifier only after material evidence/candidate change"
     },
     {
       "id": "C15",
       "phase": "P7_CORRECTION",
+      "lane": "COORD",
+      "parallel_group": null,
       "depends_on": ["C14"],
+      "status": "conditional",
       "conditional": "only when C14 != PASS",
       "action": "Separate Worker classifies verifier finding and applies smallest bounded correction, then launches a new fresh verifier; do not repeat unchanged failure more than once.",
-      "done_when": ["new verifier PASS or genuine stop code"]
+      "done_when": ["new verifier PASS or genuine stop code"],
+      "on_fail": "S-VERIFIER only after available bounded correction routes are exhausted"
     },
     {
       "id": "C16",
       "phase": "PROGRAM_CLOSE",
+      "lane": "COORD",
+      "parallel_group": null,
       "depends_on": ["C14"],
+      "status": "pending",
       "conditional": "C14 PASS or later correction-loop fresh PASS",
       "action": "Fresh-read schema/Goal and apply legal P7 done/pass plus program terminal state; update evidence linkage; state validation/check.ps1.",
       "done_when": ["branch-level terminal state valid", "checks PASS"]
@@ -154,36 +247,50 @@
     {
       "id": "C17",
       "phase": "PROGRAM_CLOSE",
+      "lane": "COORD",
+      "parallel_group": null,
       "depends_on": ["C16"],
+      "status": "pending",
       "action": "Publish P7 branch and fresh remote readback of terminal state, verifier and evidence reachability.",
       "done_when": ["remote branch terminal proof readable"]
     },
     {
       "id": "C18",
       "phase": "PROGRAM_CLOSE",
+      "lane": "COORD",
+      "parallel_group": null,
       "depends_on": ["C17"],
+      "status": "pending",
       "action": "Canonical final main promotion only with explicit authority and fresh safe-FF checks; no force/rewrite/delete; fresh main readback afterward.",
       "done_when": ["origin/main contains terminal program state"],
-      "stop_if": "S-AUTHORITY when merge authority absent"
+      "stop_if": "S-AUTHORITY when merge authority absent",
+      "on_fail": "if main advanced, integrate non-destructively and rerun affected proof; then re-evaluate FF"
     },
     {
       "id": "C19",
       "phase": "PROGRAM_CLOSE",
+      "lane": "COORD",
+      "parallel_group": null,
       "depends_on": ["C18"],
+      "status": "pending",
       "action": "Run final remote completion guard plus final check.ps1/clean/privacy confirmation from canonical main.",
-      "done_when": ["remote guard PASS", "checks PASS", "repo clean"]
+      "done_when": ["remote guard PASS", "checks PASS", "repo clean"],
+      "on_fail": "fresh main/state/evidence read; repair reversible publish/state mismatch; rerun guard before S-REMOTE"
     },
     {
       "id": "C20",
       "phase": "PROGRAM_DONE",
+      "lane": "COORD",
+      "parallel_group": null,
       "depends_on": ["C19"],
+      "status": "pending",
       "action": "Report PROGRAM DONE only if canonical main proves required P1-P7 done/pass, legal terminal state, final fresh verifier PASS, final fresh Fusion proof, accepted reference comparison, no material/false-PASS blocker, remote guard PASS and no private leakage.",
       "done_when": ["PROGRAM DONE proof complete"]
     }
   ],
   "checkpoint_when": [
     "a genuine stop code requires human action",
-    "unexpected material production defect is found during P7",
+    "unexpected material production defect is found during P7 and product-level judgment is required",
     "branch-level final program closure reached",
     "PROGRAM DONE reached"
   ]
