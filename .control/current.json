@@ -21,7 +21,7 @@
     "psd_sha256": "574d8a6511b2aabe744835d81ed76c8fc8ffd0c9c5678f3359e8eda10f9174db",
     "reference_png_sha256": "91ff8daef941b3d9052497190fdc8aa6f4d56ba524c8d912cf011b6818535f54"
   },
-  "active_task_id": "PARITY-006",
+  "active_task_id": "PARITY-007",
   "task_contract": ".control/CURRENT_GOAL.md",
   "tasks": [
     {
@@ -31,7 +31,9 @@
       "verification": "pass",
       "branch": "codex/parity-001",
       "commit": "20e4bd0df77bd2d1fe2c041f70bdf27471738f29",
-      "evidence": [".control/evidence/PARITY-001/20260902-132200/summary.json"]
+      "evidence": [
+        ".control/evidence/PARITY-001/20260902-132200/summary.json"
+      ]
     },
     {
       "id": "PARITY-002",
@@ -42,7 +44,9 @@
       "verification": "pass",
       "branch": "codex/parity-002",
       "commit": "542ef549056259f73310dc062d502de05d13d038",
-      "evidence": [".control/evidence/PARITY-002/20260902-140000/summary.json"]
+      "evidence": [
+        ".control/evidence/PARITY-002/20260902-140000/summary.json"
+      ]
     },
     {
       "id": "PARITY-003",
@@ -53,7 +57,9 @@
       "verification": "pass",
       "branch": "codex/parity-003",
       "commit": "2979e657959fe0b7bf7f271cf7d3d09d1a8e369a",
-      "evidence": [".control/evidence/PARITY-003/20260902-161254/summary.json"]
+      "evidence": [
+        ".control/evidence/PARITY-003/20260902-161254/summary.json"
+      ]
     },
     {
       "id": "PARITY-004",
@@ -129,7 +135,7 @@
     },
     {
       "id": "PARITY-006",
-      "status": "awaiting_verification",
+      "status": "done",
       "requires": [
         "PARITY-004"
       ],
@@ -143,12 +149,14 @@
         ".control/evidence/PARITY-006/20260905-p603-compare/summary.json",
         ".control/evidence/PARITY-006/20260905-p604-inventory/summary.json",
         ".control/evidence/PARITY-006/20260905-p605-closeout/summary.json",
-        ".control/evidence/PARITY-006/20260905-p621-verifier/verifier.json"
+        ".control/evidence/PARITY-006/20260905-p621-verifier/verifier.json",
+        ".control/evidence/PARITY-006/20260905-p622-guard/summary.json",
+        ".control/evidence/PARITY-006/20260905-p623-c01-linkage/summary.json"
       ]
     },
     {
       "id": "PARITY-007",
-      "status": "blocked",
+      "status": "ready",
       "requires": [
         "PARITY-005",
         "PARITY-006"

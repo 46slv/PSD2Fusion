@@ -1,0 +1,10 @@
+{
+  "schema": "psd2fusion-parity-006.p624-c02-transition.v1",
+  "task": "PARITY-006",
+  "transition": "PARITY-006 awaiting_verification->done (verification pass); PARITY-007 blocked->ready; active_task_id PARITY-006->PARITY-007",
+  "checks": {
+    "validate_control_state": "ok",
+    "check_ps1": "108/108 PASS"
+  },
+  "production_candidate": "29c18b4 unchanged; no production files touched"
+}
