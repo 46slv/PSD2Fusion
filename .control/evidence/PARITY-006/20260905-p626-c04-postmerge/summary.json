@@ -1,0 +1,12 @@
+{
+  "schema": "psd2fusion-parity-006.p626-c04-postmerge.v1",
+  "merge": "codex/parity-006@4032e0e -> main FF-only, pushed; origin/main=4032e0e via ls-remote+fetch+API",
+  "postmerge": {
+    "origin_main_current": "P6 done/pass P7 ready active PARITY-007",
+    "guard": "PASS",
+    "check_ps1": "108/108 PASS",
+    "tree": "clean",
+    "evidence": "verifier.json reachable"
+  },
+  "verdict": "C04 done"
+}

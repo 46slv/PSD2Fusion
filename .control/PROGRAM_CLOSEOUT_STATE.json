@@ -5,16 +5,18 @@
   "task": "PROGRAM_CLOSEOUT",
   "phase": "P6_CLOSE",
   "active_items": [
-    "C04"
+    "C06"
   ],
   "completed_items": [
     "C00",
     "C01",
     "C02",
-    "C03"
+    "C03",
+    "C04",
+    "C05"
   ],
   "blocked_items": [],
-  "active_stop_code": "S-AUTHORITY",
+  "active_stop_code": null,
   "reconcile_with_live_git_before_use": true,
   "last_known": {
     "canonical_main_at_closeout_start": "fe98c7abb4ff5627ccee6126781b228ccd17a70f",
@@ -32,14 +34,18 @@
     "c00_c01_evidence": ".control/evidence/PARITY-006/20260905-p623-c01-linkage/summary.json",
     "c01_linkage": "PASS applicable; post-verifier drift control-only; production candidate 29c18b4 unchanged",
     "p6_branch_status": "done/pass",
-    "p7_branch_status": "ready",
+    "p7_branch_status": "in_progress",
     "active_task": "PARITY-007",
     "c02_evidence": ".control/evidence/PARITY-006/20260905-p624-c02-transition/summary.json",
     "c02_checks": "validate ok; check.ps1 108/108 PASS",
     "c03_readback": "fetch+API match: P6 done/pass P7 ready active PARITY-007",
     "c03_guard": ".control/evidence/PARITY-006/20260905-p625-guard/summary.json",
     "c03_guard_result": "FAIL expected pre-merge; branch PASS preserved",
-    "c04_blocker": "main merge needs explicit authority; allow_main_merge_without_explicit_authority=false"
+    "c04_blocker": "main merge needs explicit authority; allow_main_merge_without_explicit_authority=false",
+    "canonical_main": "4032e0e082df77ed6509c1b44398e60f9682375e",
+    "c04_postmerge": ".control/evidence/PARITY-006/20260905-p626-c04-postmerge/summary.json",
+    "c04_guard": "PASS on canonical main",
+    "parity007_branch": "codex/parity-007 from 4032e0e"
   },
   "orchestration": {
     "coordinator": {
@@ -74,10 +80,10 @@
     "parallelism_rule": "Use queue.parallel_group when available; if parallel workers are unavailable, execute lanes sequentially in fresh independent contexts without stopping."
   },
   "last_checkpoint": {
-    "kind": "c03-done-c04-authority-stop",
-    "note": "Branch publish/readback/guard complete. C04 main promotion blocked on merge authority.",
+    "kind": "c04-c05-done",
+    "note": "C04 canonical promotion + postmerge proof done. C05 P7 branch bootstrapped with control plane; Draft PR next.",
     "evidence": [
-      ".control/evidence/PARITY-006/20260905-p625-guard/summary.json"
+      ".control/evidence/PARITY-006/20260905-p626-c04-postmerge/summary.json"
     ]
   },
   "update_policy": {

@@ -156,13 +156,13 @@
     },
     {
       "id": "PARITY-007",
-      "status": "ready",
+      "status": "in_progress",
       "requires": [
         "PARITY-005",
         "PARITY-006"
       ],
       "verification": "pending",
-      "branch": null,
+      "branch": "codex/parity-007",
       "commit": null,
       "evidence": []
     }

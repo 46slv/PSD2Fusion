@@ -1,0 +1,120 @@
+{
+  "schema": "psd2fusion-parity-007-queue.v1",
+  "task": "PARITY-007",
+  "goal": "Independent closeout verification from canonical main; fresh verdict before program terminal state.",
+  "coordinator_only_writes": true,
+  "items": [
+    {
+      "id": "P7-00",
+      "lane": "COORD",
+      "parallel_group": null,
+      "depends_on": [],
+      "program_item": "C06",
+      "action": "Clean verification environment/worktree from exact canonical main; record HEAD/version inventory."
+    },
+    {
+      "id": "P7-01",
+      "lane": "A_AUDIT",
+      "parallel_group": "P7_STATIC_A",
+      "depends_on": [
+        "P7-00"
+      ],
+      "program_item": "C07",
+      "action": "Audit P1-P6 state/evidence integrity, reachability, contracts, privacy, unsupported/rejected semantics."
+    },
+    {
+      "id": "P7-02",
+      "lane": "C_REFEREE",
+      "parallel_group": "P7_STATIC_A",
+      "depends_on": [
+        "P7-00"
+      ],
+      "program_item": "C08",
+      "action": "Full offline regression: check.ps1, tests, parser/evaluation/capability/clipping/group/LD/clbl-failclosed/false-PASS coverage."
+    },
+    {
+      "id": "P7-03",
+      "lane": "COORD",
+      "parallel_group": null,
+      "depends_on": [
+        "P7-01",
+        "P7-02"
+      ],
+      "program_item": "C09",
+      "action": "Fresh regen real PSD to ignored temp path; record hashes/counts/warnings/comp hash/float32/forbidden-tool audit."
+    },
+    {
+      "id": "P7-04",
+      "lane": "B_HOST",
+      "parallel_group": "P7_DYNAMIC_B",
+      "depends_on": [
+        "P7-03"
+      ],
+      "program_item": "C10",
+      "action": "Final fresh actual Fusion proof in dedicated project PSD2Fusion via disposable comp; full host evidence."
+    },
+    {
+      "id": "P7-05",
+      "lane": "B_HOST",
+      "parallel_group": null,
+      "depends_on": [
+        "P7-04"
+      ],
+      "program_item": "C11",
+      "action": "Strict threshold-0 final compare; record metrics; classify material vs quantization residual."
+    },
+    {
+      "id": "P7-06",
+      "lane": "C_REFEREE",
+      "parallel_group": "P7_DYNAMIC_B",
+      "depends_on": [
+        "P7-03"
+      ],
+      "program_item": "C12",
+      "action": "Independent final semantic/capability audit incl fail-closed, boundaries, float32."
+    },
+    {
+      "id": "P7-07",
+      "lane": "C_REFEREE",
+      "parallel_group": null,
+      "depends_on": [
+        "P7-01",
+        "P7-02",
+        "P7-05",
+        "P7-06"
+      ],
+      "program_item": "C13",
+      "action": "False-PASS, privacy and complexity audit."
+    },
+    {
+      "id": "P7-08",
+      "lane": "V_FRESH",
+      "parallel_group": null,
+      "depends_on": [
+        "P7-07"
+      ],
+      "program_item": "C14",
+      "action": "Fresh independent verifier returns exactly PASS/FAIL/BLOCKED; never repairs own candidate."
+    },
+    {
+      "id": "P7-09",
+      "lane": "COORD",
+      "parallel_group": null,
+      "depends_on": [
+        "P7-08"
+      ],
+      "program_item": "C15",
+      "action": "Conditional correction loop for non-PASS verdicts; new fresh verifier after each bounded correction."
+    },
+    {
+      "id": "P7-10",
+      "lane": "COORD",
+      "parallel_group": null,
+      "depends_on": [
+        "P7-08"
+      ],
+      "program_item": "C16/C17",
+      "action": "Legal terminal state on branch; publish and remote readback."
+    }
+  ]
+}
