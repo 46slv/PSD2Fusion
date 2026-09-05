@@ -67,6 +67,20 @@ class _SequenceResult:
     backdrop_consumer: Optional[_Source] = None
 
 
+@dataclass
+class _LayoutContext:
+    """One Flow layout cursor.
+
+    Each GroupOperator gets an independent local context so inner tools use
+    compact local coordinates. The outer cursor is preserved on the stack and
+    restored on group exit. ``depth_base`` makes inner depth offsets relative
+    to the group root instead of accumulating the absolute document depth.
+    """
+
+    x: float = 0.0
+    depth_base: int = 0
+
+
 def _quote(value: object) -> str:
     text = str(value)
     return '"' + text.replace("\\", "\\\\").replace('"', '\\"').replace("\r", "\\r").replace("\n", "\\n") + '"'
@@ -462,7 +476,7 @@ class _Compiler:
         self.group_count = 0
         self.clip_count = 0
         self.blend_modes: set[str] = set()
-        self._x = 0.0
+        self._layout_stack: List[_LayoutContext] = [_LayoutContext(x=0.0, depth_base=0)]
         self._root_background_name: Optional[str] = None
         # Per-member rows keep the fixed-matte path readable in Flow without
         # changing the deterministic PSD evaluation order.
@@ -506,9 +520,29 @@ class _Compiler:
         self.node_count += 1
         return candidate
 
+    @property
+    def _x(self) -> float:
+        return self._layout_stack[-1].x
+
+    @_x.setter
+    def _x(self, value: float) -> None:
+        self._layout_stack[-1].x = float(value)
+
+    def _push_layout(self, depth_base: int) -> None:
+        self._layout_stack.append(_LayoutContext(x=0.0, depth_base=depth_base))
+
+    def _pop_layout(self) -> None:
+        if len(self._layout_stack) <= 1:
+            raise ValueError("layout stack underflow: cannot pop the root context")
+        self._layout_stack.pop()
+
     def position(self, row: int = 0, depth: int = 0) -> Tuple[float, float]:
-        self._x += 180.0
-        return (self._x + depth * 40.0, float(row) * 110.0)
+        ctx = self._layout_stack[-1]
+        ctx.x += 180.0
+        relative = depth - ctx.depth_base
+        if relative < 0:
+            relative = 0
+        return (ctx.x + relative * 40.0, float(row) * 110.0)
 
     def _mode_id(self, mode: str) -> str:
         record = capability_for_blend(mode)
@@ -610,13 +644,17 @@ class _Compiler:
             inner_tools: List[str] = []
             previous_tools = self._current_tools
             self._current_tools = inner_tools
-            nested = self.sequence(
-                layer.children,
-                backdrop,
-                depth + 1,
-                inner_scope,
-            )
-            self._current_tools = previous_tools
+            self._push_layout(depth + 1)
+            try:
+                nested = self.sequence(
+                    layer.children,
+                    backdrop,
+                    depth + 1,
+                    inner_scope,
+                )
+            finally:
+                self._pop_layout()
+                self._current_tools = previous_tools
             input_target = nested.backdrop_consumer
             render_source = nested.output
             gx, gy = self.position(2, depth)
@@ -663,19 +701,23 @@ class _Compiler:
         inner_tools: List[str] = []
         previous_tools = self._current_tools
         self._current_tools = inner_tools
-        bx, by = self.position(0, depth + 1)
-        inner_tools.append(
-            _background(
-                inner_bg_name,
-                self.doc.width,
-                self.doc.height,
-                "Transparent canvas for PSD group: %s" % layer.name,
-                bx,
-                by,
+        self._push_layout(depth + 1)
+        try:
+            bx, by = self.position(0, depth + 1)
+            inner_tools.append(
+                _background(
+                    inner_bg_name,
+                    self.doc.width,
+                    self.doc.height,
+                    "Transparent canvas for PSD group: %s" % layer.name,
+                    bx,
+                    by,
+                )
             )
-        )
-        nested = self.sequence(layer.children, _Source(inner_bg_name), depth + 1, inner_scope)
-        self._current_tools = previous_tools
+            nested = self.sequence(layer.children, _Source(inner_bg_name), depth + 1, inner_scope)
+        finally:
+            self._pop_layout()
+            self._current_tools = previous_tools
         render_source = nested.output
         self.group_count += 1
         gx, gy = self.position(0, depth)
