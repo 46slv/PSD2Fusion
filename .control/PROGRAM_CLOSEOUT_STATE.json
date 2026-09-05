@@ -5,7 +5,7 @@
   "task": "PROGRAM_CLOSEOUT",
   "phase": "P6_CLOSE",
   "active_items": [
-    "C17"
+    "C18"
   ],
   "completed_items": [
     "C00",
@@ -23,7 +23,8 @@
     "C12",
     "C13",
     "C14",
-    "C16"
+    "C16",
+    "C17"
   ],
   "blocked_items": [],
   "active_stop_code": null,
@@ -71,7 +72,8 @@
     "c15": "skipped (C14 PASS)",
     "p7_terminal": "awaiting_verification + verification pass (validator-legal; P7-done literal illegal per active-task rule)",
     "c16_evidence": ".control/evidence/PARITY-007/20260905-p707-terminal/summary.json",
-    "c16_checks": "validate ok; check.ps1 108/108"
+    "c16_checks": "validate ok; check.ps1 108/108",
+    "c17_readback": "branch terminal readable: P6 done/pass P7 awaiting_verification/pass program done"
   },
   "orchestration": {
     "coordinator": {
@@ -108,11 +110,9 @@
     "parallelism_rule": "Use queue.parallel_group when available; if parallel workers are unavailable, execute lanes sequentially in fresh independent contexts without stopping."
   },
   "last_checkpoint": {
-    "kind": "c16-done",
-    "note": "Branch terminal valid. Next C17 publish/readback then C18 final promotion.",
-    "evidence": [
-      ".control/evidence/PARITY-007/20260905-p707-terminal/summary.json"
-    ]
+    "kind": "c17-done",
+    "note": "Branch terminal published and read back. Next C18 final promotion under standing authority.",
+    "evidence": []
   },
   "update_policy": {
     "when": [
