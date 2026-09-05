@@ -5,8 +5,7 @@
   "task": "PROGRAM_CLOSEOUT",
   "phase": "P6_CLOSE",
   "active_items": [
-    "C07",
-    "C08"
+    "C09"
   ],
   "completed_items": [
     "C00",
@@ -15,7 +14,9 @@
     "C03",
     "C04",
     "C05",
-    "C06"
+    "C06",
+    "C07",
+    "C08"
   ],
   "blocked_items": [],
   "active_stop_code": null,
@@ -49,7 +50,9 @@
     "c04_guard": "PASS on canonical main",
     "parity007_branch": "codex/parity-007 from 4032e0e",
     "p7_clean_worktree": "D:/Documents/PSD2Fusion-verify-20260905@4032e0e clean",
-    "c06_evidence": ".control/evidence/PARITY-007/20260905-p700-cleanenv/summary.json"
+    "c06_evidence": ".control/evidence/PARITY-007/20260905-p700-cleanenv/summary.json",
+    "c07_c08_evidence": ".control/evidence/PARITY-007/20260905-p701-static/summary.json",
+    "static_group": "PASS"
   },
   "orchestration": {
     "coordinator": {
@@ -84,10 +87,10 @@
     "parallelism_rule": "Use queue.parallel_group when available; if parallel workers are unavailable, execute lanes sequentially in fresh independent contexts without stopping."
   },
   "last_checkpoint": {
-    "kind": "c06-done",
-    "note": "Clean worktree at canonical main; C07+C08 static group starts (sequential lane emulation).",
+    "kind": "c07-c08-done",
+    "note": "Static group PASS: proof chain intact, privacy clean, offline 108/108 in clean env.",
     "evidence": [
-      ".control/evidence/PARITY-007/20260905-p700-cleanenv/summary.json"
+      ".control/evidence/PARITY-007/20260905-p701-static/summary.json"
     ]
   },
   "update_policy": {

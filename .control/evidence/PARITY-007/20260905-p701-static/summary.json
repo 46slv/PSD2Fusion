@@ -1,0 +1,15 @@
+{
+  "schema": "psd2fusion-parity-007.p701-static.v1",
+  "c07": {
+    "commits_reachable": "6/6",
+    "evidence_missing": "none",
+    "tracked_binaries": "none in 343 files",
+    "transitions": "P1-P6 done/pass, P7 in_progress, requires chains ok"
+  },
+  "c08": {
+    "env": "clean worktree @4032e0e",
+    "check_ps1": "108/108 PASS",
+    "compile": "ok"
+  },
+  "verdict": "C07 done, C08 done"
+}
