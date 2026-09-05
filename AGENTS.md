@@ -33,6 +33,8 @@ When `active_task_id` is `PARITY-005`, also read `.control/PARITY-005_RUNBOOK.md
 
 When `active_task_id` is `PARITY-006`, also read `.control/PARITY-006_RUNBOOK.md` and `.control/PARITY-006_QUEUE.json`. Treat the runbook as the execution/stop/promotion contract and the queue as the machine-readable work order. Continue through ready reversible items without asking for per-step confirmation; stop only for a declared stop condition, a semantic decision checkpoint, a verifier boundary, or an authority boundary.
 
+When program closeout files exist on the active task branch, also read `.control/PROGRAM_CLOSEOUT_RUNBOOK.md`, `.control/PROGRAM_CLOSEOUT_QUEUE.json`, and `.control/PROGRAM_CLOSEOUT_STATE.json`. For Muse 1.3 long runs, these define the parent roadmap, orchestration lanes, recovery playbook, and mutable execution position from PARITY-006 closure through PARITY-007/program completion. Reconcile the mutable state ledger with fresh Git/GitHub before using it. Do not stop at ordinary recoverable failures when the program runbook defines a next route.
+
 Read `docs/AGENT_OPERATIONS.md` only when delegation or a persistent loop materially helps. Do not load all research files by default.
 
 ## Protected invariants
@@ -102,6 +104,9 @@ In-scope reversible repository edits and non-destructive validation are allowed.
 - active PARITY-005 machine-readable work queue -> `.control/PARITY-005_QUEUE.json`;
 - active PARITY-006 execution/stop/promotion contract -> `.control/PARITY-006_RUNBOOK.md`;
 - active PARITY-006 machine-readable work queue -> `.control/PARITY-006_QUEUE.json`;
+- program closeout parent roadmap -> `.control/PROGRAM_CLOSEOUT_RUNBOOK.md`;
+- program closeout machine work order -> `.control/PROGRAM_CLOSEOUT_QUEUE.json`;
+- program closeout mutable current position/orchestration ledger -> `.control/PROGRAM_CLOSEOUT_STATE.json`;
 - historical FIRST_USABLE architecture -> root `ARCHITECTURE.md`;
 - PSD/file-format evidence -> `docs/research/`;
 - repeatable procedure -> tests/scripts/Harness;
