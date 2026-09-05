@@ -1,0 +1,9 @@
+{
+  "schema": "psd2fusion-parity-007.p700-cleanenv.v1",
+  "worktree": "D:/Documents/PSD2Fusion-verify-20260905",
+  "head": "4032e0e082df77ed6509c1b44398e60f9682375e",
+  "clean": true,
+  "python": "3.12.10",
+  "platform": "Windows-11-10.0.26200-SP0",
+  "pillow": "12.3.0"
+}
