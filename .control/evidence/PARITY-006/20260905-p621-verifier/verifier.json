@@ -1,0 +1,26 @@
+{
+  "schema": "psd2fusion-parity-006.verifier.v1",
+  "task": "PARITY-006",
+  "verdict": "PASS",
+  "role": "fresh verifier (independent of worker turn; conversation claims not used as truth)",
+  "evaluated_HEAD": "29c18b4b4c6ed4f9c8f3cc1a9c547e5bb23a6c06",
+  "remote": "fresh ls-remote + gh api confirm codex/parity-006 == 29c18b4 after fast-forward publish of previously unlanded worker commits (remote tip was strict ancestor 88e2e04); explicit refspec fetch; local == remote",
+  "checks_reproduced": {
+    "check_ps1": "ok true, 108/108 PASS fresh",
+    "state_schema": "validate_control_state ok; PARITY-006 awaiting_verification/pending; PARITY-007 blocked",
+    "branch_diff": "11 files vs main, all .control/AGENTS, zero production files",
+    "post_render_drift": "88e2e04..29c18b4 is evidence + state only",
+    "inputs": "psd 574d8a65 / ref 91ff8dae fresh; 2304x1296; PSD/ref share ICC 2b3aa164; read-only preserved",
+    "artifact": "d8d94041 fresh from disk; 2304x1296 RGBA; byte-identical to integrated",
+    "metrics_recomputed": "max3 mean0.3621194889188957 p991 alpha0 gt32 0 gt8 0 eq2 3437 eq3 5; strict FAIL retained",
+    "fitting_nodes": "Grade/Blur/Resize/Gamut/OCIO all 0 in fresh comp",
+    "largest_ge2": "704 px bbox [1862,568,1875,680] max delta 2 -> delta2-only",
+    "endpoints": "Fusion+Resolve healthy, project PSD2Fusion, comp 1 tool after all runs"
+  },
+  "host_verdict": "qualified: 21.0.3.7, exact PSD2Fusion project API-gated in all 3 runs, Saver PreDivide=1, RESULT=true 39s, same PID before/after, RESTORED 1->1, no save; incident and success kept separate; crash run never cited as PASS",
+  "residual_classification": "no material-scale residual; remainder is non-blocking quantization class per acceptance",
+  "s_host": "CLOSED as blocker: dedicated-project route 3/3 fresh successes with deterministic output; incident retained as record",
+  "worker_correction": "closeout incident_differential overclaims COMPN-range as the crash discriminator: v1 lua set the same 0-0 range and the old comp already read 0-0. True discriminators are clean 1-tool comp plus fresh dedicated project; original crash mechanism stays unisolated. Verdict unaffected.",
+  "false_pass_risks": "checked: no hidden material region, no threshold relaxation, no fitting, no production change, no repeated P4/P5 exploration",
+  "permitted_transition": "branch-level verification=pass with status awaiting_verification (canonical done needs main-merge authority); publish + readback + guard; no main merge; PARITY-007 not started"
+}

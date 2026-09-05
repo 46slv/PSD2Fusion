@@ -133,7 +133,7 @@
       "requires": [
         "PARITY-004"
       ],
-      "verification": "pending",
+      "verification": "pass",
       "branch": "codex/parity-006",
       "commit": "2bd99781fdf98e15b27d734549f39b36b2889840",
       "evidence": [
@@ -142,7 +142,8 @@
         ".control/evidence/PARITY-006/20260905-p602r-fresh-render/summary.json",
         ".control/evidence/PARITY-006/20260905-p603-compare/summary.json",
         ".control/evidence/PARITY-006/20260905-p604-inventory/summary.json",
-        ".control/evidence/PARITY-006/20260905-p605-closeout/summary.json"
+        ".control/evidence/PARITY-006/20260905-p605-closeout/summary.json",
+        ".control/evidence/PARITY-006/20260905-p621-verifier/verifier.json"
       ]
     },
     {
