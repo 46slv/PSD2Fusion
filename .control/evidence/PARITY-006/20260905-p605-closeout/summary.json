@@ -1,0 +1,25 @@
+{
+  "schema": "psd2fusion-parity-006.p605-closeout.v1",
+  "task": "PARITY-006",
+  "run_id": "20260905-p605-closeout",
+  "queue_ids_completed": ["P6-05", "P6-20"],
+  "confound_audit": {
+    "icc": "PSD and reference share ICC sha 2b3aa164 (3144 bytes); candidate has none -> comparator unverified, no global shift (mean 0.36, max 3); non-blocking per acceptance",
+    "premult": "float32 path preserved (PostMultiply=0 + ChangeDepth + AlphaMultiply); alpha exact; comparator edge_band 0 -> no fringe",
+    "transparent_rgb": "both images all-opaque (alpha 255 everywhere) -> confound impossible",
+    "crop_canvas": "dimensions exact, alpha exact -> no canvas confound",
+    "host_export_noise": "fresh render byte-identical to integrated (d8d94041) across sessions -> deterministic systematic quantization, no random noise",
+    "false_pass": "strict threshold-0 FAIL retained; no relaxation; no Grade/Blur/Resize/Flatten nodes in fresh comp; no reference fitting"
+  },
+  "decision": "no material-scale residual -> quantization not chased -> closure path per user instruction (no repair, +-1LSB repair forbidden)",
+  "worker_closeout": {
+    "branch": "codex/parity-006",
+    "changed_files": "control-plane (RUNBOOK/QUEUE/AGENTS/current.json/HOST_PROJECT.md fast-forward) + 6 evidence summaries; zero production files",
+    "commands": "check.ps1 ok 108/108; regen 136/34/23/1109 warnings 0; fuscript sanity/smoke/full renders; parity.py inspect+compare threshold 0; numpy residual census",
+    "host": "Resolve Studio 21.0.3.7 PID 72716, project PSD2Fusion, Saver PreDivide=1, render RESULT=true 39s, artifact d8d94041, RESTORED true, no save",
+    "metrics": "rgb max3 mean0.362 p99 1; alpha 0; gt32 0; eq2 3437 eq3 5 isolated; strict FAIL by count retained",
+    "blockers": "none open; earlier S-HOST superseded by fresh PASS (incident record retained)"
+  },
+  "verifier_start": "branch codex/parity-006 at closeout commit; rerun check.ps1, regen Domino, re-hash inputs (574d8a65/91ff8dae), audit evidence linkage and false-PASS paths, confirm no production diff vs main",
+  "submission": "awaiting_verification; PARITY-007 not started"
+}

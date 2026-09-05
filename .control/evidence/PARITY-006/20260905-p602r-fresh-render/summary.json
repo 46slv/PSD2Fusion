@@ -1,0 +1,43 @@
+{
+  "schema": "psd2fusion-parity-006.p602r-fresh-render.v1",
+  "task": "PARITY-006",
+  "run_id": "20260905-p602r-fresh-render",
+  "queue_ids_completed": ["P6-02"],
+  "branch": "codex/parity-006",
+  "candidate_HEAD": "88e2e04",
+  "production_note": "eb7d702..88e2e04 is control files only; render comp from latest production candidate (1109 tools, sha ae02bd2c)",
+  "host_contract": ".control/PARITY-006_HOST_PROJECT.md (exact project PSD2Fusion; old project forbidden)",
+  "gates": {
+    "sanity": "Background 64x64 Saver PreDivide=1: RESULT=true, artifact 1920x1080 RGBA (frame-format), RESTORED 1->1",
+    "smoke": "fresh p4_02 3-member fixture (52 tools, structural PASS, final MergeR_p402base01) Saver PreDivide=1: RESULT=true 1s, artifact 8x8 RGBA sha 4888f4ea, RESTORED 1->1 DELETED=53"
+  },
+  "full_render": {
+    "project": "PSD2Fusion (API-verified exact name before mutation)",
+    "resolve": "Studio 21.0.3.7, PID 72716 before and after",
+    "comp_identity": "current comp 1 tool before and after",
+    "paste_ok": true,
+    "render_source": "pasted MediaOut1 connected output",
+    "saver_predivide": 1,
+    "render_call": true,
+    "render_result": true,
+    "render_seconds": 39,
+    "artifact": ".local/p6-real-render-20260905/PSD2Fusion.host0000.png (sequence variant, qualified pattern)",
+    "artifact_bytes": 7926961,
+    "artifact_sha256": "d8d940415ac25804cde1efcc15189bf4e206849a1496c75301fa88f7b60ba984",
+    "artifact_dims": [2304, 1296],
+    "artifact_mode": "RGBA",
+    "byte_identical_to_integrated": true,
+    "deleted": 1110,
+    "delete_failures": 0,
+    "restored": true,
+    "project_saved": false,
+    "endpoint_health": "Fusion+Resolve endpoints responding before and after"
+  },
+  "incident_differential": "earlier same-day crash lacked COMPN range setup (fresh comp range 120-149, v1 rendered frame 0 against unset range, 125s nil, process exit); v2 sets Global/Render 0-0 per qualified probe and succeeds in 39s",
+  "inputs": {
+    "psd_sha256": "574d8a6511b2aabe744835d81ed76c8fc8ffd0c9c5678f3359e8eda10f9174db",
+    "reference_sha256": "91ff8daef941b3d9052497190fdc8aa6f4d56ba524c8d912cf011b6818535f54",
+    "read_only_preserved": true
+  },
+  "stop_code": "none"
+}
