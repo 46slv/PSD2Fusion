@@ -60,11 +60,21 @@ def _connection(block, field):
 
 
 def _position(block):
-    match = re.search(
-        r"ViewInfo = (?:OperatorInfo|GroupInfo|StickyNoteInfo) "
-        r"\{ Pos = \{ ([^,]+), ([^}]+) \} \}",
+    # GroupInfo blocks are multi-line since the native viewport contract
+    # (Scale/Offset/PipeStyle/Direction/Flags) is emitted; scan the balanced
+    # ViewInfo block instead of assuming Pos sits on one line.
+    header = re.search(
+        r"ViewInfo = (?:OperatorInfo|GroupInfo|StickyNoteInfo) \{",
         block,
     )
+    if not header:
+        return None
+    try:
+        end = _balanced(block, header.end() - 1)
+    except ValueError:
+        return None
+    view = block[header.start():end]
+    match = re.search(r"Pos = \{ ([^,]+), ([^}]+) \}", view)
     if not match:
         return None
     return (float(match.group(1)), float(match.group(2)))
