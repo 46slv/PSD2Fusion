@@ -1,0 +1,8 @@
+{
+  "schema": "psd2fusion-parity-007.p707-terminal.v1",
+  "conflict": "QUEUE C16 literal P7 done/pass vs validator active-task-cannot-be-done (all 7 done leaves no legal active id)",
+  "route": "playbook schema-mismatch route: choose legal representation, do not invent schema, do not weaken gate",
+  "representation": "P7 awaiting_verification + verification pass (P6 branch precedent); P1-P6 done/pass; program active pending C18-C20 canonical proof",
+  "program_done_declared_at": "C20 only",
+  "verdict": "C16 done (branch-level terminal valid)"
+}

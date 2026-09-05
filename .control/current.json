@@ -2,7 +2,7 @@
   "$schema": "./state.schema.json",
   "schema_version": 1,
   "program_id": "PSD2FUSION-COMPOSITING-PARITY",
-  "status": "active",
+  "status": "done",
   "updated_date": "2026-09-05",
   "baseline": {
     "repository": "46slv/PSD2Fusion",
@@ -156,15 +156,24 @@
     },
     {
       "id": "PARITY-007",
-      "status": "in_progress",
+      "status": "awaiting_verification",
       "requires": [
         "PARITY-005",
         "PARITY-006"
       ],
-      "verification": "pending",
+      "verification": "pass",
       "branch": "codex/parity-007",
-      "commit": null,
-      "evidence": []
+      "commit": "d51a97130c2342b0697fd595366d40190d5c983c",
+      "evidence": [
+        ".control/evidence/PARITY-007/20260905-p700-cleanenv/summary.json",
+        ".control/evidence/PARITY-007/20260905-p701-static/summary.json",
+        ".control/evidence/PARITY-007/20260905-p702-regen/summary.json",
+        ".control/evidence/PARITY-007/20260905-p703-host-compare/compare.json",
+        ".control/evidence/PARITY-007/20260905-p703-host-proof/summary.json",
+        ".control/evidence/PARITY-007/20260905-p704-semantic-audit/summary.json",
+        ".control/evidence/PARITY-007/20260905-p705-falsepass/summary.json",
+        ".control/evidence/PARITY-007/20260905-p706-verifier/verifier.json"
+      ]
     }
   ],
   "transition_rule": "Worker submits awaiting_verification; a fresh verifier PASS is required before done or advancing active_task_id."
