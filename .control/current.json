@@ -163,7 +163,7 @@
       ],
       "verification": "pass",
       "branch": "codex/parity-007",
-      "commit": "d51a97130c2342b0697fd595366d40190d5c983c",
+      "commit": "d51a971ac7e61aea7bd08f4f672c1810f2d361d2",
       "evidence": [
         ".control/evidence/PARITY-007/20260905-p700-cleanenv/summary.json",
         ".control/evidence/PARITY-007/20260905-p701-static/summary.json",
