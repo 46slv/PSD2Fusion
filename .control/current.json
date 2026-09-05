@@ -129,14 +129,21 @@
     },
     {
       "id": "PARITY-006",
-      "status": "in_progress",
+      "status": "awaiting_verification",
       "requires": [
         "PARITY-004"
       ],
       "verification": "pending",
       "branch": "codex/parity-006",
-      "commit": null,
-      "evidence": []
+      "commit": "2bd99781fdf98e15b27d734549f39b36b2889840",
+      "evidence": [
+        ".control/evidence/PARITY-006/20260905-p600-p601-baseline/summary.json",
+        ".control/evidence/PARITY-006/20260905-p602-host-incident/summary.json",
+        ".control/evidence/PARITY-006/20260905-p602r-fresh-render/summary.json",
+        ".control/evidence/PARITY-006/20260905-p603-compare/summary.json",
+        ".control/evidence/PARITY-006/20260905-p604-inventory/summary.json",
+        ".control/evidence/PARITY-006/20260905-p605-closeout/summary.json"
+      ]
     },
     {
       "id": "PARITY-007",
