@@ -1,0 +1,61 @@
+{
+  "schema": "psd2fusion-program-closeout-state.v1",
+  "queue": ".control/PROGRAM_CLOSEOUT_QUEUE.json",
+  "runbook": ".control/PROGRAM_CLOSEOUT_RUNBOOK.md",
+  "task": "PROGRAM_CLOSEOUT",
+  "phase": "P6_CLOSE",
+  "active_items": ["C00"],
+  "completed_items": [],
+  "blocked_items": [],
+  "active_stop_code": null,
+  "reconcile_with_live_git_before_use": true,
+  "last_known": {
+    "canonical_main_at_closeout_start": "fe98c7abb4ff5627ccee6126781b228ccd17a70f",
+    "p6_worker_closeout_commit": "29c18b4b4c6ed4f9c8f3cc1a9c547e5bb23a6c06",
+    "p6_worker_state": "awaiting_verification",
+    "p6_fresh_verifier_verdict": "PASS",
+    "p6_material_residual": "none; remaining residual classified quantization-scale under active acceptance",
+    "p6_host_project": "PSD2Fusion",
+    "p7_started": false
+  },
+  "orchestration": {
+    "coordinator": {
+      "lane": "COORD",
+      "owner": null,
+      "status": "ready"
+    },
+    "workers": {
+      "A_AUDIT": {"owner": null, "status": "idle", "assigned_items": []},
+      "B_HOST": {"owner": null, "status": "idle", "assigned_items": []},
+      "C_REFEREE": {"owner": null, "status": "idle", "assigned_items": []},
+      "V_FRESH": {"owner": null, "status": "idle", "assigned_items": []}
+    },
+    "shared_write_rule": "Coordinator is the only shared production/control writer unless one disjoint path set is explicitly delegated to one worker.",
+    "fresh_verifier_rule": "Verifier uses a fresh context and never repairs its own candidate."
+  },
+  "last_checkpoint": {
+    "kind": "control_plane_hardening",
+    "note": "Program closeout queue/runbook hardened for Muse 1.3 orchestration. C00 must fresh-read current branch/remote because control-only commits were added after the P6 verifier candidate.",
+    "evidence": [
+      ".control/evidence/PARITY-006/20260905-p621-verifier/verifier.json",
+      ".control/evidence/PARITY-006/20260905-p622-guard/summary.json"
+    ]
+  },
+  "update_policy": {
+    "when": [
+      "after every phase boundary",
+      "after any material route change",
+      "before discarding a long context",
+      "before and after verifier boundary",
+      "before requesting human authority"
+    ],
+    "fields_required": [
+      "phase",
+      "active_items",
+      "completed_items",
+      "blocked_items",
+      "active_stop_code",
+      "last known exact HEADs/evidence"
+    ]
+  }
+}
