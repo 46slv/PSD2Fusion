@@ -1,0 +1,12 @@
+{
+  "schema": "psd2fusion-parity-007.p705-falsepass.v1",
+  "stale_artifact": "all outputs pre-deleted before runs; P7 proof uses fresh-run artifacts only",
+  "dims_alpha": "2304x1296 RGBA both; alpha max 0; profile_status unverified explicit, not normalized",
+  "outlier": "gt32 0; no coherent >8 region; diffuse quantization only",
+  "threshold": "0 reporting-only; strict FAIL retained",
+  "oracle_sut": "oracle=PSD parse/manifest independent of SUT Fusion render; reference read-only external",
+  "load_vs_render": "7.9MB Saver render output compared, not load success",
+  "privacy": "no binaries tracked in 347 files; all host/regen outputs gitignored",
+  "legacy_paths": "final claim via check.ps1 + parity.py only; historical scripts not wired",
+  "verdict": "C13 done"
+}

@@ -1,0 +1,104 @@
+{
+  "candidate": ".local/p7-final-render-20260905/PSD2Fusion.p7final0000.png",
+  "reference": "D:\\Downloads\\20260812.png",
+  "candidate_dimensions": [
+    2304,
+    1296
+  ],
+  "reference_dimensions": [
+    2304,
+    1296
+  ],
+  "candidate_channels": 4,
+  "reference_channels": 4,
+  "threshold": 0.0,
+  "profile_status": "unverified",
+  "status": "FAIL",
+  "strict_rgba_status": "FAIL",
+  "hard_failure": null,
+  "reason": "pixel_mismatch; threshold is reporting-only",
+  "threshold_policy": "strict; threshold reports exceeding pixels but cannot relax nonzero pixel deltas",
+  "mismatch_count": {
+    "rgba": 1077836,
+    "rgb": 1077836,
+    "alpha": 0
+  },
+  "first_mismatch": {
+    "rgba": [
+      109,
+      0
+    ],
+    "rgb": [
+      109,
+      0
+    ],
+    "alpha": null
+  },
+  "outlier_guard": {
+    "threshold": 32,
+    "count": 0
+  },
+  "rgba_error": {
+    "max": 3,
+    "mean": 0.3621194889188957,
+    "p99": 1.0
+  },
+  "rgb_error": {
+    "max": 3,
+    "mean": 0.3621194889188957,
+    "p99": 1.0
+  },
+  "alpha_error": {
+    "max": 0,
+    "mean": 0.0,
+    "p99": 0.0
+  },
+  "threshold_exceeding": {
+    "count": 1077836,
+    "ratio": 0.36096509559327844
+  },
+  "regions": {
+    "edge_band": {
+      "pixel_count": 0,
+      "max": 0,
+      "mean": 0
+    },
+    "opaque": {
+      "max": 3,
+      "mean": 0.3621194889188957
+    },
+    "transparent": {
+      "max": 0,
+      "mean": 0
+    },
+    "transparent_rgb": {
+      "max": 0,
+      "mean": 0
+    }
+  },
+  "difference_bbox": [
+    0,
+    0,
+    2304,
+    1296
+  ],
+  "alpha_facts": {
+    "candidate": {
+      "present": true,
+      "min": 255,
+      "max": 255,
+      "all_opaque": true
+    },
+    "reference": {
+      "present": true,
+      "min": 255,
+      "max": 255,
+      "all_opaque": true
+    }
+  },
+  "artifacts": {
+    "absolute": ".local\\p7-compare-20260905\\diff_absolute.png",
+    "signed": ".local\\p7-compare-20260905\\diff_signed.png",
+    "alpha": ".local\\p7-compare-20260905\\diff_alpha.png"
+  }
+}
