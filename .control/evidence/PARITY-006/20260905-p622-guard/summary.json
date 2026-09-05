@@ -1,0 +1,11 @@
+{
+  "schema": "psd2fusion-parity-006.p622-guard.v1",
+  "task": "PARITY-006",
+  "run_id": "20260905-p622-guard",
+  "guard": "python scripts/remote_completion_guard.py -TaskId PARITY-006 -ExpectedActiveTaskId PARITY-006 -ExpectedStatus awaiting_verification -ExpectedVerification pass",
+  "result": "FAIL (expected pre-merge)",
+  "errors": ["state_reachable", "state_matches", "remote_expectations"],
+  "remote": {"branch": "49ebbc518b9f349dab325b25d7495f445b41a236", "candidate": "2bd99781fdf98e15b27d734549f39b36b2889840", "main": "fe98c7abb4ff5627ccee6126781b228ccd17a70f"},
+  "meaning": "branch-level verification pass is published; canonical main completion requires explicit merge authority (AGENTS.md authority boundary)",
+  "stop_code": "S-AUTHORITY for main merge / canonical done"
+}
