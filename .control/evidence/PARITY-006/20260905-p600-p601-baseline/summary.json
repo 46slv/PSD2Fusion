@@ -1,0 +1,37 @@
+{
+  "schema": "psd2fusion-parity-006.p600-p601-baseline.v1",
+  "task": "PARITY-006",
+  "run_id": "20260905-p600-p601-baseline",
+  "branch": "codex/parity-006",
+  "base_main": "fe98c7abb4ff5627ccee6126781b228ccd17a70f",
+  "control_commit": "467d848",
+  "queue_ids_completed": ["P6-00", "P6-01"],
+  "inputs": {
+    "psd_sha256": "574d8a6511b2aabe744835d81ed76c8fc8ffd0c9c5678f3359e8eda10f9174db",
+    "reference_sha256": "91ff8daef941b3d9052497190fdc8aa6f4d56ba524c8d912cf011b6818535f54",
+    "read_only_preserved": true
+  },
+  "regen": {
+    "output": ".local/p6-baseline-20260905",
+    "layers": 136,
+    "groups": 34,
+    "clipping_chains": 23,
+    "tool_count": 1109,
+    "merge_count": 196,
+    "warnings": 0,
+    "dimensions": [2304, 1296],
+    "comp_bytes": 746578,
+    "comp_sha256": "ae02bd2cca8090feb78c815fdb186fb174280e864f065d5fa5a45a0eca04128b",
+    "note": "size differs from P4-09 637396 only via output-dir absolute asset paths; structure counts identical to PARITY-004 integrated claim"
+  },
+  "offline_checks": {
+    "check_ps1": "ok true, 108/108 tests PASS",
+    "forbidden_nodes": "Grade 0, Blur 0 in fresh comp"
+  },
+  "host": {
+    "resolve_exe": "running PID 89784",
+    "actual_render": "not yet acquired; P6-02 ready, paste-route care required for live session"
+  },
+  "stop_code": "none",
+  "next_ready": ["P6-02", "P6-03", "P6-04", "P6-05"]
+}
