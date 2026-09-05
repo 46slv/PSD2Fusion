@@ -16,7 +16,8 @@
     "p6_fresh_verifier_verdict": "PASS",
     "p6_material_residual": "none; remaining residual classified quantization-scale under active acceptance",
     "p6_host_project": "PSD2Fusion",
-    "p7_started": false
+    "p7_started": false,
+    "control_plane_hardened_for_muse_orchestration": true
   },
   "orchestration": {
     "coordinator": {
@@ -31,11 +32,12 @@
       "V_FRESH": {"owner": null, "status": "idle", "assigned_items": []}
     },
     "shared_write_rule": "Coordinator is the only shared production/control writer unless one disjoint path set is explicitly delegated to one worker.",
-    "fresh_verifier_rule": "Verifier uses a fresh context and never repairs its own candidate."
+    "fresh_verifier_rule": "Verifier uses a fresh context and never repairs its own candidate.",
+    "parallelism_rule": "Use queue.parallel_group when available; if parallel workers are unavailable, execute lanes sequentially in fresh independent contexts without stopping."
   },
   "last_checkpoint": {
-    "kind": "control_plane_hardening",
-    "note": "Program closeout queue/runbook hardened for Muse 1.3 orchestration. C00 must fresh-read current branch/remote because control-only commits were added after the P6 verifier candidate.",
+    "kind": "muse_orchestration_hardening",
+    "note": "Program runbook/queue now include explicit Muse coordinator/worker lanes, parallel groups, retry budgets, and if-this-then-that recovery routes. C00 must fresh-read current branch/remote because control-only commits were added after the P6 verifier candidate.",
     "evidence": [
       ".control/evidence/PARITY-006/20260905-p621-verifier/verifier.json",
       ".control/evidence/PARITY-006/20260905-p622-guard/summary.json"
@@ -55,7 +57,8 @@
       "completed_items",
       "blocked_items",
       "active_stop_code",
-      "last known exact HEADs/evidence"
+      "last known exact HEADs/evidence",
+      "lane ownership/status when orchestration is active"
     ]
   }
 }
