@@ -33,6 +33,42 @@ reads the generated `.comp` settings and pastes that tool set into the Fusion
 Composition that was current when the script started.  The generated `.comp`,
 assets, and manifest remain available as recovery/debug artifacts.
 
+### Running-state UX
+
+After the PSD is selected and any overwrite confirmation has passed, PSD2Fusion
+should display a small visible running-state window before noticeable blocking
+work begins.  The v1 contract is intentionally coarse and truthful:
+
+```text
+PSD2Fusion
+
+処理しています…
+PSDを変換しています…
+```
+
+After bridge conversion/artifact verification and before current-graph
+insertion, the status may change to:
+
+```text
+処理しています…
+Fusionグラフを挿入しています…
+```
+
+The launcher must not invent a percentage or ETA.  Its current Python bridge is
+one blocking process call from Lua, so finer-grained progress is not observable
+unless the bridge later exposes structured progress.  The running-state UI is
+informational only in v1: there is no mid-run Cancel until cooperative bridge
+cancellation plus complete host/artifact rollback are independently proven.
+
+Success closes the running-state UI only after the existing host readback and
+identity/invariant checks have passed, then shows the normal completion dialog.
+Failure closes the running-state UI after any required rollback, then shows the
+existing detailed failure dialog.  The progress layer must not move Resolve
+mutation/Paste onto an unsafe background thread merely to keep the window
+responsive.
+
+Full implementation/acceptance contract: `docs/RESOLVE_PROGRESS_UX.md`.
+
 This differs from `LoadComp` and `TimelineItem.ImportFusionComp(path)`, which
 load or add a separate composition instead of inserting tools into the graph
 currently shown in Resolve's integrated Fusion page.  The launcher verifies
@@ -68,6 +104,10 @@ all tools from the first run remained the same runtime objects after the
 second run; the generated final Merge-to-MediaOut connection was visible and
 Resolve remained responsive.  Existing Group/clipping behavior and the
 pre-existing no-current-Composition guard were unchanged.
+
+The progress-UX feature is a later presentation layer and requires its own real
+host acceptance before being called FIRST_USABLE.  The prior insertion evidence
+does not by itself prove UIManager/Dispatcher rendering or repaint behavior.
 
 ## Known limitations
 
